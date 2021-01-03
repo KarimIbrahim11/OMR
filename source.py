@@ -38,7 +38,7 @@ from skimage.io import imsave
 import argparse
 
 import sys
-
+from skimage.transform import resize
 from skimage.exposure import histogram
 
 from skimage.exposure import histogram
@@ -50,6 +50,8 @@ def showHist(img):
     plt.figure()
     imgHist = histogram(img, nbins=256)
     bar(imgHist[1].astype(np.uint8), imgHist[0], width=0.8, align='center')
+    plt.show()
+
 
 def showHist2(histogramImg):
     plt.figure()
@@ -60,12 +62,9 @@ def read_image(path):
 
 
 def otsu_binarize(gray_img):
-    otsu_threshold = threshold_otsu(gray_img)
-    img = np.copy(gray_img)
-    print(otsu_threshold)
-    img = img > otsu_threshold
-    # img = img > 0.55
-    return img
+    thresh = threshold_otsu(gray_img)
+    binary = gray_img > thresh
+    return binary.astype(int), thresh
 
 
 def show_images(images, titles=None):
@@ -193,6 +192,7 @@ def deskew(image):
     return rotated
 
 
+
 # if filename.lower().endswith('.jpg') or filename.lower().endswith('.png'):
 path = '27_!.jpg'
 img = read_image(path)
@@ -206,4 +206,8 @@ rotated = deskew(gray)
 # show_images([gray, edges],['image','edges'])
 # binImg = binary_closing(binImg)
 # image_lines(gray, thres=90)
-show_images([rotated])
+
+photo = resize(rotated, (256, 256))
+hist,_ = histogram(photo, nbins=256)
+# showHist(hist)
+
