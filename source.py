@@ -22,7 +22,7 @@ rotated = deskew(gray)
 # hist,_ = histogram(photo, nbins=256)
 # showHist(hist)
 bin, _ = otsu_binarize(rotated)
-removeLines(bin)
+rimg = removeLines(bin)
 
 # Remove Staff
 staff_indices = find_stafflines(rotated, 0, 0)
@@ -37,3 +37,37 @@ photo = resize(new_image, (256, 256))
 hist, _ = histogram(photo, nbins=256)
 # showHist(hist)
 
+new_image = new_image.astype(float)
+icut, iicut = 0, 0
+r, c = new_image.shape
+notesList = []
+notFinished = True
+for k in range(2):
+    flag = True
+    for j in range(icut, c):
+        flag = True
+        for i in range(iicut, r):
+            if new_image[i][j] != 0:
+                flag = False
+                break
+        if flag:
+            icut, iicut = j, j+400
+            if icut > 200:
+                break
+        if np.sum(new_image[:][j]) > 500:
+            notFinished = False
+    print("i, j = " + str(icut) + ", " + str(iicut))
+    n1 = new_image[:, icut:iicut]
+    n1 = resize(n1, (256, 256))
+    notesList.append(n1)
+    show_images([n1])
+
+hrimg = np.sum(rimg, 0)
+m = len(hrimg)
+
+
+for i in range(m):
+    if hrimg[i] == 0:
+        rimg[:, i] = 1
+
+show_images([rimg])

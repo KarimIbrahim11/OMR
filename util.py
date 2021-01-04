@@ -162,6 +162,7 @@ def removeLines(bin):
             bin[i, :] = 0
 
     show_images([bin])
+    return bin
 
 def get_references(img):
     # Run length encoding
