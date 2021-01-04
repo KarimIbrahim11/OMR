@@ -1,4 +1,6 @@
+
 import numpy as np
+import skimage
 import skimage.io as io
 
 # Show the figures / plots inside the notebook
@@ -10,6 +12,8 @@ from skimage.feature import canny
 from skimage.filters import threshold_otsu
 from skimage.transform import hough_line, hough_line_peaks
 from skimage.util import random_noise
+from skimage.measure import find_contours
+from skimage.draw import rectangle, rectangle_perimeter
 import numpy as np
 import skimage.io as io
 import matplotlib.pyplot as plt
@@ -32,6 +36,7 @@ from skimage.filters import gaussian, threshold_otsu
 from skimage.feature import canny
 from skimage.transform import probabilistic_hough_line, rotate
 import os
+from statistics import mode
 
 from skimage.io import imsave
 
@@ -215,4 +220,105 @@ def removeLines(bin):
             bin[i, :] = 0
 
     show_images([bin])
+
+def get_references(img):
+    # Run length encoding
+    #     img = binary_dilation(img2,np.ones((3,3)))
+    encoded_img = []
+    encoded_img_color = []
+    # loop on the columns of the img
+    for i in range(img.shape[1]):
+        col = img[:, i]
+        encoded_col = []
+        encoded_col_color = []
+
+        current_color = col[0]
+        current_count = 0
+        # loop on the rows
+        for j in range(img.shape[0]):
+            if current_color == col[j]:
+                current_count += 1
+            else:
+                # appending count and color
+                encoded_col.append(current_count)
+                encoded_col_color.append(current_color)
+
+                current_color = col[j]
+                current_count = 1
+        encoded_col.append(current_count)
+        encoded_col_color.append(current_color)
+
+        encoded_img.extend(encoded_col)
+        encoded_img_color.extend(encoded_col_color)
+
+    encoded_img = np.array(encoded_img)
+    encoded_img_color = np.array(encoded_img_color)
+
+    black_encoded = encoded_img[encoded_img_color == 0]
+    white_encoded = encoded_img[encoded_img_color == 1]
+
+    space = mode(black_encoded)
+    thickness = mode(white_encoded)
+
+    return space, thickness
+
+
+def find_stafflines(img, space, thickness):
+    row_hist = np.array([sum(img[i, :]) for i in range(img.shape[0])])
+    #     thickness += 2
+    print(max(row_hist))
+
+    staff_indices = []
+
+    staff_length = 5 * (space + thickness) - space
+    row = 0
+    thresh = 0.6
+    print(img.shape)
+
+    staff_lines = row_hist > thresh * img.shape[1]
+    staff_indices = np.where(staff_lines == True)[0]
+
+    #     while row< (img.shape[0] - staff_length + 1):
+    #         staff_lines = [row_hist[j:j+thickness] for j in range(row,
+    #                             row + (4)*(thickness + space)+1, thickness+space)]
+
+    #         for staff in staff_lines:
+    #             if sum(staff)/thickness < thresh*img.shape[1]:
+    #                 row += 1
+    #                 break
+    #             else:
+    #                 print(row,sum(staff),thresh*img.shape[1])
+    #                 staff_row_indices = [list(range(j, j + thickness)) for j in
+    #                                      range(row,
+    #                                        row + (4) * (thickness + space) + 1,
+    #                                        thickness + space)]
+    #                 staff_indices.append(staff_row_indices)
+    #                 row += staff_length
+    #                 break
+
+    return staff_indices
+
+
+def draw_contours(img):
+    # se = np.ones((3, 3))
+    # closing_card = binary_erosion(binary_dilation(new_image, se), se)
+    contours = find_contours(new_image, 0.8)
+    # print("contours:", len(contours))
+    bounding_boxes = np.array([[min(c[:, 1]), max(c[:, 1]), min(c[:, 0]), max(c[:, 0])] for c in contours]).astype(int)
+    # print("bounding_boxes:", bounding_boxes)
+    img_boxes = new_image.copy().astype(float)
+
+    # When provided with the correct format of the list of bounding_boxes, this section will set all pixels inside
+    # boxes in img_with_boxes
+    for box in bounding_boxes:
+        [Xmin, Xmax, Ymin, Ymax] = box
+        # if (Xmax - Xmin) / (Ymax - Ymin) < 2.5 or (Xmax - Xmin) / (Ymax - Ymin) > 3.5:
+        #     print("continues")
+        #     continue
+        # print("box:", box)
+        rr, cc = rectangle_perimeter(start=(Ymin, Xmin), end=(Ymax, Xmax), shape=gray.shape)
+        img_boxes[rr, cc] = 1  # set color white
+
+    return img_boxes, bounding_boxes
+
 
