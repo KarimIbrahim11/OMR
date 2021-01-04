@@ -89,64 +89,6 @@ def show_images(images, titles=None):
     plt.show()
 
 
-'''
-def drawLine(ax, angle, dist):
-   
-    This function should draw the lines, given axis(ax), the angle and the distance parameters
-
-    TODO:
-    Get x1,y1,x2,y2
- 
-    angle_deg = 180 * abs(angle) / np.pi
-
-    # if abs(angle) >= ((40 / 180) * np.pi) and abs(angle) <= ((60 / 180) * np.pi):
-    #     print("huraay")
-    #
-    x1, y1 = 0, (dist / m.cos(angle))
-    x2, y2 = (dist / m.sin(angle)), 0
-
-    # This line draws the line in red
-
-    ax[1].plot((x1, y1), (x2, y2), '-r')
-
-
-# image = rgb2gray(io.imread('triangles.png'))
-
-
-def image_lines(image, thres=None):
-    edges = canny(image)
-
-    show_images([image, edges],['image','edges'])
-    hough_space, angles, distances = hough_line(edges)
-    if thres == None:
-        thres = 0.5 * np.max(hough_space)
-    print(thres)
-
-    acumm, angles, dists = hough_line_peaks(hough_space, angles, distances, threshold=thres)
-
-    ## This part draw the lines on the image.
-
-    fig, axes = plt.subplots(1, 2, figsize=(20, 6))
-    ax = axes.ravel()
-
-    ax[0].imshow(image, cmap=cm.gray)
-    ax[0].set_title('Input image')
-    ax[0].set_axis_off()
-
-    ax[1].imshow(image, cmap=cm.gray)
-    for angle, dist in zip(angles, dists):
-        drawLine(ax, angle, dist)
-    ax[1].set_xlim((0, image.shape[1]))
-    ax[1].set_ylim((image.shape[0], 0))
-    ax[1].set_axis_off()
-    ax[1].set_title('Detected lines')
-
-    plt.tight_layout()
-    plt.show()
-
-'''
-
-
 def get_references(img):
     # Run length encoding
     #     img = binary_dilation(img2,np.ones((3,3)))
