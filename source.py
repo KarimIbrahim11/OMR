@@ -32,6 +32,7 @@ from skimage.filters import gaussian, threshold_otsu
 from skimage.feature import canny
 from skimage.transform import probabilistic_hough_line, rotate
 import os
+from statistics import mode
 
 from skimage.io import imsave
 
@@ -55,7 +56,8 @@ def showHist(img):
 
 def showHist2(histogramImg):
     plt.figure()
-    bar(histogramImg[1]*255, histogramImg[0], width=0.8, align='center')
+    bar(histogramImg[1] * 255, histogramImg[0], width=0.8, align='center')
+
 
 def read_image(path):
     return io.imread(path)
@@ -145,11 +147,89 @@ def image_lines(image, thres=None):
 '''
 
 
-def deskew(image):
-    #image = imread(filename, as_grey=True)
+def get_references(img):
+    # Run length encoding
+    #     img = binary_dilation(img2,np.ones((3,3)))
+    encoded_img = []
+    encoded_img_color = []
+    # loop on the columns of the img
+    for i in range(img.shape[1]):
+        col = img[:, i]
+        encoded_col = []
+        encoded_col_color = []
 
+        current_color = col[0]
+        current_count = 0
+        # loop on the rows
+        for j in range(img.shape[0]):
+            if current_color == col[j]:
+                current_count += 1
+            else:
+                # appending count and color
+                encoded_col.append(current_count)
+                encoded_col_color.append(current_color)
+
+                current_color = col[j]
+                current_count = 1
+        encoded_col.append(current_count)
+        encoded_col_color.append(current_color)
+
+        encoded_img.extend(encoded_col)
+        encoded_img_color.extend(encoded_col_color)
+
+    encoded_img = np.array(encoded_img)
+    encoded_img_color = np.array(encoded_img_color)
+
+    black_encoded = encoded_img[encoded_img_color == 0]
+    white_encoded = encoded_img[encoded_img_color == 1]
+
+    space = mode(black_encoded)
+    thickness = mode(white_encoded)
+
+    return space, thickness
+
+
+def find_stafflines(img, space, thickness):
+    row_hist = np.array([sum(img[i, :]) for i in range(img.shape[0])])
+    #     thickness += 2
+    print(max(row_hist))
+
+    staff_indices = []
+
+    staff_length = 5 * (space + thickness) - space
+    row = 0
+    thresh = 0.6
+    print(img.shape)
+
+    staff_lines = row_hist > thresh * img.shape[1]
+    staff_indices = np.where(staff_lines == True)[0]
+
+    #     while row< (img.shape[0] - staff_length + 1):
+    #         staff_lines = [row_hist[j:j+thickness] for j in range(row,
+    #                             row + (4)*(thickness + space)+1, thickness+space)]
+
+    #         for staff in staff_lines:
+    #             if sum(staff)/thickness < thresh*img.shape[1]:
+    #                 row += 1
+    #                 break
+    #             else:
+    #                 print(row,sum(staff),thresh*img.shape[1])
+    #                 staff_row_indices = [list(range(j, j + thickness)) for j in
+    #                                      range(row,
+    #                                        row + (4) * (thickness + space) + 1,
+    #                                        thickness + space)]
+    #                 staff_indices.append(staff_row_indices)
+    #                 row += staff_length
+    #                 break
+
+    return staff_indices
+
+
+def deskew(image):
+    # image = imread( filename, as_grey=True)
     # threshold to get rid of extraneous noise
     thresh = threshold_otsu(image)
+    print(thresh)
     normalize = image > thresh
 
     # gaussian blur
@@ -178,6 +258,7 @@ def deskew(image):
 
     # correcting for 'sideways' alignments
     rotation_angle = histo[1][np.argmax(histo[0])]
+    rotation_angle = int(rotation_angle)
     print(rotation_angle)
     '''
     if rotation_angle > 45:
@@ -185,16 +266,14 @@ def deskew(image):
     elif rotation_angle < -45:
         rotation_number = 90 - abs(rotation_angle)
     '''
-    show_images([gray,normalize,edges], ["gray", "bin", "edges"])
-    rotated = rotate(binary_closing(np.logical_not(normalize), np.ones((3, 3))), rotation_angle, resize=True, mode='constant', cval=0)
-    # counts, bins = np.histogram(rotated)
-    # plt.hist(bins[:-1], bins, weights=counts, orientation='horizontal')
+    # show_images([gray,normalize,edges], ["gray", "bin", "edges"])
+    rotated = rotate(binary_closing(np.logical_not(normalize), np.ones((3, 3))), rotation_angle, resize=True,
+                     mode='constant', cval=0).astype(np.uint8)
     return rotated
 
 
-
 # if filename.lower().endswith('.jpg') or filename.lower().endswith('.png'):
-path = '27_!.jpg'
+path = 'cases/27_!.jpg'
 img = read_image(path)
 gray = rgb2gray(img)
 
@@ -206,8 +285,14 @@ rotated = deskew(gray)
 # show_images([gray, edges],['image','edges'])
 # binImg = binary_closing(binImg)
 # image_lines(gray, thres=90)
+staff_indices = find_stafflines(rotated, 0, 0)
+print(staff_indices)
+rotated[staff_indices, :] = 0
 
-photo = resize(rotated, (256, 256))
-hist,_ = histogram(photo, nbins=256)
+new_image = binary_closing(rotated, np.ones((3, 1)))
+
+show_images([rotated, new_image])
+
+photo = resize(new_image, (256, 256))
+hist, _ = histogram(photo, nbins=256)
 # showHist(hist)
-
