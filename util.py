@@ -94,69 +94,11 @@ def show_images(images, titles=None):
     plt.show()
 
 
-'''
-def drawLine(ax, angle, dist):
-
-    This function should draw the lines, given axis(ax), the angle and the distance parameters
-
-    TODO:
-    Get x1,y1,x2,y2
-
-    angle_deg = 180 * abs(angle) / np.pi
-
-    # if abs(angle) >= ((40 / 180) * np.pi) and abs(angle) <= ((60 / 180) * np.pi):
-    #     print("huraay")
-    #
-    x1, y1 = 0, (dist / m.cos(angle))
-    x2, y2 = (dist / m.sin(angle)), 0
-
-    # This line draws the line in red
-
-    ax[1].plot((x1, y1), (x2, y2), '-r')
-
-
-# image = rgb2gray(io.imread('triangles.png'))
-
-
-def image_lines(image, thres=None):
-    edges = canny(image)
-
-    show_images([image, edges],['image','edges'])
-    hough_space, angles, distances = hough_line(edges)
-    if thres == None:
-        thres = 0.5 * np.max(hough_space)
-    print(thres)
-
-    acumm, angles, dists = hough_line_peaks(hough_space, angles, distances, threshold=thres)
-
-    ## This part draw the lines on the image.
-
-    fig, axes = plt.subplots(1, 2, figsize=(20, 6))
-    ax = axes.ravel()
-
-    ax[0].imshow(image, cmap=cm.gray)
-    ax[0].set_title('Input image')
-    ax[0].set_axis_off()
-
-    ax[1].imshow(image, cmap=cm.gray)
-    for angle, dist in zip(angles, dists):
-        drawLine(ax, angle, dist)
-    ax[1].set_xlim((0, image.shape[1]))
-    ax[1].set_ylim((image.shape[0], 0))
-    ax[1].set_axis_off()
-    ax[1].set_title('Detected lines')
-
-    plt.tight_layout()
-    plt.show()
-
-'''
-
-
 def deskew(image):
-    # image = imread(filename, as_grey=True)
-
+    # image = imread( filename, as_grey=True)
     # threshold to get rid of extraneous noise
     thresh = threshold_otsu(image)
+    print(thresh)
     normalize = image > thresh
 
     # gaussian blur
@@ -185,6 +127,7 @@ def deskew(image):
 
     # correcting for 'sideways' alignments
     rotation_angle = histo[1][np.argmax(histo[0])]
+    rotation_angle = int(rotation_angle)
     print(rotation_angle)
     '''
     if rotation_angle > 45:
@@ -192,12 +135,11 @@ def deskew(image):
     elif rotation_angle < -45:
         rotation_number = 90 - abs(rotation_angle)
     '''
-    show_images([image, normalize, edges], ["gray", "bin", "edges"])
+    # show_images([gray,normalize,edges], ["gray", "bin", "edges"])
     rotated = rotate(binary_closing(np.logical_not(normalize), np.ones((3, 3))), rotation_angle, resize=True,
-                     mode='constant', cval=0)
-    # counts, bins = np.histogram(rotated)
-    # plt.hist(bins[:-1], bins, weights=counts, orientation='horizontal')
+                     mode='constant', cval=0).astype(np.uint8)
     return rotated
+
 
 
 def removeLines(bin):
@@ -302,11 +244,12 @@ def find_stafflines(img, space, thickness):
 def draw_contours(img):
     # se = np.ones((3, 3))
     # closing_card = binary_erosion(binary_dilation(new_image, se), se)
-    contours = find_contours(new_image, 0.8)
+    contours = find_contours(img, 0.8)
     # print("contours:", len(contours))
     bounding_boxes = np.array([[min(c[:, 1]), max(c[:, 1]), min(c[:, 0]), max(c[:, 0])] for c in contours]).astype(int)
     # print("bounding_boxes:", bounding_boxes)
-    img_boxes = new_image.copy().astype(float)
+    img_boxes = img.copy().astype(float)
+    gray = rgb2gray(img)
 
     # When provided with the correct format of the list of bounding_boxes, this section will set all pixels inside
     # boxes in img_with_boxes
