@@ -1,7 +1,7 @@
 from OMR.util import *
 
 # if filename.lower().endswith('.jpg') or filename.lower().endswith('.png'):
-path = 'cases/10.PNG'
+path = 'cases/02.PNG'
 img = read_image(path)
 gray = rgb2gray(img)
 rotated = deskew(gray)
@@ -43,14 +43,13 @@ show_images([rotated, withoutLines], ["Binary", "After Line Removal"])
 
 # Non uniform Closing
 # First dilate if there's a horizontal skip
-selem = np.array([[1, 1, 1], [0, 0, 0],  [1, 1, 1]])
+
+selem = np.array([[1, 1, 1], [0, 0, 0],  [0, 0, 0], [1, 1, 1]])
 withoutLines_dilated = binary_dilation(withoutLines, selem)
 # Second Erode for vertical segmentations
 selem = np.array([[0, 0, 1, 0]*3]).reshape((4, 3))
-#selem = np.array([[0, 0, 1, 0],[0, 0, 1, 1],[0, 0, 1, 1],[0, 0, 1, 0]])
 withoutLines_dilated = binary_erosion(withoutLines_dilated, selem)
-withoutLines_dilated = binary_closing(withoutLines_dilated, np.ones((7, 1)))
-withoutLines_dilated = binary_closing(withoutLines_dilated)
+withoutLines_dilated = binary_closing(withoutLines_dilated, np.ones((6, 1)))
 
 # withoutLines_dilated = binary_erosion(withoutLines_dilated, np.array(selem))
 # selem = [[0, 1, 0], [1, 1, 1], [0, 1, 0]]
@@ -58,7 +57,12 @@ withoutLines_dilated = binary_closing(withoutLines_dilated)
 show_images([withoutLines_dilated], ["Dilated"])
 notes = CCA(withoutLines_dilated)
 displayComponents(withoutLines_dilated, notes)
+# Thinning each image can help in some features
+
 notesImages = componentsToImages(notes)
+for Image in notesImages:
+    Image = thin(Image, 3)
+    show_images([Image])
 
 show_images(notesImages)
 # show_images([binary_closing(notesImages[2])])
