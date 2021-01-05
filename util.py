@@ -285,7 +285,7 @@ def displayComponents(binary, components):
         if component.area >= 30:
             # draw rectangle around segmented coins
             minR, minC, maxR, maxC = component.bbox
-            rect = mpatch.Rectangle((minC, minR), maxC - minC, maxR - minR, fill=False, edgecolor='red', linewidth=2)
+            rect = mpatch.Rectangle((minC, minR), maxC - minC, maxR - minR, fill=False, edgecolor='blue', linewidth=2)
             # show_images([component.image], ["el sorraaa"])
             ax.add_patch(rect)
     ax.set_axis_off()
@@ -303,4 +303,4 @@ def componentsToImages(components):
             minR, minC, maxR, maxC = component.bbox
             rect = mpatch.Rectangle((minC, minR), maxC - minC, maxR - minR, fill=False, edgecolor='red', linewidth=2)
             images.append(component.image)
-    return np.array(images)
+    return np.array(images, dtype=object)
