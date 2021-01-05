@@ -1,4 +1,3 @@
-
 import numpy as np
 import skimage
 import skimage.io as io
@@ -17,6 +16,7 @@ from skimage.draw import rectangle, rectangle_perimeter
 import numpy as np
 import skimage.io as io
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatch
 from matplotlib.pyplot import bar
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
@@ -141,8 +141,7 @@ def deskew(image):
     return rotated
 
 
-
-def removeLines(bin):
+def removeHLines(bin):
     hproj = np.sum(bin, 1)
 
     # Create output image same height as text, 500 px wide
@@ -154,15 +153,16 @@ def removeLines(bin):
     for row in range(bin.shape[0]):
         cv2.line(result, (0, row), (int(hproj[row] * w / m), row), (255, 255, 255), 1)
 
-    show_images([bin, result], ['binarized', 'horizontal projection'])
+    #show_images([bin, result], ['binarized', 'horizontal projection'])
 
     r, c = result.shape
     for i in range(r):
         if np.sum(result[i]) > 255 * 480:
             bin[i, :] = 0
 
-    show_images([bin])
+    #show_images([bin])
     return bin
+
 
 def get_references(img):
     # Run length encoding
@@ -266,3 +266,41 @@ def draw_contours(img):
     return img_boxes, bounding_boxes
 
 
+# CCA APPROACH TESTED
+def CCA(binary):
+    # Perform CCA on the mask
+    labeled_image = skimage.measure.label(binary, connectivity=2, return_num=True, background=0)
+    components = skimage.measure.regionprops(labeled_image[0])
+
+    return components
+
+
+# CCA Display Components TESTED
+def displayComponents(binary, components):
+    # takes ski.image.regionProps output
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.imshow(binary)
+    for component in components:
+        # take regions with large enough areas
+        if component.area >= 30:
+            # draw rectangle around segmented coins
+            minR, minC, maxR, maxC = component.bbox
+            rect = mpatch.Rectangle((minC, minR), maxC - minC, maxR - minR, fill=False, edgecolor='red', linewidth=2)
+            # show_images([component.image], ["el sorraaa"])
+            ax.add_patch(rect)
+    ax.set_axis_off()
+    plt.tight_layout()
+    plt.show()
+
+
+# Convert Each Component to image and append them in a single array
+def componentsToImages(components):
+    images = []
+    for component in components:
+        # take regions with large enough areas
+        if component.area >= 30:
+            # draw rectangle around segmented coins
+            minR, minC, maxR, maxC = component.bbox
+            rect = mpatch.Rectangle((minC, minR), maxC - minC, maxR - minR, fill=False, edgecolor='red', linewidth=2)
+            images.append(component.image)
+    return np.array(images)
