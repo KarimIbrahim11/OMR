@@ -17,16 +17,17 @@ show_images([rotated], ["binary"])
 # Remove Staff AMIR
 # bin, _ = otsu_binarize(rotated)
 # TODO A MORE ROBUST TO SKEWNESS STAFF LINE REMOVAL
-# withoutLines = removeHLines(rotated)
-# show_images([rotated, withoutLines], ["Binary", "After Line Removal"])
+rotated_copy = rotated.copy()
+withoutLines = removeHLines(rotated_copy)
+show_images([rotated, withoutLines], ["Binary", "After Line Removal"])
 
 # Remove Staff TIFA
 # staff_indices = find_stafflines(rotated, 0, 0)
 # print(staff_indices)
 # rotated[staff_indices, :] = 0
-s, t = get_references(rotated)
-withoutLines = binary_opening(rotated, np.ones((t+1, 1)))
-show_images([rotated, withoutLines], ["Rotated", "After Line Removal"])
+#s, t = get_references(rotated)
+#withoutLines = binary_opening(rotated, np.ones((t+1, 1)))
+#show_images([rotated, withoutLines], ["Rotated", "After Line Removal"])
 
 # Non uniform Closing
 # First dilate if there's a horizontal skip
@@ -40,10 +41,30 @@ withoutLines_dilated = binary_dilation(withoutLines, selem)
 selem = np.array([[0, 0, 1, 0] * 3]).reshape((4, 3))
 withoutLines_dilated = binary_erosion(withoutLines_dilated, selem)
 withoutLines_dilated = binary_closing(withoutLines_dilated, np.ones((6, 1)))
-
+#io.imsave('savedImage2.png', withoutLines_dilated)
+#path = 'savedImage.png'
+#rtt = read_image(path)
 show_images([withoutLines_dilated], ["Dilated"])
+# regionproprs object
 notes = CCA(withoutLines_dilated)
-displayComponents(rotated, notes)
+# TODO bounding Boxes for each component
+boxes = RetrieveComponentBox(notes)
+# print(boxes)
+notes_with_lines = []
+for box in boxes:
+    [Ymin, Xmin, Ymax, Xmax] = box
+    #print(box)
+    rr, cc = rectangle_perimeter(start = (Ymin,Xmin), end = (Ymax,Xmax), shape=rotated.shape)
+    rotated[rr, cc] = 1  # set color white
+    notes_with_lines.append(rotated[np.min(rr):np.max(rr), np.min(cc):np.max(cc)])
+
+
+# TODO AMIR: NOTES WITH LINES FEL ARRAY DA:
+notes_with_lines = np.array(notes_with_lines, dtype=object)
+show_images([rotated],["BOUNDING BOXES"])
+#show_images(notes_with_lines)
+displayComponents(withoutLines_dilated, notes)
+notesImages = componentsToImages(notes)
 # TODO Thinning each image can help in some features
 
 '''
@@ -51,9 +72,9 @@ for Image in notesImages:
     Image = thin(Image, 5)
     show_images([Image])
 '''
-notesImages = componentsToImages(notes)
 
 # TODO CLASSIFICATION USING SIFT OR A PLAN B
+'''
 show_images(notesImages)
 sampleimg = notesImages[37]
 show_images([sampleimg])
@@ -72,13 +93,14 @@ wawa = np.negative(wawa)
 wawa = cv2.normalize(wawa, None, 0, 255, cv2.NORM_MINMAX).astype('uint8')
 print(wawa)
 
-'''
+
 img = np.zeros((sampleimg, 3))
 
 img[:, :, 0] = sampleimg*255.0/255.0
 img[:, :, 1] = sampleimg*255.0/255.0
 img[:, :, 2] = sampleimg*255.0/255.0
 print(img)
+'''
 '''
 img1 = cv2.imread('clef.jpg')
 
@@ -154,5 +176,5 @@ img3 = cv2.drawMatches(img1, kp1, wawa, kp2, good, None, **draw_params)
 
 plt.imshow(img3, 'gray'), plt.show()
 
-show_images(notesImages)
-
+#show_images(notesImages)
+'''

@@ -284,6 +284,7 @@ def displayComponents(binary, components):
         # take regions with large enough areas
         if component.area >= 30:
             # draw rectangle around segmented coins
+            #print("orientation of component:",component.orientation)
             minR, minC, maxR, maxC = component.bbox
             rect = mpatch.Rectangle((minC, minR), maxC - minC, maxR - minR, fill=False, edgecolor='blue', linewidth=2)
             # show_images([component.image], ["el sorraaa"])
@@ -291,6 +292,17 @@ def displayComponents(binary, components):
     ax.set_axis_off()
     plt.tight_layout()
     plt.show()
+
+
+# Retrieve Boxes bs
+def RetrieveComponentBox(components):
+    boxes = []
+    for component in components:
+        # take regions with large enough areas
+        if component.area >= 30:
+            # draw rectangle around segmented coins
+            boxes.append(component.bbox)
+    return np.array(boxes, dtype=object)
 
 
 # Convert Each Component to image and append them in a single array
