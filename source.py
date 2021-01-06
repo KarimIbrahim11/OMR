@@ -1,6 +1,7 @@
 from cv2.cv2 import CV_32F
 
-from util import *
+
+from OMR.util import *
 
 path = 'cases/02.PNG'
 img = read_image(path)
@@ -65,6 +66,45 @@ show_images([rotated],["BOUNDING BOXES"])
 #show_images(notes_with_lines)
 displayComponents(withoutLines_dilated, notes)
 notesImages = componentsToImages(notes)
+
+# notes_hp = []
+# for img in notes_with_lines:
+    # img[:, 0] = 0
+    # hproj = np.sum(img, 1)
+    # m = np.max(hproj)
+    # w = img.shape[1]
+    # result = np.zeros((hproj.shape[0], w))
+    # # Draw a line for each row
+    # for row in range(img.shape[0]):
+    #     cv2.line(result, (0, row), (int(hproj[row] * w / m), row), (255, 255, 255), 1)
+    # notes_hp.append((img, result))
+
+
+num_lines = 0
+num_lines_list = []
+for img in notes_with_lines:
+    lm, no = img.shape
+    num_lines = 0
+    for i in range(1, lm):
+        if img[i][1] == 0:
+            continue
+        elif img[i][1] == 1 and img[i-1][1] == 0:
+            num_lines += 1
+
+
+
+    print(num_lines)
+    num_lines_list.append(num_lines)
+
+    if num_lines == 3:
+        print("g")
+    elif num_lines == 4:
+        print("d")
+    else:
+        print("none")
+    show_images([img])
+
+
 # TODO Thinning each image can help in some features
 
 '''
