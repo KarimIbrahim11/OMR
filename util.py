@@ -93,6 +93,18 @@ def show_images(images, titles=None):
     fig.set_size_inches(np.array(fig.get_size_inches()) * n_ims)
     plt.show()
 
+def negativeandSave(path):
+    img = read_image(path)
+    if path.lower().endswith('.jpg'):
+        gray = rgb2gray(img)
+    elif path.lower().endswith('.png'):
+        gray = rgb2gray(img)
+    thresh = threshold_otsu(gray)
+    #neg = 1-gray
+    normalize = gray > thresh
+    # normalize = img_as_ubyte(normalize)
+    show_images([img,gray,normalize])
+    io.imsave(path+'2.jpg', normalize)
 
 def deskew(image):
     # image = imread( filename, as_grey=True)
@@ -153,14 +165,14 @@ def removeHLines(bin):
     for row in range(bin.shape[0]):
         cv2.line(result, (0, row), (int(hproj[row] * w / m), row), (255, 255, 255), 1)
 
-    #show_images([bin, result], ['binarized', 'horizontal projection'])
+    # show_images([bin, result], ['binarized', 'horizontal projection'])
 
     r, c = result.shape
     for i in range(r):
         if np.sum(result[i]) > 255 * 480:
             bin[i, :] = 0
 
-    #show_images([bin])
+    # show_images([bin])
     return bin
 
 
