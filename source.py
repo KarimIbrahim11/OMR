@@ -54,6 +54,8 @@ boxes = RetrieveComponentBox(notes)
 notes_with_lines = []
 for box in boxes:
     [Ymin, Xmin, Ymax, Xmax] = box
+    Ymin -= 5
+    Ymax += 25
     #print(box)
     rr, cc = rectangle_perimeter(start = (Ymin,Xmin), end = (Ymax,Xmax), shape=rotated.shape)
     rotated[rr, cc] = 1  # set color white
