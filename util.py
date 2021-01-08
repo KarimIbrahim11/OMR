@@ -276,7 +276,7 @@ def find_stafflines(img, space, thickness):
 
 def find_verticalLines(img):
     col_hist = np.array([sum(img[:, i]) for i in range(img.shape[1])])
-    thresh = 0.5
+    thresh = 0.6
     staff_lines = col_hist > thresh * img.shape[0]
     staff_indices = np.where(staff_lines == True)[0]
     return staff_indices
@@ -290,6 +290,16 @@ def find_horizontalLines(img):
     staff_lines = row_hist > thresh * img.shape[1]
     staff_indices = np.where(staff_lines == True)[0]
     return staff_indices
+
+
+def countStems(stems_indices):
+    stems = []
+    for i in range(len(stems_indices)):
+        temp_stem = stems_indices[i]
+        if i == 0 or temp_stem > stems_indices[i - 1] + 1:
+            stems.append(temp_stem)
+    return stems, len(stems)
+
 
 def draw_contours(img):
     # se = np.ones((3, 3))

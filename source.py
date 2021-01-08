@@ -8,7 +8,7 @@ from skimage.transform import hough_circle, hough_circle_peaks, hough_ellipse
 
 from util import *
 
-path = 'cases/01.PNG'
+path = 'cases/02.PNG'
 The_image = read_image(path)
 if path.lower().endswith('.jpg'):
     gray = rgb2gray(The_image)
@@ -106,68 +106,90 @@ for img in binary_notes_with_lines:
 # show_images(notesImages)
 show_images(notesImages)
 # TODO FINDING THE RHYTHM OF THE NOTES AND THE NUMBER OF THE NOTES
-##### Remove Vertical Stems
-image = notesImages[13]
+##### Remove Vertical Stems and find their indices
+image = notesImages[22]  # [17] #28
 V_staff_indices = find_verticalLines(image)
+print(V_staff_indices)
 image[:, V_staff_indices] = 0
+stems_indices, stem_count = countStems(V_staff_indices)
+print(stems_indices)
+if stem_count == 0:
+    print("One Whole note")
+elif stem_count == 1:
+    stacced_flag = 0
+    print("Many notes i.e: Chord or one single note( half or quarter or eighth or sixteenth)")
+    ##### Find Row Histogram
+    row_histogram = np.array([sum(image[i, :]) for i in range(image.shape[0])])
+    print(row_histogram.shape)
 
-##### Find Row Histogram
-row_histogram = np.array([sum(image[i, :]) for i in range(image.shape[0])])
-print(row_histogram.shape)
+    ##### IF chord or not, i.e: Find Peaks corresponding to each note with the threshold
+    note_threshold = image.shape[1] // 2
+    peaks, _ = find_peaks(row_histogram, height=note_threshold)
 
-##### Find Peaks corresponding to each note with the threshold
-note_threshold = image.shape[1]//2
-peaks, _ = find_peaks(row_histogram, height=note_threshold)
+    ##### Plot Peaks on histogram
+    # print(peaks)
+    plt.plot(row_histogram)
+    plt.plot(peaks, row_histogram[peaks], "x")
+    plt.plot(np.zeros_like(row_histogram), "--", color="gray")
+    plt.show()
 
-##### Plot Peaks on histogram
-# print(peaks)
-plt.plot(row_histogram)
-plt.plot(peaks, row_histogram[peaks], "x")
-plt.plot(np.zeros_like(row_histogram), "--", color="gray")
-plt.show()
+    ##### Find the local Minimas between the number of notes
+    numberOfPeaks = len(peaks)
+    localMinimas = []
+    if numberOfPeaks == 1:
+        print("One Note i.e no Chord")
+    elif numberOfPeaks == 2:
+        print("Two Notes Chord")
+        # for detecting stacced notes, we will put a threshold on the peaks and increment them accordingly
+        # print(row_histogram[peaks])
+        if row_histogram[peaks[0]] > row_histogram[peaks[1]] + row_histogram[peaks[1]] // 2 or \
+                row_histogram[peaks[0]] + row_histogram[peaks[0]] // 2 < row_histogram[peaks[1]]:
+            print("Three notes Chord Stacced!")
+            # TODO WE NEED TO FIND THE LOCALMINIMAS FOR SEGMENTATION FOR HOLLOW/ RIGID SPHERE
+            # TODO ADD A FLAG FOR THE IMAGE RADII IN THE HOUGH CIRCLE ALGORITHM
+            stacced_flag = 1
+            # numberOfPeaks += 1
+            # peaks = [np.min(peaks), np.max(peaks//2), np.max(peaks//2)]
+            # peaks.append(np.max(peaks//2))
+        else:
+            localMinimas.append((peaks[0] + peaks[1]) // 2)
+    elif numberOfPeaks == 3:
+        print("Three Notes Chord")
+        localMinimas.append((peaks[0] + peaks[1]) // 2)
+        localMinimas.append((peaks[1] + peaks[2]) // 2)
 
-##### Find the local Minimas between the number of notes
-numberOfPeaks = len(peaks)
-localMinimas = []
-if numberOfPeaks == 1:
-    print("One Note i.e no Chord")
-elif numberOfPeaks == 2:
-    print("Two Notes Chord")
-    localMinimas.append((peaks[0]+peaks[1]) // 2)
-elif numberOfPeaks == 3:
-    print("Three Notes Chord")
-    localMinimas.append((peaks[0]+peaks[1]) // 2)
-    localMinimas.append((peaks[1]+peaks[2]) // 2)
+    ##### Segment the image based on
+    # for i in range(len(localMinimas)):
 
+    image = img_as_ubyte(image)
+    show_images([image])
+    edges = canny(image, sigma=2, low_threshold=10, high_threshold=50)
+    print("Edgesssss:")
+    show_images([edges])
 
-##### Segment the image based on
-# for i in range(len(localMinimas)):
+    # Detect two radii
+    hough_radii = 0
+    if stacced_flag == 1:
+        hough_radii = np.arange(image.shape[1] // 4, image.shape[1] // 4 + 10, 5)
+    else:
+        hough_radii = np.arange(image.shape[1] // 2 - 10, image.shape[1] // 2, 5)
+    hough_res = hough_circle(edges, hough_radii)
+    print("hough radii", hough_radii)
+    # Select the most prominent 3 circles
+    accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=3)
 
+    # Draw them
+    fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(10, 4))
+    image = color.gray2rgb(image)
+    for center_y, center_x, radius in zip(cy, cx, radii):
+        circy, circx = circle_perimeter(center_y, center_x, radius,
+                                        shape=image.shape)
+        image[circy, circx] = (220, 20, 20)
 
-
-
-image = img_as_ubyte(image)
-show_images([image])
-edges = canny(image, sigma=2, low_threshold=10, high_threshold=50)
-show_images([edges])
-
-# Detect two radii
-hough_radii = np.arange(image.shape[1]//2-10, image.shape[1]//2, 5)
-hough_res = hough_circle(edges, hough_radii)
-
-# Select the most prominent 3 circles
-accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=1)
-
-# Draw them
-fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(10, 4))
-image = color.gray2rgb(image)
-for center_y, center_x, radius in zip(cy, cx, radii):
-    circy, circx = circle_perimeter(center_y, center_x, radius,
-                                    shape=image.shape)
-    image[circy, circx] = (220, 20, 20)
-
-ax.imshow(image, cmap=plt.cm.gray)
-plt.show()
+    ax.imshow(image, cmap=plt.cm.gray)
+    plt.show()
+elif count == 2:
+    print("Beamed note, we need to find the number of tails")
 
 '''
 # Load picture and detect edges
