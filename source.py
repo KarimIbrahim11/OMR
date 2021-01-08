@@ -1,6 +1,7 @@
 from cv2.cv2 import CV_32F
 
 # from OMR.util import *
+from scipy.signal import find_peaks
 from skimage import color
 from skimage.draw import circle_perimeter, ellipse_perimeter
 from skimage.transform import hough_circle, hough_circle_peaks, hough_ellipse
@@ -104,7 +105,71 @@ for img in binary_notes_with_lines:
 
 # show_images(notesImages)
 show_images(notesImages)
-# TODO Thinning each image can help in some features
+# TODO FINDING THE RHYTHM OF THE NOTES AND THE NUMBER OF THE NOTES
+##### Remove Vertical Stems
+image = notesImages[13]
+V_staff_indices = find_verticalLines(image)
+image[:, V_staff_indices] = 0
+
+##### Find Row Histogram
+row_histogram = np.array([sum(image[i, :]) for i in range(image.shape[0])])
+print(row_histogram.shape)
+
+##### Find Peaks corresponding to each note with the threshold
+note_threshold = image.shape[1]//2
+peaks, _ = find_peaks(row_histogram, height=note_threshold)
+
+##### Plot Peaks on histogram
+# print(peaks)
+plt.plot(row_histogram)
+plt.plot(peaks, row_histogram[peaks], "x")
+plt.plot(np.zeros_like(row_histogram), "--", color="gray")
+plt.show()
+
+##### Find the local Minimas between the number of notes
+numberOfPeaks = len(peaks)
+localMinimas = []
+if numberOfPeaks == 1:
+    print("One Note i.e no Chord")
+elif numberOfPeaks == 2:
+    print("Two Notes Chord")
+    localMinimas.append((peaks[0]+peaks[1]) // 2)
+elif numberOfPeaks == 3:
+    print("Three Notes Chord")
+    localMinimas.append((peaks[0]+peaks[1]) // 2)
+    localMinimas.append((peaks[1]+peaks[2]) // 2)
+
+
+##### Segment the image based on
+# for i in range(len(localMinimas)):
+
+
+
+
+image = img_as_ubyte(image)
+show_images([image])
+edges = canny(image, sigma=2, low_threshold=10, high_threshold=50)
+show_images([edges])
+
+# Detect two radii
+hough_radii = np.arange(image.shape[1]//2-10, image.shape[1]//2, 5)
+hough_res = hough_circle(edges, hough_radii)
+
+# Select the most prominent 3 circles
+accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=1)
+
+# Draw them
+fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(10, 4))
+image = color.gray2rgb(image)
+for center_y, center_x, radius in zip(cy, cx, radii):
+    circy, circx = circle_perimeter(center_y, center_x, radius,
+                                    shape=image.shape)
+    image[circy, circx] = (220, 20, 20)
+
+ax.imshow(image, cmap=plt.cm.gray)
+plt.show()
+
+'''
 # Load picture and detect edges
 referenceImg = gray_notes_with_lines[2].astype(float)
 image_gray = notesImages[2].astype(float)
@@ -117,7 +182,7 @@ edges = canny(image_gray, sigma=2.0, low_threshold=0.55, high_threshold=0.8)
 # The accuracy corresponds to the bin size of a major axis.
 # The value is chosen in order to get a single high accumulator.
 # The threshold eliminates low accumulators
-result = hough_ellipse(edges, accuracy=100, min_size=10, max_size=100)
+result = hough_ellipse(edges, accuracy=100, max_size=image_gray.shape[1])
 result.sort(order='accumulator')
 
 # Estimated parameters for the ellipse
@@ -146,7 +211,7 @@ ax2.set_title('Edge (white) and result (red)')
 ax2.imshow(edges)
 
 plt.show()
-
+'''
 '''
 for Image in notesImages:
     Image = thin(Image, 5)

@@ -154,7 +154,7 @@ def deskew(gray):
     rotated = rotate(binary_closing(np.logical_not(normalize), np.ones((3, 3))), rotation_angle, resize=True,
                      mode='constant', cval=0).astype(np.uint8)
     # show_images([gray])
-    gray = rotate(gray,  rotation_angle, resize=True, mode='constant', cval=255)
+    gray = rotate(gray, rotation_angle, resize=True, mode='constant', cval=255)
     return rotated, gray
 
 
@@ -273,6 +273,23 @@ def find_stafflines(img, space, thickness):
 
     return staff_indices
 
+
+def find_verticalLines(img):
+    col_hist = np.array([sum(img[:, i]) for i in range(img.shape[1])])
+    thresh = 0.5
+    staff_lines = col_hist > thresh * img.shape[0]
+    staff_indices = np.where(staff_lines == True)[0]
+    return staff_indices
+
+
+def find_horizontalLines(img):
+    row_hist = np.array([sum(img[i, :]) for i in range(img.shape[0])])
+    print(max(row_hist))
+    thresh = 0.6
+    print(img.shape)
+    staff_lines = row_hist > thresh * img.shape[1]
+    staff_indices = np.where(staff_lines == True)[0]
+    return staff_indices
 
 def draw_contours(img):
     # se = np.ones((3, 3))
