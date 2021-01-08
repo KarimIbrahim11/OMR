@@ -93,6 +93,7 @@ def show_images(images, titles=None):
     fig.set_size_inches(np.array(fig.get_size_inches()) * n_ims)
     plt.show()
 
+
 def negativeandSave(path):
     img = read_image(path)
     if path.lower().endswith('.jpg'):
@@ -100,15 +101,17 @@ def negativeandSave(path):
     elif path.lower().endswith('.png'):
         gray = rgb2gray(img)
     thresh = threshold_otsu(gray)
-    #neg = 1-gray
+    # neg = 1-gray
     normalize = gray > thresh
     # normalize = img_as_ubyte(normalize)
-    show_images([img,gray,normalize])
-    io.imsave(path+'2.jpg', normalize)
+    show_images([img, gray, normalize])
+    io.imsave(path + '2.jpg', normalize)
 
-def deskew(image):
+
+def deskew(gray):
     # image = imread( filename, as_grey=True)
     # threshold to get rid of extraneous noise
+    image = gray.copy()
     thresh = threshold_otsu(image)
     print(thresh)
     normalize = image > thresh
@@ -150,7 +153,24 @@ def deskew(image):
     # show_images([gray,normalize,edges], ["gray", "bin", "edges"])
     rotated = rotate(binary_closing(np.logical_not(normalize), np.ones((3, 3))), rotation_angle, resize=True,
                      mode='constant', cval=0).astype(np.uint8)
-    return rotated
+    # show_images([gray])
+    gray = rotate(gray,  rotation_angle, resize=True, mode='constant', cval=255)
+    return rotated, gray
+
+
+def segmentBoxesInImage(boxes, image_to_segment):
+    notes_with_lines = []
+    for box in boxes:
+        [Ymin, Xmin, Ymax, Xmax] = box
+        Ymin -= 5
+        Ymax += 25
+        # print(box)
+        rr, cc = rectangle_perimeter(start=(Ymin, Xmin), end=(Ymax, Xmax), shape=image_to_segment.shape)
+        # rotated[rr, cc] = 1  # set color white
+        notes_with_lines.append(image_to_segment[np.min(rr):np.max(rr), np.min(cc):np.max(cc)])
+
+    notes_with_lines = np.array(notes_with_lines, dtype=object)
+    return notes_with_lines
 
 
 def removeHLines(bin):
@@ -296,7 +316,7 @@ def displayComponents(binary, components):
         # take regions with large enough areas
         if component.area >= 30:
             # draw rectangle around segmented coins
-            #print("orientation of component:",component.orientation)
+            # print("orientation of component:",component.orientation)
             minR, minC, maxR, maxC = component.bbox
             rect = mpatch.Rectangle((minC, minR), maxC - minC, maxR - minR, fill=False, edgecolor='blue', linewidth=2)
             # show_images([component.image], ["el sorraaa"])

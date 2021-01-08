@@ -1,18 +1,24 @@
 from cv2.cv2 import CV_32F
 
 # from OMR.util import *
+from skimage import color
+from skimage.draw import circle_perimeter, ellipse_perimeter
+from skimage.transform import hough_circle, hough_circle_peaks, hough_ellipse
+
 from util import *
 
 path = 'cases/01.PNG'
-img = read_image(path)
+The_image = read_image(path)
 if path.lower().endswith('.jpg'):
-    gray = rgb2gray(img)
+    gray = rgb2gray(The_image)
 elif path.lower().endswith('.png'):
-    gray = rgb2gray(rgba2rgb(img))
+    gray = rgb2gray(rgba2rgb(The_image))
 # negativeandSave('quarternote.png')
 # TODO 7AD YE3MEL LOCAL BINARIZATION NEGARAB
 # TODO SKEWNESS NEDIF AGAINST CAPTURED
-rotated = deskew(gray)
+rotated, gray = deskew(gray)
+
+# show_images([gray], ["Gray: "])
 # show_images([rotated], ["binary"])
 
 # Remove Staff AMIR
@@ -52,25 +58,17 @@ notes = CCA(withoutLines_dilated)
 # TODO bounding Boxes for each component
 boxes = RetrieveComponentBox(notes)
 # print(boxes)
-notes_with_lines = []
-for box in boxes:
-    [Ymin, Xmin, Ymax, Xmax] = box
-    Ymin -= 5
-    Ymax += 25
-    # print(box)
-    rr, cc = rectangle_perimeter(start=(Ymin, Xmin), end=(Ymax, Xmax), shape=rotated.shape)
-    # rotated[rr, cc] = 1  # set color white
-    notes_with_lines.append(rotated[np.min(rr):np.max(rr), np.min(cc):np.max(cc)])
 
+binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)
+gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
 # TODO AMIR: NOTES WITH LINES FEL ARRAY DA:
-notes_with_lines = np.array(notes_with_lines, dtype=object)
 # show_images([rotated], ["BOUNDING BOXES"])
-# show_images(notes_with_lines)
+# show_images(binary_notes_with_lines)
 displayComponents(withoutLines_dilated, notes)
 notesImages = componentsToImages(notes)
 
 # notes_hp = []
-# for img in notes_with_lines:
+# for img in binary_notes_with_lines:
 # img[:, 0] = 0
 # hproj = np.sum(img, 1)
 # m = np.max(hproj)
@@ -84,7 +82,7 @@ notesImages = componentsToImages(notes)
 
 num_lines = 0
 num_lines_list = []
-for img in notes_with_lines:
+for img in binary_notes_with_lines:
     lm, no = img.shape
     num_lines = 0
     for i in range(1, lm):
@@ -104,7 +102,50 @@ for img in notes_with_lines:
         print("none")
     # show_images([img])
 
+# show_images(notesImages)
+show_images(notesImages)
 # TODO Thinning each image can help in some features
+# Load picture and detect edges
+referenceImg = gray_notes_with_lines[2].astype(float)
+image_gray = notesImages[2].astype(float)
+show_images([image_gray])
+image_gray *= 255.0
+print("Image gray shape : ", image_gray.shape)
+edges = canny(image_gray, sigma=2.0, low_threshold=0.55, high_threshold=0.8)
+
+# Perform a Hough Transform
+# The accuracy corresponds to the bin size of a major axis.
+# The value is chosen in order to get a single high accumulator.
+# The threshold eliminates low accumulators
+result = hough_ellipse(edges, accuracy=100, min_size=10, max_size=100)
+result.sort(order='accumulator')
+
+# Estimated parameters for the ellipse
+best = list(result[-1])
+yc, xc, a, b = [int(round(x)) for x in best[1:5]]
+
+orientation = best[5]
+
+# Draw the ellipse on the original image
+cy, cx = ellipse_perimeter(yc, xc, a, b, orientation)
+# print("Parameters of ellipse: ",cy, cx)
+# np.min(cy):np.max(cy), np.min(cx):np.max(cx)
+referenceImg[cy, cx] = 128.0
+# The_image[cy, cx, 1] = 0
+# The_image[cy, cx, 2] = 255
+# Draw the edge (white) and the resulting ellipse (red)
+edges = color.gray2rgb(img_as_ubyte(edges))
+edges[cy, cx] = (250, 0, 0)
+
+fig2, (ax1, ax2) = plt.subplots(ncols=2, nrows=1, figsize=(8, 4), sharex=True, sharey=True)
+
+ax1.set_title('Original picture')
+ax1.imshow(referenceImg)
+
+ax2.set_title('Edge (white) and result (red)')
+ax2.imshow(edges)
+
+plt.show()
 
 '''
 for Image in notesImages:
