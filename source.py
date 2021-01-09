@@ -15,72 +15,72 @@ if path.lower().endswith('.jpg'):
 elif path.lower().endswith('.png'):
     gray = rgb2gray(rgba2rgb(The_image))
 # negativeandSave('quarternote.png')
-# TODO 7AD YE3MEL LOCAL BINARIZATION NEGARAB
-# TODO SKEWNESS NEDIF AGAINST CAPTURED
-rotated, gray = deskew(gray)
+# TODO SKEWNESS NEDIF AGAINST CAPTURED PERSPECTIVE // AMIR
 
+rotated, gray = deskew(gray)
 # show_images([gray], ["Gray: "])
 # show_images([rotated], ["binary"])
 
-# Remove Staff AMIR
-# bin, _ = otsu_binarize(rotated)
-# TODO A MORE ROBUST TO SKEWNESS STAFF LINE REMOVAL
+# TODO STAFF LINE REMOVAL
 rotated_copy = rotated.copy()
-withoutLines = removeHLines(rotated_copy)
+# withoutLines = removeHLines(rotated_copy)
 # show_images([rotated, withoutLines], ["Binary", " After Line Removal"])
 
 # Remove Staff TIFA
 # staff_indices = find_stafflines(rotated, 0, 0)
 # print(staff_indices)
 # rotated[staff_indices, :] = 0
-# s, t = get_references(rotated)
-# withoutLines = binary_opening(rotated, np.ones((t+2, 1)))
-# show_images([rotated, withoutLines], ["Rotated", "After Line Removal"])
+s, t = get_references(rotated)
+withoutLines = binary_opening(rotated, np.ones((t+2, 1)))
+# Added another opening for noise removal:
+# withoutLines = binary_opening(withoutLines, np.ones((3, 3)))
+show_images([rotated, withoutLines], ["Rotated", "After Line Removal"])
+
+
+
+# TODO replace the 6 with a variable dependant on the ratio between The width and the height of the image And remove
+#  the non uniform closing
 
 # Non uniform Closing
 # First dilate if there's a horizontal skip
 withoutLines_dilated = withoutLines
-
-# TODO replace the 6 with a variable dependant on the ratio between The width and the height of the image And remove
-#  the non uniform closing
 selem = np.array([[1, 1, 1], [0, 0, 0], [0, 0, 0], [1, 1, 1]])
 withoutLines_dilated = binary_dilation(withoutLines, selem)
 # Second Erode for vertical segmentations
 selem = np.array([[0, 0, 1, 0] * 3]).reshape((4, 3))
 withoutLines_dilated = binary_erosion(withoutLines_dilated, selem)
 withoutLines_dilated = binary_closing(withoutLines_dilated, np.ones((6, 1)))
+
+show_images([withoutLines_dilated], ["Dilated"])
+
+# withoutLines_dilated = binary_closing(withoutLines_dilated, np.ones((5, 5)))
+# withoutLines_dilated = binary_opening(withoutLines_dilated, np.ones((5, 5)))
 # io.imsave('savedImage2.png', withoutLines_dilated)
 # path = 'savedImage.png'
 # rtt = read_image(path)
 # withoutLines_dilated = withoutLines
-show_images([withoutLines_dilated], ["Dilated"])
+
 # regionproprs object
 notes = CCA(withoutLines_dilated)
-# TODO bounding Boxes for each component
 boxes = RetrieveComponentBox(notes)
-# print(boxes)
-
 binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)
 gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
-# TODO AMIR: NOTES WITH LINES FEL ARRAY DA:
-# show_images([rotated], ["BOUNDING BOXES"])
-# show_images(binary_notes_with_lines)
-displayComponents(withoutLines_dilated, notes)
 notesImages = componentsToImages(notes)
 
-# notes_hp = []
-# for img in binary_notes_with_lines:
-# img[:, 0] = 0
-# hproj = np.sum(img, 1)
-# m = np.max(hproj)
-# w = img.shape[1]
-# result = np.zeros((hproj.shape[0], w))
-# # Draw a line for each row
-# for row in range(img.shape[0]):
-#     cv2.line(result, (0, row), (int(hproj[row] * w / m), row), (255, 255, 255), 1)
-# notes_hp.append((img, result))
+displayComponents(withoutLines_dilated, notes)
 
+# TODO TEMPALTE MATCH THE CLEFS //JOE
+'''
+clef_template = read_image('clef.jpg')
+clef_template = resize(clef_template, (clef_template.shape[0] // 10, clef_template.shape[1] // 10))
+grayyyyyyyy = rgb2gray(clef_template)
+print(grayyyyyyyy.shape)
+binaryclef = grayyyyyyyy > threshold_otsu(grayyyyyyyy)
+print(binaryclef.shape, notesImages[1].shape)
+template_Match(notesImages[24], binaryclef)
+'''
 
+# TODO AMIR: FIND PITCH
 num_lines = 0
 num_lines_list = []
 for img in binary_notes_with_lines:
@@ -103,9 +103,8 @@ for img in binary_notes_with_lines:
         print("none")
     # show_images([img])
 
-# show_images(notesImages)
-show_images(notesImages)
-# TODO FINDING THE RHYTHM OF THE NOTES AND THE NUMBER OF THE NOTES
+
+# TODO Classification FINDING THE RHYTHM OF THE NOTES AND THE NUMBER OF THE NOTES //KARIM
 ##### Remove Vertical Stems and find their indices
 image = notesImages[22]  # [17] #28
 V_staff_indices = find_verticalLines(image)
@@ -123,7 +122,7 @@ elif stem_count == 1:
     print(row_histogram.shape)
 
     ##### IF chord or not, i.e: Find Peaks corresponding to each note with the threshold
-    note_threshold = image.shape[1] // 2
+    note_threshold = image.shape[1] // 2 - 1
     peaks, _ = find_peaks(row_histogram, height=note_threshold)
 
     ##### Plot Peaks on histogram
@@ -146,9 +145,9 @@ elif stem_count == 1:
                 row_histogram[peaks[0]] + row_histogram[peaks[0]] // 2 < row_histogram[peaks[1]]:
             print("Three notes Chord Stacced!")
             # TODO WE NEED TO FIND THE LOCALMINIMAS FOR SEGMENTATION FOR HOLLOW/ RIGID SPHERE
-            # TODO ADD A FLAG FOR THE IMAGE RADII IN THE HOUGH CIRCLE ALGORITHM
+            # Stacced flag for number of peaks increment
             stacced_flag = 1
-            # numberOfPeaks += 1
+            numberOfPeaks += 1
             # peaks = [np.min(peaks), np.max(peaks//2), np.max(peaks//2)]
             # peaks.append(np.max(peaks//2))
         else:
@@ -170,13 +169,13 @@ elif stem_count == 1:
     # Detect two radii
     hough_radii = 0
     if stacced_flag == 1:
-        hough_radii = np.arange(image.shape[1] // 4, image.shape[1] // 4 + 10, 5)
+        hough_radii = np.arange(image.shape[1] // 4 , image.shape[1] // 4 + 10, 1)
     else:
         hough_radii = np.arange(image.shape[1] // 2 - 10, image.shape[1] // 2, 5)
     hough_res = hough_circle(edges, hough_radii)
     print("hough radii", hough_radii)
     # Select the most prominent 3 circles
-    accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=3)
+    accums, cx, cy, radii = hough_circle_peaks(hough_res, hough_radii, total_num_peaks=numberOfPeaks)
 
     # Draw them
     fig, ax = plt.subplots(ncols=1, nrows=1, figsize=(10, 4))
@@ -188,7 +187,7 @@ elif stem_count == 1:
 
     ax.imshow(image, cmap=plt.cm.gray)
     plt.show()
-elif count == 2:
+elif stem_count == 2:
     print("Beamed note, we need to find the number of tails")
 
 '''
@@ -240,7 +239,7 @@ for Image in notesImages:
     show_images([Image])
 '''
 
-# TODO CLASSIFICATION USING SIFT OR A PLAN B
+
 '''
 show_images(notesImages)
 sampleimg = notesImages[12]

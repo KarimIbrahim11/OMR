@@ -7,8 +7,8 @@ import skimage.io as io
 from skimage.color import rgb2gray, rgb2hsv, rgba2rgb
 import matplotlib.pyplot as plt
 import numpy as np
-from skimage.feature import canny
-from skimage.filters import threshold_otsu
+from skimage.feature import canny, match_template
+from skimage.filters import threshold_otsu, threshold_sauvola, threshold_local, threshold_niblack
 from skimage.transform import hough_line, hough_line_peaks
 from skimage.util import random_noise
 from skimage.measure import find_contours
@@ -112,10 +112,20 @@ def deskew(gray):
     # image = imread( filename, as_grey=True)
     # threshold to get rid of extraneous noise
     image = gray.copy()
-    thresh = threshold_otsu(image)
-    print(thresh)
-    normalize = image > thresh
+    # OTSU
+    # thresh = threshold_otsu(image)
+    # SAUVOLA
+    thresh = threshold_sauvola(image, window_size=51)
+    # NIBLACK
+    # thresh = threshold_niblack(image, window_size=25, k=0.8)
+    # LOCAL
+    # bin1 =  threshold_local(image, 3, 'mean')
+    # func = lambda arr: arr.mean()
+    # thresh = threshold_local(image, 11, 'generic', param=func)
 
+    # print(thresh)
+    normalize = image > thresh
+    show_images([normalize], ["binary"])
     # gaussian blur
     blur = gaussian(normalize, 3)
 
@@ -341,7 +351,7 @@ def displayComponents(binary, components):
     ax.imshow(binary)
     for component in components:
         # take regions with large enough areas
-        if component.area >= 30:
+        if component.area >= 44:
             # draw rectangle around segmented coins
             # print("orientation of component:",component.orientation)
             minR, minC, maxR, maxC = component.bbox
@@ -358,7 +368,7 @@ def RetrieveComponentBox(components):
     boxes = []
     for component in components:
         # take regions with large enough areas
-        if component.area >= 30:
+        if component.area >= 44:
             # draw rectangle around segmented coins
             boxes.append(component.bbox)
     return np.array(boxes, dtype=object)
@@ -369,9 +379,42 @@ def componentsToImages(components):
     images = []
     for component in components:
         # take regions with large enough areas
-        if component.area >= 30:
+        if component.area >= 44:
             # draw rectangle around segmented coins
             minR, minC, maxR, maxC = component.bbox
             rect = mpatch.Rectangle((minC, minR), maxC - minC, maxR - minR, fill=False, edgecolor='red', linewidth=2)
             images.append(component.image)
     return np.array(images, dtype=object)
+
+
+# SKIMAGE TEMPLATE MATCHING
+def template_Match(img, template):
+    result = match_template(img, template)
+    ij = np.unravel_index(np.argmax(result), result.shape)
+    x, y = ij[::-1]
+
+    fig = plt.figure(figsize=(8, 3))
+    ax1 = plt.subplot(1, 3, 1)
+    ax2 = plt.subplot(1, 3, 2)
+    ax3 = plt.subplot(1, 3, 3, sharex=ax2, sharey=ax2)
+
+    ax1.imshow(template, cmap=plt.cm.gray)
+    ax1.set_axis_off()
+    ax1.set_title('image')
+
+    ax2.imshow(img, cmap=plt.cm.gray)
+    ax2.set_axis_off()
+    ax2.set_title('rotated')
+    # highlight matched region
+    hcoin, wcoin = template.shape
+    rect = plt.Rectangle((x, y), wcoin, hcoin, edgecolor='r', facecolor='none')
+    ax2.add_patch(rect)
+
+    ax3.imshow(result)
+    ax3.set_axis_off()
+    ax3.set_title('`match_template`\nresult')
+    # highlight matched region
+    ax3.autoscale(False)
+    ax3.plot(x, y, 'o', markeredgecolor='r', markerfacecolor='none', markersize=10)
+
+    plt.show()
