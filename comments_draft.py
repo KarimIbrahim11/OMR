@@ -177,3 +177,55 @@ def image_lines(image, thres=None):
     plt.show()
 
 '''
+
+############### FINDING PEAKS TOP AND BOT IMAGE
+
+'''
+row_histogram_not_filled = np.array([sum(image_filled_hole[i, :]) for i in range(image_filled_hole.shape[0])])
+print(row_histogram.shape)
+
+##### IF chord or not, i.e: Find Peaks corresponding to each note with the threshold
+note_threshold = image.shape[1] // 2 - 1
+peaks_not_filled_holes, _ = find_peaks(row_histogram_not_filled, height=note_threshold)
+
+##### Plot Peaks on histogram
+print("peaks", peaks_not_filled_holes)
+plt.plot(row_histogram_not_filled)
+plt.plot(peaks_not_filled_holes, row_histogram_not_filled[peaks_not_filled_holes], "x")
+plt.plot(np.zeros_like(row_histogram_not_filled), "--", color="gray")
+plt.show()
+
+##### IF chord or not, i.e: Find Peaks corresponding to each note with the threshold
+note_threshold = image.shape[1] // 2 - 1
+peaks_filled_holes, _ = find_peaks(row_histogram_filled, height=note_threshold)
+
+##### Plot Peaks on histogram
+print("peaks", peaks_filled_holes)
+plt.plot(row_histogram_filled)
+plt.plot(peaks_filled_holes, row_histogram_filled[peaks_filled_holes], "x")
+plt.plot(np.zeros_like(row_histogram_filled), "--", color="gray")
+plt.show()
+
+row_histogram_not_filled = np.array([sum(image_filled_hole[i, :]) for i in range(image_filled_hole.shape[0])])
+print(row_histogram_filled.shape)
+
+##### IF chord or not, i.e: Find Peaks corresponding to each note with the threshold
+note_threshold = image.shape[1] // 2 - 1
+peaks_not_filled_holes, _ = find_peaks(row_histogram_not_filled, height=note_threshold)
+
+##### Plot Peaks on histogram
+print("peaks", peaks_not_filled_holes)
+plt.plot(row_histogram_not_filled)
+plt.plot(peaks_not_filled_holes, row_histogram_not_filled[peaks_not_filled_holes], "x")
+plt.plot(np.zeros_like(row_histogram_not_filled), "--", color="gray")
+plt.show()
+
+peaks = []
+row_histogram = []
+if len(peaks_filled_holes) < len(peaks_not_filled_holes):
+    peaks = peaks_not_filled_holes
+    row_histogram = row_histogram_not_filled
+else:
+    peaks = peaks_filled_holes
+    row_histogram = row_histogram_filled
+'''

@@ -1,6 +1,7 @@
 from cv2.cv2 import CV_32F
 
 # from OMR.util import *
+from scipy.ndimage import binary_fill_holes
 from scipy.signal import find_peaks
 from skimage import color
 from skimage.draw import circle_perimeter, ellipse_perimeter
@@ -8,7 +9,7 @@ from skimage.transform import hough_circle, hough_circle_peaks, hough_ellipse
 
 from util import *
 
-path = 'cases/02.PNG'
+path = 'cases/01.PNG'
 The_image = read_image(path)
 if path.lower().endswith('.jpg'):
     gray = rgb2gray(The_image)
@@ -31,12 +32,10 @@ rotated_copy = rotated.copy()
 # print(staff_indices)
 # rotated[staff_indices, :] = 0
 s, t = get_references(rotated)
-withoutLines = binary_opening(rotated, np.ones((t+2, 1)))
+withoutLines = binary_opening(rotated, np.ones((t + 2, 1)))
 # Added another opening for noise removal:
 # withoutLines = binary_opening(withoutLines, np.ones((3, 3)))
 show_images([rotated, withoutLines], ["Rotated", "After Line Removal"])
-
-
 
 # TODO replace the 6 with a variable dependant on the ratio between The width and the height of the image And remove
 #  the non uniform closing
@@ -103,10 +102,10 @@ for img in binary_notes_with_lines:
         print("none")
     # show_images([img])
 
-
 # TODO Classification FINDING THE RHYTHM OF THE NOTES AND THE NUMBER OF THE NOTES //KARIM
 ##### Remove Vertical Stems and find their indices
-image = notesImages[22]  # [17] #28
+show_images(notesImages)
+image = notesImages[11]  # [22]  # [17] #28
 V_staff_indices = find_verticalLines(image)
 print(V_staff_indices)
 image[:, V_staff_indices] = 0
@@ -115,10 +114,21 @@ print(stems_indices)
 if stem_count == 0:
     print("One Whole note")
 elif stem_count == 1:
-    stacced_flag = 0
+
+
+    #image_filled_hole = binary_closing(image, np.ones((7, 7)))
+    #show_images([image, image_filled_hole])
+    top_bottom, top_image, bot_image = classifyNotePositionInSegment(image)
+
     print("Many notes i.e: Chord or one single note( half or quarter or eighth or sixteenth)")
+
+    image_copy = (image.copy())
+    image_filled_hole = image_copy
+
+    # TODO FIND WHETHER IT WAS FILLED OR HOLLOW THEN GO BACK TO USING IMAGE_COPY
+
     ##### Find Row Histogram
-    row_histogram = np.array([sum(image[i, :]) for i in range(image.shape[0])])
+    row_histogram = np.array([sum(image_filled_hole[i, :]) for i in range(image_filled_hole.shape[0])])
     print(row_histogram.shape)
 
     ##### IF chord or not, i.e: Find Peaks corresponding to each note with the threshold
@@ -126,50 +136,66 @@ elif stem_count == 1:
     peaks, _ = find_peaks(row_histogram, height=note_threshold)
 
     ##### Plot Peaks on histogram
-    # print(peaks)
+    print("peaks", peaks)
     plt.plot(row_histogram)
     plt.plot(peaks, row_histogram[peaks], "x")
     plt.plot(np.zeros_like(row_histogram), "--", color="gray")
     plt.show()
 
+
+
+
     ##### Find the local Minimas between the number of notes
+    stacced_flag = 0
     numberOfPeaks = len(peaks)
-    localMinimas = []
+    # localMinimas = []
     if numberOfPeaks == 1:
         print("One Note i.e no Chord")
     elif numberOfPeaks == 2:
         print("Two Notes Chord")
-        # for detecting stacced notes, we will put a threshold on the peaks and increment them accordingly
-        # print(row_histogram[peaks])
-        if row_histogram[peaks[0]] > row_histogram[peaks[1]] + row_histogram[peaks[1]] // 2 or \
-                row_histogram[peaks[0]] + row_histogram[peaks[0]] // 2 < row_histogram[peaks[1]]:
-            print("Three notes Chord Stacced!")
-            # TODO WE NEED TO FIND THE LOCALMINIMAS FOR SEGMENTATION FOR HOLLOW/ RIGID SPHERE
-            # Stacced flag for number of peaks increment
-            stacced_flag = 1
-            numberOfPeaks += 1
-            # peaks = [np.min(peaks), np.max(peaks//2), np.max(peaks//2)]
-            # peaks.append(np.max(peaks//2))
+
+        ##### Find the distance between tail peak and note peak to differentiate between // IN CASE OF FILLING HOLES
+        if peaks[0] - peaks[1] > peaks[1] // 2 or peaks[1] - peaks[0] > peaks[1] // 2:
+            print("False Identification of tail as a note")
+            numberOfPeaks -= 1
+            if max(row_histogram[peaks[0]], row_histogram[peaks[1]]) == row_histogram[peaks[0]]:
+                peaks = [peaks[0]]
+            else:
+                peaks = [peaks[1]]
+            print("peaks", peaks)
         else:
-            localMinimas.append((peaks[0] + peaks[1]) // 2)
+            # for detecting stacced notes, we will put a threshold on the peaks and increment them accordingly
+            # print(row_histogram[peaks])
+            if row_histogram[peaks[0]] > row_histogram[peaks[1]] + row_histogram[peaks[1]] // 2 or \
+                    row_histogram[peaks[0]] + row_histogram[peaks[0]] // 2 < row_histogram[peaks[1]]:
+                print("Three notes Chord Stacced!")
+                # TODO WE NEED TO FIND THE LOCALMINIMAS FOR SEGMENTATION FOR HOLLOW/ RIGID SPHERE
+                # Stacced flag for number of peaks increment
+                stacced_flag = 1
+                numberOfPeaks += 1
+                # peaks = [np.min(peaks), np.max(peaks//2), np.max(peaks//2)]
+                # peaks.append(np.max(peaks//2))
+            # else:
+            #    localMinimas.append((peaks[0] + peaks[1]) // 2)
     elif numberOfPeaks == 3:
         print("Three Notes Chord")
-        localMinimas.append((peaks[0] + peaks[1]) // 2)
-        localMinimas.append((peaks[1] + peaks[2]) // 2)
+        # localMinimas.append((peaks[0] + peaks[1]) // 2)
+        # localMinimas.append((peaks[1] + peaks[2]) // 2)
 
+
+    '''
     ##### Segment the image based on
     # for i in range(len(localMinimas)):
 
     image = img_as_ubyte(image)
     show_images([image])
     edges = canny(image, sigma=2, low_threshold=10, high_threshold=50)
-    print("Edgesssss:")
     show_images([edges])
 
     # Detect two radii
     hough_radii = 0
     if stacced_flag == 1:
-        hough_radii = np.arange(image.shape[1] // 4 , image.shape[1] // 4 + 10, 1)
+        hough_radii = np.arange(image.shape[1] // 4, image.shape[1] // 4 + 10, 1)
     else:
         hough_radii = np.arange(image.shape[1] // 2 - 10, image.shape[1] // 2, 5)
     hough_res = hough_circle(edges, hough_radii)
@@ -189,7 +215,7 @@ elif stem_count == 1:
     plt.show()
 elif stem_count == 2:
     print("Beamed note, we need to find the number of tails")
-
+'''
 '''
 # Load picture and detect edges
 referenceImg = gray_notes_with_lines[2].astype(float)
@@ -238,7 +264,6 @@ for Image in notesImages:
     Image = thin(Image, 5)
     show_images([Image])
 '''
-
 
 '''
 show_images(notesImages)

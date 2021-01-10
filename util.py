@@ -286,7 +286,7 @@ def find_stafflines(img, space, thickness):
 
 def find_verticalLines(img):
     col_hist = np.array([sum(img[:, i]) for i in range(img.shape[1])])
-    thresh = 0.6
+    thresh = 0.7
     staff_lines = col_hist > thresh * img.shape[0]
     staff_indices = np.where(staff_lines == True)[0]
     return staff_indices
@@ -418,3 +418,77 @@ def template_Match(img, template):
     ax3.plot(x, y, 'o', markeredgecolor='r', markerfacecolor='none', markersize=10)
 
     plt.show()
+
+
+def findBoundingCircleArea(img, contours):
+    (x, y), radius = cv2.minEnclosingCircle(contours[0])
+    center = (int(x), int(y))
+    area = m.pi * int(radius) * int(radius)
+    bounding_circle = cv2.circle(cv2.cvtColor(img, cv2.COLOR_GRAY2RGB), center, int(radius), (0, 255, 0), 2)
+    return area, bounding_circle
+
+
+def findContourArea(img):
+    contours, _ = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    if len(contours) != 0:
+        area = cv2.contourArea(contours[0])
+    else:
+        # print("No contours found")
+        area = 0
+    return area, contours
+
+
+def extract_features_for_head_tail(img):
+    area, contours = findContourArea(img)
+    if area > 10 and len(contours) != 0:
+        area1, _ = findBoundingCircleArea(img, contours)
+        ratioCirc = area / area1
+    else:
+        ratioCirc = 0
+    feature = ratioCirc
+    return feature
+
+
+def bin_image_to_opencvimage(bin_img):
+    # print(bin_img.shape)
+    shape = np.asarray(bin_img.shape)
+    shape = np.append(shape, 3)
+    # print(shape)
+    wawa = np.zeros(shape)
+    # print(np.max(bin_img))
+    wawa[:, :, 0] = np.array(bin_img * 255, dtype=np.uint8)
+    wawa[:, :, 1] = np.array(bin_img * 255, dtype=np.uint8)
+    wawa[:, :, 2] = np.array(bin_img * 255, dtype=np.uint8)
+    # print("wawa:", wawa.shape)
+
+    # wawa = np.negative(wawa)
+    wawa = cv2.normalize(wawa, None, 0, 255, cv2.NORM_MINMAX).astype('uint8')
+    gray = cv2.cvtColor(wawa, cv2.COLOR_BGR2GRAY)
+    kernelSize = (3, 3)
+    blur = cv2.blur(gray, kernelSize)
+    _, binary = cv2.threshold(blur, 50, 255, cv2.THRESH_BINARY)
+    # wawa = np.negative(wawa)
+    # gray = cv2.cvtColor(wawa, cv2.COLOR_BGR2GRAY)
+    # wawa = cv2.normalize(wawa, None, 0, 255, cv2.NORM_MINMAX).astype('uint8')
+
+    return binary
+
+
+def classifyNotePositionInSegment(img):
+    top_image = img[0:img.shape[0] // 2, :]
+    bot_image = img[img.shape[0] // 2: img.shape[0] - 1, :]
+    # show_images([top_image, bot_image],["Top image", "Bot Image"])
+    top_image_cv = bin_image_to_opencvimage(top_image)
+    bot_image_cv = bin_image_to_opencvimage(bot_image)
+
+    ratio_top = extract_features_for_head_tail(top_image_cv)
+    ratio_bot = extract_features_for_head_tail(bot_image_cv)
+    print("Circle Ratios: ", [ratio_top, ratio_bot])
+    tb = -1
+    if max(ratio_bot, ratio_top) == ratio_top:
+        print("Note head is up")
+        tb = 0
+    else:
+        print("Note head is down")
+        tb = 1
+    return tb, top_image, bot_image
