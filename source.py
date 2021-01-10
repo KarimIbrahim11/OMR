@@ -1,3 +1,4 @@
+import imutils as imutils
 from cv2.cv2 import CV_32F
 
 # from OMR.util import *
@@ -15,7 +16,9 @@ if path.lower().endswith('.jpg'):
     gray = rgb2gray(The_image)
 elif path.lower().endswith('.png'):
     gray = rgb2gray(rgba2rgb(The_image))
-# negativeandSave('quarternote.png')
+
+image = gray.copy()
+
 # TODO SKEWNESS NEDIF AGAINST CAPTURED PERSPECTIVE // AMIR
 
 rotated, gray = deskew(gray)
@@ -104,17 +107,29 @@ for img in binary_notes_with_lines:
 # TODO Classification FINDING THE RHYTHM OF THE NOTES AND THE NUMBER OF THE NOTES //KARIM
 ##### PROCESSING EACH NOTE SEGMENT
 show_images(notesImages)
-image = notesImages[11]  # [22]  # [17] #28
+image = notesImages[52]  # [22]  # [17] # 28
 
 #### FINDING POSITION OF NOTE HEAD --> TOP = 0, BOTTOM = 1 and returning segmented images
-show_images([notesImages[28]])
-top_bottom, top_image, bot_image = classifyNotePositionInSegment(notesImages[28])
-print("Top or bottom:", top_bottom)
+show_images([notesImages[55]])  # 4 #1 #14# 26 27 39 25
+
+avgAreas = np.average(componentsAreas(notes))
+ratio = notesImages[55].shape[0] / notesImages[55].shape[1]
+area = notes[55].area
+print("Area: ", area, " Average area:", avgAreas)
+print("ratio: ", ratio)
+if ratio > 1.4:
+    print("Accidentals or single stem")
+    # TODO ACCIDENTAL CLASSIFICATION
+else:
+    print("Beamed notes")
 
 #### Removing Stems to count the number of notes
 V_staff_indices = find_verticalLines(image)
 print(V_staff_indices)
 image[:, V_staff_indices] = 0
+
+top_bottom, top_image, bot_image = classifyNotePositionInSegment(notesImages[5])
+print("Top or bottom:", top_bottom)
 stems_indices, stem_count = countStems(V_staff_indices)
 print(stems_indices)
 if stem_count == 0:

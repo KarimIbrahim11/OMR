@@ -229,3 +229,30 @@ else:
     peaks = peaks_filled_holes
     row_histogram = row_histogram_filled
 '''
+
+############# classificationbayez
+'''
+if area < 0.6 * avgAreas:
+    print("Accidentals/ Rests")
+elif ratio >= 1.5 and area >= 0.6 * avgAreas:  # and area > avgAreas - 20:
+    print("Single stem")
+elif ratio < 1.5 and area >= 0.9 * avgAreas:
+    print("Beamed Notes")
+'''
+'''
+#### Calculate ratio of width to height to classify:
+avgAreas = np.average(componentsAreas(notes))
+print("Average area:", avgAreas)
+for i in range(len(notes)):
+    # Rows to columns:
+    ratio = notesImages[i].shape[0] // notesImages[i].shape[1]
+    area = notes[i].area
+    if ratio > 1.2:  # and area > avgAreas - 20:
+        print("Single stem")
+    else:
+        print("Beamed note or accidental")
+        if area > avgAreas - 10:
+            print("Beamed Notes")
+        else:
+            print("Accidental, rest or dot")
+'''
