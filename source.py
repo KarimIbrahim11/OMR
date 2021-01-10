@@ -9,7 +9,7 @@ from skimage.transform import hough_circle, hough_circle_peaks, hough_ellipse
 
 from util import *
 
-path = 'cases/01.PNG'
+path = 'cases/02.PNG'
 The_image = read_image(path)
 if path.lower().endswith('.jpg'):
     gray = rgb2gray(The_image)
@@ -65,7 +65,6 @@ boxes = RetrieveComponentBox(notes)
 binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)
 gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
 notesImages = componentsToImages(notes)
-
 displayComponents(withoutLines_dilated, notes)
 
 # TODO TEMPALTE MATCH THE CLEFS //JOE
@@ -103,9 +102,16 @@ for img in binary_notes_with_lines:
     # show_images([img])
 
 # TODO Classification FINDING THE RHYTHM OF THE NOTES AND THE NUMBER OF THE NOTES //KARIM
-##### Remove Vertical Stems and find their indices
+##### PROCESSING EACH NOTE SEGMENT
 show_images(notesImages)
 image = notesImages[11]  # [22]  # [17] #28
+
+#### FINDING POSITION OF NOTE HEAD --> TOP = 0, BOTTOM = 1 and returning segmented images
+show_images([notesImages[28]])
+top_bottom, top_image, bot_image = classifyNotePositionInSegment(notesImages[28])
+print("Top or bottom:", top_bottom)
+
+#### Removing Stems to count the number of notes
 V_staff_indices = find_verticalLines(image)
 print(V_staff_indices)
 image[:, V_staff_indices] = 0
@@ -115,10 +121,9 @@ if stem_count == 0:
     print("One Whole note")
 elif stem_count == 1:
 
-
-    #image_filled_hole = binary_closing(image, np.ones((7, 7)))
-    #show_images([image, image_filled_hole])
-    top_bottom, top_image, bot_image = classifyNotePositionInSegment(image)
+    # image_filled_hole = binary_closing(image, np.ones((7, 7)))
+    # show_images([image, image_filled_hole])
+    # top_bottom, top_image, bot_image = classifyNotePositionInSegment(image)
 
     print("Many notes i.e: Chord or one single note( half or quarter or eighth or sixteenth)")
 
@@ -141,9 +146,6 @@ elif stem_count == 1:
     plt.plot(peaks, row_histogram[peaks], "x")
     plt.plot(np.zeros_like(row_histogram), "--", color="gray")
     plt.show()
-
-
-
 
     ##### Find the local Minimas between the number of notes
     stacced_flag = 0
@@ -181,7 +183,6 @@ elif stem_count == 1:
         print("Three Notes Chord")
         # localMinimas.append((peaks[0] + peaks[1]) // 2)
         # localMinimas.append((peaks[1] + peaks[2]) // 2)
-
 
     '''
     ##### Segment the image based on
