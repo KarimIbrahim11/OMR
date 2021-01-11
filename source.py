@@ -68,8 +68,8 @@ notes, notesImages = CCA(withoutLines_dilated)
 print([notes[0]])
 show_images(notesImages)
 boxes = RetrieveComponentBox(notes)
-binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)
-gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
+# binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)
+# gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
 # notesImages = componentsToImages(notes)
 displayComponents(withoutLines_dilated, notes)
 
@@ -85,6 +85,7 @@ template_Match(notesImages[24], binaryclef)
 '''
 
 # TODO AMIR: FIND PITCH
+'''
 num_lines = 0
 num_lines_list = []
 for img in binary_notes_with_lines:
@@ -106,7 +107,7 @@ for img in binary_notes_with_lines:
     else:
         print("none")
     # show_images([img])
-
+'''
 # TODO Classification FINDING THE RHYTHM OF THE NOTES AND THE NUMBER OF THE NOTES //KARIM
 ##### PROCESSING EACH NOTE SEGMENT
 # show_images(notesImages)

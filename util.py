@@ -381,13 +381,15 @@ def displayComponents(binary, components):
 
 
 # Retrieve Boxes bs
-def RetrieveComponentBox(components):
+def RetrieveComponentBox(images):
     boxes = []
-    for component in components:
-        # take regions with large enough areas
-        if component.area >= 44:
-            # draw rectangle around segmented coins
-            boxes.append(component.bbox)
+    for img in images:
+        minR = np.min(img[0])
+        maxR = np.max(img[0])
+        minC = np.min(img[1])
+        maxC = np.max(img[1])
+        bbox = [minR, minC, maxR, maxC]
+        boxes.append(bbox)
     return np.array(boxes, dtype=object)
 
 
