@@ -63,13 +63,14 @@ show_images([withoutLines_dilated], ["Dilated"])
 # withoutLines_dilated = withoutLines
 
 # regionproprs object
-notes, sorted_images = CCA(withoutLines_dilated)
+notes, notesImages = CCA(withoutLines_dilated)
+
 print([notes[0]])
-show_images(sorted_images)
+show_images(notesImages)
 boxes = RetrieveComponentBox(notes)
 binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)
 gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
-notesImages = componentsToImages(notes)
+# notesImages = componentsToImages(notes)
 displayComponents(withoutLines_dilated, notes)
 
 # TODO TEMPALTE MATCH THE CLEFS //JOE
@@ -108,7 +109,7 @@ for img in binary_notes_with_lines:
 
 # TODO Classification FINDING THE RHYTHM OF THE NOTES AND THE NUMBER OF THE NOTES //KARIM
 ##### PROCESSING EACH NOTE SEGMENT
-show_images(notesImages)
+# show_images(notesImages)
 image = notesImages[52]  # [22]  # [17] # 28
 
 #### FINDING POSITION OF NOTE HEAD --> TOP = 0, BOTTOM = 1 and returning segmented images
