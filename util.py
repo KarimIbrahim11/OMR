@@ -350,12 +350,13 @@ def CCA(binary):
             minR, minC, maxR, maxC = component.bbox
             thisdict[minC] = []
             thisdict[minC].append(binary[minR:maxR+2, minC:maxC+2])
+            thisdict[minC].append(component.bbox)
             keys.append(str(index))
-            boxes.append(component.bbox)
             index += 1
     print(thisdict.keys())
     for key in sorted(thisdict.keys()):
         sorted_notes_images.append(thisdict[key][0])
+        boxes.append(thisdict[key][1])
     return components, sorted_notes_images, boxes
 
 def componentsAreas(components):

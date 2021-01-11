@@ -2,11 +2,7 @@ import imutils as imutils
 from cv2 import CV_32F
 
 # from OMR.util import *
-from scipy.ndimage import binary_fill_holes
 from scipy.signal import find_peaks
-from skimage import color
-from skimage.draw import circle_perimeter, ellipse_perimeter
-from skimage.transform import hough_circle, hough_circle_peaks, hough_ellipse
 
 from util import *
 
@@ -114,7 +110,6 @@ for img in binary_notes_with_lines:
 # show_images(notesImages)
 image = notesImages[21]  # [22]  # [17] # 28 # 10 # 6 # 21
 
-
 show_images([notesImages[21]])  # 4 #1 #14# 26 27 39 25
 
 avgAreas = np.average(componentsAreas(notes))
@@ -125,32 +120,20 @@ print("ratio: ", ratio)
 if ratio > 1.4:
     print("Accidentals or single stem")
     # TODO ACCIDENTAL CLASSIFICATION
-else:
-    print("Beamed notes")
 
-#### Removing Stems to count the number of notes
-V_staff_indices = find_verticalLines(image)
-print(V_staff_indices)
-#image[:, V_staff_indices] = 0
-stems_indices, stem_count = countStems(V_staff_indices)
+    #### Removing Stems to count the number of notes
+    V_staff_indices = find_verticalLines(image)
+    print(V_staff_indices)
+    # image[:, V_staff_indices] = 0
+    stems_indices, stem_count = countStems(V_staff_indices)
 
-
-# s, t = get_references(image)
-image = binary_opening(image, np.ones((1, t + 4)))
-show_images([image])
-#### Find out where the notes are top or bottom
-top_bottom, top_image, bot_image = classifyNotePositionInSegment(image)
-print("Top or bottom:", top_bottom)
-print(stems_indices)
-if stem_count == 0:
-    print("One Whole note")
-elif stem_count == 1:
-
-    # image_filled_hole = binary_closing(image, np.ones((7, 7)))
-    # show_images([image, image_filled_hole])
-    # top_bottom, top_image, bot_image = classifyNotePositionInSegment(image)
-
-    print("Many notes i.e: Chord or one single note( half or quarter or eighth or sixteenth)")
+    # s, t = get_references(image)
+    image = binary_opening(image, np.ones((1, t + 4)))
+    show_images([image])
+    #### Find out where the notes are top or bottom
+    top_bottom, top_image, bot_image = classifyNotePositionInSegment(image)
+    print("Top or bottom:", top_bottom)
+    print(stems_indices)
 
     image_copy = (image.copy())
     image_filled_hole = image_copy
@@ -208,4 +191,11 @@ elif stem_count == 1:
         print("Three Notes Chord")
         # localMinimas.append((peaks[0] + peaks[1]) // 2)
         # localMinimas.append((peaks[1] + peaks[2]) // 2)
+else:
+    print("Beamed notes")
 
+if stem_count == 0:
+    print("One Whole note")
+elif stem_count == 1:
+
+    print("Many notes i.e: Chord or one single note( half or quarter or eighth or sixteenth)")
