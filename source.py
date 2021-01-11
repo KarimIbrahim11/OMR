@@ -10,7 +10,7 @@ from skimage.transform import hough_circle, hough_circle_peaks, hough_ellipse
 
 from util import *
 
-path = 'cases/01.PNG'
+path = 'cases/02.PNG'
 The_image = read_image(path)
 if path.lower().endswith('.jpg'):
     gray = rgb2gray(The_image)
@@ -67,7 +67,7 @@ notes, notesImages = CCA(withoutLines_dilated)
 
 print([notes[0]])
 show_images(notesImages)
-boxes = RetrieveComponentBox(notes)
+# boxes = RetrieveComponentBox(notes)
 # binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)
 # gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
 # notesImages = componentsToImages(notes)
@@ -111,14 +111,14 @@ for img in binary_notes_with_lines:
 # TODO Classification FINDING THE RHYTHM OF THE NOTES AND THE NUMBER OF THE NOTES //KARIM
 ##### PROCESSING EACH NOTE SEGMENT
 # show_images(notesImages)
-image = notesImages[52]  # [22]  # [17] # 28
+image = notesImages[13]  # [22]  # [17] # 28
 
 #### FINDING POSITION OF NOTE HEAD --> TOP = 0, BOTTOM = 1 and returning segmented images
-show_images([notesImages[55]])  # 4 #1 #14# 26 27 39 25
+show_images([notesImages[13]])  # 4 #1 #14# 26 27 39 25
 
 avgAreas = np.average(componentsAreas(notes))
-ratio = notesImages[55].shape[0] / notesImages[55].shape[1]
-area = notes[55].area
+ratio = notesImages[13].shape[0] / notesImages[13].shape[1]
+area = notes[13].area
 print("Area: ", area, " Average area:", avgAreas)
 print("ratio: ", ratio)
 if ratio > 1.4:
@@ -132,7 +132,7 @@ V_staff_indices = find_verticalLines(image)
 print(V_staff_indices)
 image[:, V_staff_indices] = 0
 
-top_bottom, top_image, bot_image = classifyNotePositionInSegment(notesImages[5])
+top_bottom, top_image, bot_image = classifyNotePositionInSegment(notesImages[1])
 print("Top or bottom:", top_bottom)
 stems_indices, stem_count = countStems(V_staff_indices)
 print(stems_indices)
