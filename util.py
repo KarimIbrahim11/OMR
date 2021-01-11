@@ -344,23 +344,27 @@ def CCA(binary):
     sorted_notes_images = []
     index = 0
     keys = []
+    boxes = []
     for component in components:
         if component.area >= 44:
             minR, minC, maxR, maxC = component.bbox
             thisdict[minC] = []
             thisdict[minC].append(binary[minR:maxR+2, minC:maxC+2])
             keys.append(str(index))
+            boxes.append(component.bbox)
             index += 1
     print(thisdict.keys())
     for key in sorted(thisdict.keys()):
         sorted_notes_images.append(thisdict[key][0])
-    return components, sorted_notes_images
+    return components, sorted_notes_images, boxes
 
 def componentsAreas(components):
     area = []
     for component in components:
         area.append(component.area)
     return np.array(area)
+
+
 # CCA Display Components TESTED
 def displayComponents(binary, components):
     # takes ski.image.regionProps output
@@ -379,21 +383,22 @@ def displayComponents(binary, components):
     plt.tight_layout()
     plt.show()
 
-
+'''
 # Retrieve Boxes bs
 def RetrieveComponentBox(images):
     boxes = []
     for img in images:
-        minR = np.min(img[0])
-        maxR = np.max(img[0])
-        minC = np.min(img[1])
-        maxC = np.max(img[1])
+        minR = np.amin(img, axis=0)
+        maxR = np.amax(img, axis=0)
+        minC = np.amin(img, axis=1)
+        maxC = np.amax(img, axis=1)
         bbox = [minR, minC, maxR, maxC]
         boxes.append(bbox)
     return np.array(boxes, dtype=object)
-
+'''
 
 # Convert Each Component to image and append them in a single array
+'''
 def componentsToImages(components):
     images = []
     for component in components:
@@ -438,7 +443,7 @@ def template_Match(img, template):
 
     plt.show()
 
-
+'''
 def findBoundingCircleArea(img, contours):
     (x, y), radius = cv2.minEnclosingCircle(contours[0])
     center = (int(x), int(y))

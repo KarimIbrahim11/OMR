@@ -1,5 +1,5 @@
 import imutils as imutils
-from cv2.cv2 import CV_32F
+from cv2 import CV_32F
 
 # from OMR.util import *
 from scipy.ndimage import binary_fill_holes
@@ -63,13 +63,14 @@ show_images([withoutLines_dilated], ["Dilated"])
 # withoutLines_dilated = withoutLines
 
 # regionproprs object
-notes, notesImages = CCA(withoutLines_dilated)
+notes, notesImages, boxes = CCA(withoutLines_dilated)
 
 print([notes[0]])
 show_images(notesImages)
-# boxes = RetrieveComponentBox(notes)
-# binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)
-# gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
+# boxes = RetrieveComponentBox(notesImages)
+binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)
+gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
+show_images(binary_notes_with_lines)
 # notesImages = componentsToImages(notes)
 displayComponents(withoutLines_dilated, notes)
 

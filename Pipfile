@@ -4,6 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+imutils = "*"
+scipy = "*"
+scikit-image = "*"
 
 [dev-packages]
 
