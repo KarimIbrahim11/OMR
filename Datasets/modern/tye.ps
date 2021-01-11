@@ -1,0 +1,6191 @@
+%!PS-Adobe-1.0
+%%Creator: Mup
+%%Title: music:  from tye.mup
+%%CreationDate: Tue Aug 15 16:50:11 2006
+%%Pages: (atend)
+%%DocumentFonts: (atend)
+%%BoundingBox: 0 0 612 792
+%%EndComments
+% Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000, 2003, 2004 by Arkkra Enterprises
+% All rights reserved
+
+% Mup PostScript Prolog 5.2 for use with Mup 5.2
+
+% lwid is used as the width of a standard (thin) line in the music
+% character definitions.
+/lwid 70 def
+/halflwid lwid 2 div def
+
+% Define the following for use in do_upshortnote, do_dnshortnote, and
+% do_shortrest; it has to be done outside of the music font definition.
+/utildict 10 dict def
+utildict begin
+	/setnumflags	{	/numflags	exch def } def
+	/sethooksm1	{	/hooksm1	exch def } def
+	/setoffsets	{	/offsets	exch def } def
+	/setx		{	/x		exch def } def
+	/sety		{	/y		exch def } def
+end
+
+% Define a music character font.  Each music character is defined as if it
+% were a normal ASCII character in a strange font where "A" looks like a
+% treble clef, "B" looks like a bass clef, etc.
+
+/mfont0 100 dict def
+mfont0 begin
+	/FontType 3 def
+	/FontMatrix [ .001 0 0 0.001 0 0 ] def
+	/FontBBox [ -2000 -4030 2000 4030 ] def
+	/FontName (Mfont0) def
+
+	% set up Encoding vector with standard names
+	/Encoding 256 array def
+	StandardEncoding Encoding copy
+	pop
+
+	% the following definitions are used for quarter rests
+	/topx -170 def /topy 950 def
+	/cor1x 250 def /cor1y 450 def
+	/cor2x -300 def /cor2y 200 def
+	/cor3x 250 def /cor3y -400 def
+
+	% the following definitions are used for double sharps
+	/limit 300 halflwid add def
+	/off 70 def
+	/inbendsmall limit 200 sub def
+	/inbendbig limit 20 sub def
+	/outbendsmall 100 def
+	/outbendbig outbendsmall off add def
+
+	%%%%% define routines that will be used by multiple characters %%%%%
+	/do_1n {
+		gsave
+		newpath -10 rotate 1.6 1 scale
+		0 0 325 0 360 arc		%outer ellipse
+		1 1.6 div 1 scale 10 rotate	%back to original
+		35 rotate 0.85 1.1 scale
+		0 0 275 0 360 arc		%inner ellipse
+		eofill
+		grestore
+	} def
+	/do_upflag {
+		-315 0 moveto
+		-300 100 -100 480 0 600 curveto
+		300 960 350 1500 200 1700 curveto
+		130 1700 lineto
+		350 1200 50 650 -315 600 curveto
+		fill
+	} def
+	/do_flat {
+		-250 -400 moveto	%outer edge of loop
+		500 0 350 650 -250 160 curveto
+		-250 160 lwid sub lineto %inner edge of loop
+		100 400 300 0 -250 -400 lwid add curveto
+		fill
+
+		lwid setlinewidth	%stem
+		-250 1100 moveto -250 -400 lineto stroke
+	} def
+	/do_diamond {
+		newpath
+		420 0 moveto 0 300 lineto -420 0 lineto
+		0 -300 lineto closepath
+		259 -29 moveto -41 185 lineto -259 29 lineto
+		41 -185 lineto closepath
+		eofill
+	} def
+	/do_2n {
+		gsave
+		newpath 25 rotate 1.4 1 scale
+		0 0 315 0 360 arc		%outer ellipse
+		1 1.4 div 1 scale		%back to original
+		1.3 0.5 scale
+		0 0 310 0 360 arc		%inner ellipse
+		eofill
+		grestore
+	} def
+	/do_4n {
+		gsave
+		newpath 25 rotate 1.35 1 scale
+		0 0 310 0 360 arc fill
+		grestore
+	} def
+	/do_com {
+		newpath
+		330 250 150 0 360 arc fill	%knob at upper right
+		465 300 moveto			%outer boundary
+		410 500 200 635 0 635 curveto
+		-750 635 -750 -635 0 -635 curveto
+		350 -635 480 -300 500 -100 curveto
+		430 -100 lineto			%inner boundary
+		380 -300 250 -565 0 -565 curveto
+		-450 -565 -450 565 0 565 curveto
+		200 565 370 350 395 300 curveto
+		fill
+	} def
+	/do_ferm {
+		0 0 800 lwid sub 0 180 arc	%inner arc
+		-800 0 lineto
+		0 270 lwid sub 800 180 0 arcn	%outer arc
+		800 0 lineto fill
+		0 120 120 0 360 arc fill	%the dot
+	} def
+	/do_mor {
+		gsave
+		0.7 1 scale	%scrunch the following horizontally
+		45 rotate	%to pretend all lines horz or vertical
+		0 1 1 {
+			pop	%we don't need the loop variable
+			%one half of the mordent
+			0 40 moveto 350 40 lineto 350 -460 lineto
+			750 -460 lineto 750 -540 lineto
+			150 -540 lineto 150 -40 lineto
+			0 -40 lineto fill
+			180 rotate	%to do the other half
+		} for
+		grestore
+	} def
+	/do_turn {
+		gsave
+		0 1 1 {
+			pop	%we don't need the loop variable
+			0 -100 moveto	%outer boundary
+			200 -400 625 -400 625 0 curveto
+			625 200 500 325 300 325 curveto
+			300 185 lineto	%inner boundary
+			450 255 555 150 555 0 curveto
+			555 -350 250 -250 0 100 curveto
+			fill
+			300 255 70 0 360 arc fill %knob on end
+			180 rotate	%to do the other half
+		} for
+		grestore
+	} def
+
+	/do_upshortnote {
+		utildict begin
+		setnumflags		%set numflags from the stack
+		gsave
+		-330 0 translate	%half a flag width
+		do_4n			%do a quarter note head
+		lwid setlinewidth
+		370 0 moveto
+		370 2100 numflags 2 sub flagsep mul add lineto stroke
+		670 2100 numflags 2 sub flagsep mul add translate
+		1 -1 scale		%reflect across X axis
+		0 1 numflags 1 sub {
+			do_upflag	%do an upflag
+			pop		%we don't need the loop variable
+			0 flagsep translate
+		} for
+		grestore
+		end
+	} def
+
+	/do_dnshortnote {
+		utildict begin
+		setnumflags		%set numflags from the stack
+		do_4n			%do a quarter note head
+		lwid setlinewidth
+		-370 0 moveto
+		-370 -2100 numflags 2 sub flagsep mul sub lineto stroke
+		gsave
+		-70 -2100 numflags 2 sub flagsep mul sub translate
+		0 1 numflags 1 sub {
+			do_upflag	%do an upflag
+			pop		%we don't need the loop variable
+			0 flagsep translate
+		} for
+		grestore
+		end
+	} def
+
+	/do_shortrest {
+		utildict begin
+		sety setx setoffsets sethooksm1	%set variable from the stack
+		gsave
+		-105.8 offsets mul -600 offsets mul translate
+		0 1 hooksm1 {		%loop once per hook
+			newpath
+			1 setlinewidth
+			gsave
+			1 1.2 scale
+			-150 300 1.2 div 140 0 360 arc fill 	%the dot
+			grestore
+			lwid setlinewidth
+			-50 700 550 255 315 arc		%rest of the hook
+			hooksm1 lt { stroke 105.8 600 translate } if
+		} for
+		x y lineto stroke
+		grestore
+		end
+	} def
+
+
+	% subsidiary dictionary of character definitions
+	/CharStrings 128 dict def
+	CharStrings begin
+
+		/.notdef {} def
+
+		% Here are the definitions of the characters.  A stepsize here
+		% is 300 units (assuming the character is drawn at its default
+		% size).
+
+		% gclef
+		/A {
+			newpath
+			%start with inner curl, inside boundary
+			-50 -300 moveto
+			-450 600 700 700 750 0 curveto
+			750 -800 -700 -800 -700 200 curveto
+			-700 900 500 1400 520 2250 curveto
+			520 2900 300 3000 200 3000 curveto
+			100 3000 -400 2500 -200 1800 curveto
+			350 -600 lineto
+			720 -1600 0 -1650 -400 -1400 curveto
+
+			%go back to start, drawing the other boundary
+			-400 -1480 lineto
+			0 -1700 800 -1700 430 -600 curveto
+			-120 1800 lineto
+			-300 2400 200 2800 250 2800 curveto
+			400 2800 430 2700 430 2450 curveto
+			430 1800 -900 1200 -900 300 curveto
+			-750 -900 800 -900 850 0 curveto
+			900 1100 -750 900 -120 -300 curveto fill
+
+			%circle at the bottom
+			-300 -1250 250 0 360 arc fill
+		} def
+
+		% fclef
+		/B {
+			newpath
+			%start with outside boundary, at bottom
+			-1000 -1700 moveto
+			100 -1100 500 -600 450 0 curveto
+			450 850 -1100 850 -950 0 curveto
+
+			%go back to start, drawing the other boundary
+			-880 0 lineto
+			-920 400 -600 560 -300 560 curveto
+			0 560 150 400 150 0 curveto
+			150 -400 100 -900 -1000 -1620 curveto fill
+
+			%circle at the left
+			newpath
+			-700 0 250 0 360 arc fill
+
+			%do the two dots after the main curve
+			700 -300 100 0 360 arc fill
+			700 300 100 0 360 arc fill
+		} def
+
+		% cclef
+		/C {
+			gsave
+			%do upper curved part, then scale to do mirror image
+			0 1 1 {
+				pop	%we don't need the loop variable
+				%outer boundary of curve
+				-170 0 moveto 100 300 lineto
+				400 -200 750 300 750 650 curveto
+				750 1100 450 1235 250 1235 curveto
+				0 1235 -143 1100 -143 950 curveto
+
+				%inner boundary of curve
+				0 950 lineto
+				0 1100 30 1165 250 1165 curveto
+				300 1165 450 1100 450 650 curveto
+				450 400 400 -100 100 400 curveto
+				-270 0 lineto fill
+				%stroke
+				%-270 0 moveto 100 400 lineto
+				%400 -100 450 400 450 650 curveto
+				%450 1100 300 1165 250 1165 curveto
+				%30 1165 0 1100 0 950 curveto
+				%stroke
+
+				%elliptical ball at end of curve
+				gsave
+				1.3 1 scale
+				10 950 120 0 360 arc fill
+				grestore
+				1 -1 scale	%reflect across X axis
+			} for
+			grestore
+
+			% two vertical lines on the left
+			300 setlinewidth -600 -1200 halflwid sub moveto
+			-600 1200 halflwid add lineto stroke
+			lwid setlinewidth -300 -1200 halflwid sub moveto
+			-300 1200 halflwid add lineto stroke
+		} def
+
+		% dblwhole
+		/D {
+			do_1n		%do a whole note
+			lwid setlinewidth
+			-490 -600 moveto -490 600 lineto stroke
+			490 -600 moveto 490 600 lineto stroke
+		} def
+
+		% 1n
+		/E {
+			do_1n		%do a whole note
+		} def
+
+		% 2n
+		/F {
+			do_2n		%do a half note
+		} def
+
+		% 4n
+		/G {
+			do_4n		%do a quarter note head
+		} def
+
+		% upflag
+		/H {
+			do_upflag		%do an upflag
+		} def
+
+		% dnflag
+		/I {
+			gsave
+			1 -1 scale	%reflect across X axis
+			do_upflag		%do an upflag
+			grestore
+		} def
+
+		% dwhrest
+		/J {
+			300 setlinewidth
+			0 0 moveto 0 600 lineto stroke
+		} def
+
+		% 1rest
+		/K {
+			lwid setlinewidth
+			-750 600 moveto 750 600 lineto stroke
+			300 setlinewidth
+			-400 450 moveto 400 450 lineto stroke
+		} def
+
+		% 2rest
+		/L {
+			lwid setlinewidth
+			-750 0 moveto 750 0 lineto stroke
+			300 setlinewidth
+			-400 150 moveto 400 150 lineto stroke
+		} def
+
+		% 4rest
+		/M {
+			newpath
+			cor3x cor3y halflwid add moveto
+			%-400 -200 -450 -650 50 -950 lwid add curveto
+			-450 -50 -450 -650 50 -950 lwid add curveto
+			-150 -650 -100 -250 cor3x cor3y halflwid sub curveto
+			fill
+
+			cor1x cor1y moveto cor1x 200 sub cor1y 200 add lineto
+			cor2x cor2y lineto cor2x 200 add cor2y 200 sub lineto
+			fill
+
+			lwid setlinewidth
+			topx topy moveto cor1x cor1y lineto stroke
+			cor2x cor2y moveto cor3x cor3y lineto stroke
+		} def
+
+		% 8rest
+		/N {
+			0 0 0 -600 do_shortrest
+		} def
+
+		% 16rest
+		/O {
+			1 1 100 -1200 do_shortrest
+		} def
+
+		% 32rest
+		/P {
+			2 1 0 -1800 do_shortrest
+		} def
+
+		% 64rest
+		/Q {
+			3 2 -80 -2100 do_shortrest
+		} def
+
+		% 128rest
+		/R {
+			4 2 -150 -2700 do_shortrest
+		} def
+
+		% 256rest
+		/S {
+			5 3 -280 -3300 do_shortrest
+		} def
+
+		% dot
+		/T {
+			newpath
+			0 0 120 0 360 arc fill
+		} def
+
+		% nat
+		/U {
+			% fill crossbars so that we can do parallelograms
+			-235 -470 moveto -235 -270 lineto
+			235 -130 lineto 235 -330 lineto fill
+			-235 130 moveto -235 330 lineto
+			235 470 lineto 235 270 lineto fill
+
+			% vertical strokes
+			lwid setlinewidth
+			-200 -380 moveto -200 850 lineto stroke
+			200 -850 moveto 200 380 lineto stroke
+		} def
+
+		% sharp
+		/V {
+			% fill crossbars so that we can do parallelograms
+			-325 -480 moveto -325 -280 lineto
+			325 -120 lineto 325 -320 lineto fill
+			-325 120 moveto -325 320 lineto
+			325 480 lineto 325 280 lineto fill
+
+			% vertical strokes
+			lwid setlinewidth
+			-150 -930 moveto -150 880 lineto stroke
+			150 -880 moveto 150 930 lineto stroke
+		} def
+
+		% flat
+		/W {
+			do_flat		%do a flat
+		} def
+
+		% dblsharp
+		/X {
+			gsave
+			0 1 3 {		%loop once for each of 4 sticks
+				pop	%we don't need the loop variable
+				0 off neg moveto
+				outbendbig outbendsmall lineto
+				inbendbig inbendsmall lineto
+				limit limit lineto
+				inbendsmall inbendbig lineto
+				outbendsmall outbendbig lineto
+				off neg 0 lineto
+				fill
+				-90 rotate
+			} for
+			grestore
+		} def
+
+		% dblflat
+		/Y {
+			-290 580 290 {	%loop once for each flat
+
+				gsave
+				1 setlinewidth
+				0 translate	%translate left/right (loop var)
+				do_flat		%do a flat
+				grestore
+
+			} for
+		} def
+
+		% xnote
+		/Z {
+			gsave
+			1.15 1 scale 120 setlinewidth 1 setlinecap	%round
+			-300 -300 moveto 300 300 lineto stroke
+			-300 300 moveto 300 -300 lineto stroke
+			grestore
+		} def
+
+		% dwhdiamond
+		/a {
+			do_diamond	%do a diamond
+			lwid setlinewidth
+			-420 -600 moveto -420 600 lineto stroke
+			420 -600 moveto 420 600 lineto stroke
+		} def
+
+		% diamond
+		/b {
+			do_diamond	%do a diamond
+		} def
+
+		% filldiamond
+		/c {
+			420 0 moveto 0 300 lineto
+			-420 0 lineto 0 -300 lineto fill
+		} def
+
+		% up2n
+		/d {
+			lwid setlinewidth
+			380 0 moveto 380 2100 lineto stroke
+			do_2n		%do a half note
+		} def
+
+		% dn2n
+		/e {
+			lwid setlinewidth
+			-380 0 moveto -380 -2100 lineto stroke
+			do_2n		%do a half note
+		} def
+
+		% up4n
+		/f {
+			do_4n		%do a quarter note head
+			lwid setlinewidth
+			370 0 moveto 370 2100 lineto stroke
+		} def
+
+		% dn4n
+		/g {
+			do_4n		%do a quarter note head
+			lwid setlinewidth
+			-370 0 moveto -370 -2100 lineto stroke
+		} def
+
+		% up8n
+		/h {
+			gsave
+			-330 0 translate	% half a flag width
+			do_4n		%do a quarter note head
+			lwid setlinewidth
+			370 0 moveto 370 2100 lineto stroke
+			670 2100 translate
+			1 -1 scale	%reflect across X axis
+			do_upflag		%do an upflag
+			grestore
+		} def
+
+		% dn8n
+		/i {
+			do_4n		%do a quarter note head
+			lwid setlinewidth
+			-370 0 moveto -370 -2100 lineto stroke
+			gsave
+			-70 -2100 translate
+			do_upflag		%do an upflag
+			grestore
+		} def
+
+		% up16n
+		/j {
+			2 do_upshortnote
+		} def
+
+		% dn16n
+		/k {
+			2 do_dnshortnote
+		} def
+
+		% up32n
+		/l {
+			3 do_upshortnote
+		} def
+
+		% dn32n
+		/m {
+			3 do_dnshortnote
+		} def
+
+		% up64n
+		/n {
+			4 do_upshortnote
+		} def
+
+		% dn64n
+		/o {
+			4 do_dnshortnote
+		} def
+
+		% up128n
+		/p {
+			5 do_upshortnote
+		} def
+
+		% dn128n
+		/q {
+			5 do_dnshortnote
+		} def
+
+		% up256n
+		/r {
+			6 do_upshortnote
+		} def
+
+		% dn256n
+		/s {
+			6 do_dnshortnote
+		} def
+
+		% com
+		/t {
+			do_com		%do a common time symbol
+		} def
+
+		% cut
+		/u {
+			do_com		%do a common time symbol
+			lwid setlinewidth
+			0 -900 moveto 0 900 lineto stroke
+		} def
+
+		% begped
+		/v {
+			lwid setlinewidth
+			-200 600 moveto -200 0 lineto 200 0 lineto stroke
+		} def
+
+		% pedal
+		/w {
+			lwid setlinewidth
+			-500 0 moveto -450 0 lineto 0 600 lineto
+			450 0 lineto 500 0 lineto stroke
+		} def
+
+		% endped
+		/x {
+			lwid setlinewidth
+			200 600 moveto 200 0 lineto -200 0 lineto stroke
+		} def
+
+		% dnbow
+		/y {
+			lwid setlinewidth
+			-350 0 moveto -350 900 lineto stroke
+			350 0 moveto 350 900 lineto stroke
+			200 setlinewidth
+			-350 800 moveto 350 800 lineto stroke
+		} def
+
+		% upbow
+		/z {
+			lwid setlinewidth
+			-300 900 moveto 0 0 lineto 300 900 lineto stroke
+		} def
+
+		% wedge
+		/one {
+			0 0 moveto -150 500 lineto 150 500 lineto fill
+		} def
+
+		% uwedge
+		/two {
+			-150 0 moveto 150 0 lineto 0 500 lineto fill
+		} def
+
+		% ferm
+		/three {
+			newpath
+			do_ferm		%do a right side up fermata
+		} def
+
+		% uferm
+		/four {
+			newpath
+			gsave
+			0 270 lwid sub 800 add translate %baseline at bottom
+			180 rotate			%upside down
+			do_ferm		%do a right side up fermata
+			grestore
+		} def
+
+		% sign
+		/five {
+			gsave
+			%do upper left curved part, upper right dot;
+			%then rotate 180 to do other half
+			0 1 1 {
+				pop	%we don't need the loop variable
+				0 100 moveto		%inner boundary
+				-1000 300 -400 750 -200 700 curveto
+				-200 800 lineto		%outer boundary
+				-550 900 -1100 100 0 -100 curveto
+				fill
+				%dot at end of curve
+				-200 700 100 0 360 arc fill
+				%dot in upper right quadrant
+				500 200 70 0 360 arc fill
+				180 rotate
+			} for
+			grestore
+
+			%slash through middle
+			lwid setlinewidth
+			-400 -800 moveto 400 800 lineto stroke
+		} def
+
+		% coda
+		/six {
+			newpath
+			gsave
+			0.6 1 scale
+			0 0 550 0 360 arc	%outside boundary
+			1 0.6 div 1 scale	%back to original
+			0.9 1 scale
+			0 0 650 0 360 arc	%inside boundary
+			eofill
+			grestore
+			lwid setlinewidth
+			0 -850 moveto 0 850 lineto stroke
+			-800 0 moveto 800 0 lineto stroke
+		} def
+
+		% mor
+		/seven {
+			do_mor		%do a mordent
+		} def
+
+		% invmor
+		/eight {
+			do_mor		%do a mordent
+			lwid setlinewidth
+			0 -450 moveto 0 450 lineto stroke
+		} def
+
+		% turn
+		/nine {
+			do_turn		%do a turn
+		} def
+
+		% invturn
+		/zero {
+			gsave
+			1 -1 scale	%reflect across X axis
+			do_turn		%do a turn
+			grestore
+		} def
+
+		% acc_gt
+		/numbersign {
+			lwid setlinewidth
+			-500 300 moveto 500 0 lineto -500 -300 lineto stroke
+		} def
+
+		% acc_hat
+		/dollar {
+			newpath
+			-365 0 moveto 0 860 lineto 365 0 lineto
+			150 0 lineto -75 530 lineto -300 0 lineto fill
+		} def
+
+		% acc_uhat
+		/quotedbl {
+			newpath
+			365 860 moveto 0 0 lineto -365 860 lineto
+			-150 860 lineto 75 330 lineto 300 860 lineto fill
+		} def
+
+		% tr
+		/asterisk {
+			%vertical bar of t
+			-350 1000 moveto -550 200 lineto
+			-612.5 -50 -212.5 -50 -160 200 curveto
+			-230 200 lineto
+			-300 50 -420 50 -400 200 curveto
+			-200 1000 lineto fill
+
+			%crossbar of t and vertical bar of r
+			-700 600 moveto -160 600 lineto
+			20 600 30 520 60 440 curveto
+			-50 0 lineto 70 0 lineto 180 440 lineto
+			190 480 100 670 -150 670 curveto
+			-690 670 lineto fill
+
+			%horizontal curve of r
+			100 480 moveto
+			300 630 450 700 650 550 curveto
+			560 480 lineto
+			450 630 300 560 100 390 curveto
+			fill
+
+			%knob at end of r
+			600 460 100 0 360 arc fill
+		} def
+
+		% leg
+		/comma {
+			100 setlinewidth
+			-400 0 moveto 400 0 lineto stroke
+		} def
+
+		% rr
+		/hyphen {
+			100 setlinewidth
+			-400 0 moveto 0 1000 lineto stroke
+			0 0 moveto 400 1000 lineto stroke
+		} def
+
+		% measrpt
+		/period {
+			newpath -450 400 150 0 360 arc fill
+			newpath 450 -400 150 0 360 arc fill
+			200 setlinewidth
+			-550 -600 moveto 550 600 lineto stroke
+		} def
+
+		% copyright
+		/slash {
+			lwid setlinewidth
+			newpath 0 400 400 0 360 arc stroke
+			newpath 0 400 200 45 315 arc stroke
+		} def
+
+		% dim
+		/quoteleft {
+			50 setlinewidth
+			newpath 0 640 220 0 360 arc stroke
+		} def
+
+		% halfdim
+		/quoteright {
+			50 setlinewidth
+			newpath 0 640 220 0 360 arc stroke
+			newpath -340 300 moveto 340 980 lineto stroke
+		} def
+
+		% triangle
+		/asciicircum {
+			50 setlinewidth
+			newpath -340 -10 moveto 0 710 lineto
+			340 -10 lineto closepath stroke
+		} def
+
+		% qwhrest
+		/ampersand {
+			300 setlinewidth
+			0 -600 moveto 0 600 lineto stroke
+		} def
+
+		% ll1rest
+		/exclam {
+			310 setlinewidth
+			-400 455 moveto 400 450 lineto stroke
+		} def
+
+		% ll2rest
+		/at {
+			310 setlinewidth
+			-400 145 moveto 400 150 lineto stroke
+		} def
+	end
+
+	/BuildChar {
+
+		exch begin
+		Encoding exch get
+
+		dup
+		Mcbbox0 exch get
+		aload pop setcachedevice
+
+		CharStrings exch get
+		exec
+		end
+	} def
+end
+
+
+% Define another music character font, since there are too many to fit in one
+% font.  It works the same way as the first one.
+
+/mfont1 100 dict def
+mfont1 begin
+	/FontType 3 def
+	/FontMatrix [ .001 0 0 0.001 0 0 ] def
+	/FontBBox [ -2000 -4030 2000 4030 ] def
+	/FontName (Mfont1) def
+
+	% set up Encoding vector with standard names
+	/Encoding 256 array def
+	StandardEncoding Encoding copy
+	pop
+
+	%%%%% define routines that will be used by multiple characters %%%%%
+
+	/do_dwh_bars {
+		% the two bars surrounding a double whole note
+		lwid setlinewidth
+		-420 -600 moveto -420 600 lineto stroke
+		420 -600 moveto 420 600 lineto stroke
+	} def
+	/do_righttriangle {
+		newpath
+		420 270 moveto -420 270 lineto 350 -300 lineto 420 -300 lineto
+		350 150 moveto -140 150 lineto 350 -213 lineto
+		eofill
+	} def
+	/do_fillrighttriangle {
+		newpath
+		420 270 moveto -420 270 lineto 350 -300 lineto 420 -300 lineto
+		fill
+	} def
+	/do_rectangle {
+		newpath
+		420 270 moveto -420 270 lineto -420 -270 lineto 420 -270 lineto
+		350 150 moveto -350 150 lineto -350 -150 lineto 350 -150 lineto
+		eofill
+	} def
+	/do_isostriangle {
+		newpath
+		0 300 moveto -420 -270 lineto 420 -270 lineto
+		0 182 moveto -245 -150 lineto 245 -150 lineto
+		eofill
+	} def
+	/do_piewedge {
+		newpath
+		0 -300 moveto 0 -244 514 35 145 arc
+		0 -209 moveto 0 -244 394 43 137 arc
+		eofill
+	} def
+	/do_semicircle {
+		newpath
+		gsave
+		1 1.357 scale 420 199 moveto 0 199 420 180 360 arc
+		1 1.09 scale 350 111 moveto 0 199 350 194.1 345.9 arc
+		eofill
+		grestore
+	} def
+	/do_slashhead {
+		newpath
+		lwid setlinewidth
+		-620 -530 moveto -480 -670 lineto 620 530 lineto 480 670 lineto
+		closepath stroke
+	} def
+
+	% subsidiary dictionary of character definitions
+	/CharStrings 128 dict def
+	CharStrings begin
+
+		/.notdef {} def
+
+		% Here are the definitions of the characters.  A stepsize here
+		% is 300 units (assuming the character is drawn at its default
+		% size).
+
+		% dwhrighttriangle
+		/A {
+			do_righttriangle
+			do_dwh_bars
+		} def
+
+		% righttriangle
+		/B {
+			do_righttriangle
+		} def
+
+		% fillrighttriangle
+		/C {
+			newpath
+			420 270 moveto -420 270 lineto 350 -300 lineto
+			420 -300 lineto
+			fill
+		} def
+
+		% udwhrighttriangle
+		/D {
+			gsave
+			180 rotate
+			do_righttriangle
+			do_dwh_bars
+			grestore
+		} def
+
+		% urighttriangle
+		/E {
+			gsave
+			180 rotate
+			do_righttriangle
+			grestore
+		} def
+
+		% ufillrighttriangle
+		/F {
+			gsave
+			180 rotate
+			do_fillrighttriangle
+			grestore
+		} def
+
+		% dwhrectangle
+		/G {
+			do_rectangle
+			do_dwh_bars
+		} def
+
+		% rectangle
+		/H {
+			do_rectangle
+		} def
+
+		% fillrectangle
+		/I {
+			newpath
+			420 270 moveto -420 270 lineto -420 -270 lineto
+			420 -270 lineto
+			fill
+		} def
+
+		% dwhisostriangle
+		/J {
+			do_isostriangle
+			do_dwh_bars
+		} def
+
+		% isostriangle
+		/K {
+			do_isostriangle
+		} def
+
+		% fillisostriangle
+		/L {
+			newpath
+			0 300 moveto -420 -270 lineto 420 -270 lineto
+			fill
+		} def
+
+		% dwhpiewedge
+		/M {
+			do_piewedge
+			do_dwh_bars
+		} def
+
+		% piewedge
+		/N {
+			do_piewedge
+		} def
+
+		% fillpiewedge
+		/O {
+			newpath
+			0 -300 moveto 0 -244 514 35 145 arc
+			fill
+		} def
+
+		% dwhsemicircle
+		/P {
+			do_semicircle
+			do_dwh_bars
+		} def
+
+		% semicircle
+		/Q {
+			do_semicircle
+		} def
+
+		% fillsemicircle
+		/R {
+			newpath
+			gsave
+			1 570 420 div scale
+			420 199 moveto 0 199 420 180 360 arc
+			fill
+			grestore
+		} def
+
+		% dwhslashhead
+		/S {
+			do_slashhead
+			lwid setlinewidth
+			-650 -600 moveto -650 600 lineto stroke
+			650 -600 moveto 650 600 lineto stroke
+		} def
+
+		% slashhead
+		/T {
+			do_slashhead
+		} def
+
+		% fillslashhead
+		/U {
+			newpath
+			200 setlinewidth
+			-550 -600 moveto 550 600 lineto stroke
+		} def
+
+		% blankhead
+		/V {
+			%print nothing
+		} def
+	end
+
+	/BuildChar {
+
+		exch begin
+		Encoding exch get
+
+		dup
+		Mcbbox1 exch get
+		aload pop setcachedevice
+
+		CharStrings exch get
+		exec
+		end
+	} def
+end
+
+
+% General routines for printing any music character, invoked by each music
+% character's specific routine below.  The scaling factor (default 1) needs
+% to be multiplied by 10 to get the actual size.  These routines restore the
+% preexisting current font when they are done.
+
+/printmchar0 {
+	gsave
+	/musicchar exch def
+	/Mfont0 findfont exch 10 mul scalefont setfont moveto 
+	musicchar show
+	grestore
+} def
+/printmchar1 {
+	gsave
+	/musicchar exch def
+	/Mfont1 findfont exch 10 mul scalefont setfont moveto 
+	musicchar show
+	grestore
+} def
+
+% Define each music character name to be a routine that prints the character.
+% Each character is to be invoked as in this example:
+%	100 200 1 gclef		% at (100, 200), scale to default size & print
+
+/gclef			{ (A) printmchar0 } def
+/fclef			{ (B) printmchar0 } def
+/cclef			{ (C) printmchar0 } def
+/dblwhole		{ (D) printmchar0 } def
+/1n			{ (E) printmchar0 } def
+/2n			{ (F) printmchar0 } def
+/4n			{ (G) printmchar0 } def
+/upflag			{ (H) printmchar0 } def
+/dnflag			{ (I) printmchar0 } def
+/dwhrest		{ (J) printmchar0 } def
+/1rest			{ (K) printmchar0 } def
+/2rest			{ (L) printmchar0 } def
+/4rest			{ (M) printmchar0 } def
+/8rest			{ (N) printmchar0 } def
+/16rest			{ (O) printmchar0 } def
+/32rest			{ (P) printmchar0 } def
+/64rest			{ (Q) printmchar0 } def
+/128rest		{ (R) printmchar0 } def
+/256rest		{ (S) printmchar0 } def
+/dot			{ (T) printmchar0 } def
+/nat			{ (U) printmchar0 } def
+/sharp			{ (V) printmchar0 } def
+/flat			{ (W) printmchar0 } def
+/dblsharp		{ (X) printmchar0 } def
+/dblflat		{ (Y) printmchar0 } def
+/xnote			{ (Z) printmchar0 } def
+/dwhdiamond		{ (a) printmchar0 } def
+/diamond		{ (b) printmchar0 } def
+/filldiamond		{ (c) printmchar0 } def
+/up2n			{ (d) printmchar0 } def
+/dn2n			{ (e) printmchar0 } def
+/up4n			{ (f) printmchar0 } def
+/dn4n			{ (g) printmchar0 } def
+/up8n			{ (h) printmchar0 } def
+/dn8n			{ (i) printmchar0 } def
+/up16n			{ (j) printmchar0 } def
+/dn16n			{ (k) printmchar0 } def
+/up32n			{ (l) printmchar0 } def
+/dn32n			{ (m) printmchar0 } def
+/up64n			{ (n) printmchar0 } def
+/dn64n			{ (o) printmchar0 } def
+/up128n			{ (p) printmchar0 } def
+/dn128n			{ (q) printmchar0 } def
+/up256n			{ (r) printmchar0 } def
+/dn256n			{ (s) printmchar0 } def
+/com			{ (t) printmchar0 } def
+/cut			{ (u) printmchar0 } def
+/begped			{ (v) printmchar0 } def
+/pedal			{ (w) printmchar0 } def
+/endped			{ (x) printmchar0 } def
+/dnbow			{ (y) printmchar0 } def
+/upbow			{ (z) printmchar0 } def
+/wedge			{ (1) printmchar0 } def
+/uwedge			{ (2) printmchar0 } def
+/ferm			{ (3) printmchar0 } def
+/uferm			{ (4) printmchar0 } def
+/sign			{ (5) printmchar0 } def
+/coda			{ (6) printmchar0 } def
+/mor			{ (7) printmchar0 } def
+/invmor			{ (8) printmchar0 } def
+/turn			{ (9) printmchar0 } def
+/invturn		{ (0) printmchar0 } def
+/acc_gt			{ (#) printmchar0 } def
+/acc_hat		{ ($) printmchar0 } def
+/acc_uhat		{ (") printmchar0 } def
+/tr			{ (*) printmchar0 } def
+/leg			{ (,) printmchar0 } def
+/rr			{ (-) printmchar0 } def
+/measrpt		{ (.) printmchar0 } def
+/copyright		{ (/) printmchar0 } def
+/dim			{ (`) printmchar0 } def
+/halfdim		{ (') printmchar0 } def
+/triangle		{ (^) printmchar0 } def
+/qwhrest		{ (&) printmchar0 } def
+/ll1rest		{ (!) printmchar0 } def
+/ll2rest		{ (@) printmchar0 } def
+/dwhrighttriangle	{ (A) printmchar1 } def
+/righttriangle		{ (B) printmchar1 } def
+/fillrighttriangle	{ (C) printmchar1 } def
+/udwhrighttriangle	{ (D) printmchar1 } def
+/urighttriangle		{ (E) printmchar1 } def
+/ufillrighttriangle	{ (F) printmchar1 } def
+/dwhrectangle		{ (G) printmchar1 } def
+/rectangle		{ (H) printmchar1 } def
+/fillrectangle		{ (I) printmchar1 } def
+/dwhisostriangle	{ (J) printmchar1 } def
+/isostriangle		{ (K) printmchar1 } def
+/fillisostriangle	{ (L) printmchar1 } def
+/dwhpiewedge		{ (M) printmchar1 } def
+/piewedge		{ (N) printmchar1 } def
+/fillpiewedge		{ (O) printmchar1 } def
+/dwhsemicircle		{ (P) printmchar1 } def
+/semicircle		{ (Q) printmchar1 } def
+/fillsemicircle		{ (R) printmchar1 } def
+/dwhslashhead		{ (S) printmchar1 } def
+/slashhead		{ (T) printmchar1 } def
+/fillslashhead		{ (U) printmchar1 } def
+/blankhead		{ (V) printmchar1 } def
+
+
+% Define routines for Mup output other than music characters.
+
+/stepsize 3 def	   % define a step size as 3 points (at default magnification)
+
+% x1 y1 x2 lines dist staffscale staff
+%		draw a staff starting at x1, y1 and extending to x2 with "lines"
+%		lines, 2*dist*stepsize apart, scaled by staffscale
+/staff {
+	/staffscale exch def
+	/dist exch def
+	/lines exch def
+	/x2 exch def
+	/y1 exch def
+	/x1 exch def
+	0.7 staffscale mul sb setlinewidth
+	1 lines sub  2  lines 1 sub {	% loop from bottom line to top line
+		dup stepsize mul staffscale mul dist mul y1 add x1 exch moveto
+		stepsize mul staffscale mul dist mul y1 add x2 exch lineto stroke
+	} for
+} def
+
+% x y1 y2 bracket	draw a bracket; y1 is the top
+/bracket {
+	/y2 exch def
+	/y1 exch def
+	/x exch def
+	gsave
+	3 setlinewidth
+	x 2 sub y1 1 add moveto
+	x 2 sub y2 1 sub lineto
+	stroke
+	x 2 sub y1 1 add moveto
+	x 1 sub y1 1 add   x 3 add y1 1 add   x 5 add y1 6 add   curveto
+	x 6 add y1 5 add lineto
+	x 5 add y1 2 add   x 1 add y1 2 sub   x 2 sub y1 2 sub   curveto
+	fill
+	x 2 sub y2 1 sub moveto
+	x 1 sub y2 1 sub   x 3 add y2 1 sub   x 5 add y2 6 sub   curveto
+	x 6 add y2 5 sub lineto
+	x 5 add y2 2 sub   x 1 add y2 2 add   x 2 sub y2 2 add   curveto
+	fill
+	grestore
+} def
+
+% x y1 y2 brace		draw a brace; y1 is the top
+/brace {
+	/y2 exch def
+	/y1 exch def
+	/x exch def
+	gsave
+	x 9 sub y1 y2 add 2 div translate
+	/topy y1 y2 sub 2 div 1 sub def
+	0 1 1 {
+		pop
+		%0 topy moveto 0 0 lineto stroke
+		0 0 moveto
+		16 topy 0.2 mul   -11 topy 0.6 mul   8 topy   curveto
+		8.7 topy lineto
+		-7 topy 0.7 mul   20 topy 0.3 mul   1 0   curveto
+		fill
+		1 -1 scale	% flip to do bottom half
+	} for
+	grestore
+} def
+
+% endx endy wavy staffscale	draw a wavy line from current point to here,
+%				scaled by staffscale
+/wavy {
+	/staffscale exch def
+	/endy exch def		% define the end point of the line
+	/endx exch def
+	currentpoint		% line starts at current point
+	/begy exch def		% define the beginning point of the line
+	/begx exch def
+	gsave
+	/dx endx begx sub def	% find delta x and delta y
+	/dy endy begy sub def
+	/r dx dx mul dy dy mul add sqrt def	% hypotenuse
+	/theta dy dx atan def			% angle with positive x axis
+	begx begy translate	% change axes so that we can draw the line
+	theta rotate		%   from (0, 0) to (r, 0)
+	staffscale staffscale scale	% scale everything by staffscale
+	/scaledr r staffscale div def	% but scale r in reverse to keep length
+
+	% Each outer loop draws one cycle of the squiggle.  It continues until
+	% we are at or beyond the desired end point.
+	0 0 moveto
+	0 6 scaledr {
+		gsave
+		% first loop draws left half of squiggle; second draws right
+		0 1 1 {
+			0.0 0.4 moveto
+			2.0 1.9 3.4 2.3 3.9 0.0 curveto
+			2.1 0.0 lineto
+			1.9 0.8 1.4 0.7 0.0 -0.4 curveto
+			fill
+			pop 180 rotate -6 0 translate
+		} for
+		grestore
+
+		pop 6 0 translate	% shift axes right one squiggle
+	} for
+
+	grestore
+} def
+
+% x y space frets fretno numvert curvel curver [ f1 f2 f3 ... ] grid
+%				print a guitar grid diagram
+/grid {
+	/grid_positions exch def % 0="o", -1="x", -2=nothing, positive=dot
+	/curver exch def	% right string for curve, 0 if none
+	/curvel exch def	% left string for curve, 0 if none
+	/numvert exch def	% vertical position to print fretno, 0 if none
+	/fretno exch def	% fret no. to print at right, 0 if none
+	/frets exch def		% number of fret lines
+	/space exch def		% points between two neighboring lines
+	/y exch def		% y coord of top fret line
+	/x exch def		% x coord of left strings
+
+	gsave
+	/strings grid_positions length def	% number of strings
+	/lmarky 0.4 space mul y add def		% lowest Y of a "o" or "x"
+	space 10 div setlinewidth
+	2 setlinecap
+
+	% draw the lines of the grid
+	0  1  strings 1 sub {	% loop from left string to right string
+		dup space mul x add y moveto
+		space mul x add frets 1 sub space mul y exch sub lineto stroke
+	} for
+	0  -1  1 frets sub {	% loop from top fret (nut) to bottom fret
+		dup space mul y add x exch moveto
+		space mul y add strings 1 sub space mul x add exch lineto stroke
+	} for
+
+	% draw the curved line if there is one
+	curvel 0 gt {
+		% within strings curvel to curver, find smallest positive fret
+		/minfret 1000 def
+		curvel 1 curver {
+			/strno exch def
+			/grid_p grid_positions strno 1 sub get def
+			grid_p 0 gt grid_p minfret lt and {
+				/minfret grid_p def
+			} if
+		} for
+
+		% if curve goes above top fret, other marks must be higher
+		minfret 1 eq {
+			/hmarky 1.2 space mul y add def
+		} {
+			/hmarky lmarky def
+		} ifelse
+
+		/strdiff curver curvel sub def
+		space 8 div setlinewidth
+
+		% set endpoint coords of curve; higher if curve is short
+		/curvex1 curvel 1 sub space mul x add def
+		/curvex2 curver 1 sub space mul x add def
+		/curvey 1 minfret sub space mul y add def
+		strdiff 3 lt {
+			/curvey 0.2 strdiff div space mul curvey add def
+		} if
+
+		% move to left end, set other points, draw curve
+		curvex1 curvey moveto
+
+		curvex1 curvex2 curvex1 sub 3 div add
+		curvey space 0.4 strdiff sqrt mul mul add
+
+		curvex2 curvex2 curvex1 sub 3 div sub
+		curvey space 0.4 strdiff sqrt mul mul add
+
+		curvex2 curvey curveto stroke
+	} if
+
+	space 10 div setlinewidth
+
+	% draw dots and x and o marks
+	0  1  strings 1 sub {	% loop from left string to right string
+		/strno exch def	% first string is 0
+		/grid_p grid_positions strno get def
+		/strx strno space mul x add def
+
+		% set Y of mark higher if curved line covers this string
+		strno 1 add curvel ge  strno 1 add curver le  and {
+			/marky hmarky def
+		} {
+			/marky lmarky def
+		} ifelse
+
+		grid_p -1 eq {		% draw an X above the string
+			/xhwid space 3 div def
+			strx xhwid sub marky xhwid sub moveto
+			strx xhwid add marky xhwid add lineto stroke
+			strx xhwid sub marky xhwid add moveto
+			strx xhwid add marky xhwid sub lineto stroke
+		} if
+		grid_p 0 eq {		% draw a circle above the string
+			strx marky space 0.3 mul 0 360 arc stroke
+		} if
+		grid_p 1 ge {		% draw a dot by the proper fret
+			strx y grid_p space mul sub space 3 div add
+			space 3 div 0 360 arc fill
+		} if
+	} for
+
+	% print "X fr" if requested
+	fretno 0 gt {
+		/Palatino-Roman findfont space 1.9 mul scalefont setfont
+		x strings 0.5 sub space mul add
+		y space numvert 0.3 add mul sub moveto
+		fretno 2 string cvs show ( fr) show
+	} if
+	grestore
+} def
+
+% x1 y1 x2 y2 whitebox		draw a white rectangle with opposite
+%				corners of (x1,y1) and (x2,y2)
+/whitebox {
+	/y2 exch def
+	/x2 exch def
+	/y1 exch def
+	/x1 exch def
+	1.0 setgray
+	newpath
+	x1 y1 moveto
+	x1 y2 lineto
+	x2 y2 lineto
+	x2 y1 lineto
+	closepath
+	fill
+	stroke
+	0.0 setgray
+} def
+
+
+/LineNum 0 def
+/InputFile (unknown) def
+
+% n linenum
+/linenum {
+	/LineNum exch def
+} def
+
+% (inputfilename) inputfile
+/inputfile {
+	/InputFile exch def
+} def
+
+% find size of Encoding and make a dictionary
+% that size for bounding box information
+mfont0 begin
+/dictsize Encoding length def
+mfont0 /Mcbbox0 dictsize dict put
+
+% temporarily redefine printmchar0 to get code
+5 dict begin
+/printmchar0 { {} forall } def
+
+Mcbbox0 Encoding 128rest get [ 1140.0 0 -515.0 -1515.0 615.0 1685.0 ] put
+Mcbbox0 Encoding 16rest get [ 830.0 0 -415.0 -1215.0 405.0 485.0 ] put
+Mcbbox0 Encoding 1n get [ 1080.0 0 -535.0 -335.0 535.0 345.0 ] put
+Mcbbox0 Encoding 1rest get [ 1540.0 0 -765.0 -5.0 765.0 645.0 ] put
+Mcbbox0 Encoding 256rest get [ 1250.0 0 -625.0 -2115.0 615.0 1685.0 ] put
+Mcbbox0 Encoding 2n get [ 880.0 0 -435.0 -345.0 435.0 355.0 ] put
+Mcbbox0 Encoding 2rest get [ 1540.0 0 -765.0 -45.0 765.0 315.0 ] put
+Mcbbox0 Encoding 32rest get [ 940.0 0 -415.0 -1215.0 515.0 1085.0 ] put
+Mcbbox0 Encoding 4n get [ 840.0 0 -415.0 -335.0 415.0 345.0 ] put
+Mcbbox0 Encoding 4rest get [ 650.0 0 -345.0 -885.0 295.0 985.0 ] put
+Mcbbox0 Encoding 64rest get [ 1040.0 0 -515.0 -1515.0 515.0 1085.0 ] put
+Mcbbox0 Encoding 8rest get [ 750.0 0 -305.0 -615.0 435.0 485.0 ] put
+Mcbbox0 Encoding acc_gt get [ 1170.0 0 -525.0 -335.0 635.0 345.0 ] put
+Mcbbox0 Encoding acc_hat get [ 780.0 0 -385.0 -5.0 385.0 875.0 ] put
+Mcbbox0 Encoding acc_uhat get [ 780.0 0 -385.0 -5.0 385.0 875.0 ] put
+Mcbbox0 Encoding begped get [ 470.0 0 -245.0 -45.0 215.0 615.0 ] put
+Mcbbox0 Encoding cclef get [ 1540.0 0 -765.0 -1245.0 765.0 1255.0 ] put
+Mcbbox0 Encoding coda get [ 1640.0 0 -815.0 -855.0 815.0 865.0 ] put
+Mcbbox0 Encoding com get [ 1100.0 0 -575.0 -635.0 515.0 655.0 ] put
+Mcbbox0 Encoding copyright get [ 920.0 0 -455.0 -45.0 455.0 855.0 ] put
+Mcbbox0 Encoding cut get [ 1100.0 0 -575.0 -905.0 515.0 915.0 ] put
+Mcbbox0 Encoding dblflat get [ 1170.0 0 -595.0 -405.0 565.0 1115.0 ] put
+Mcbbox0 Encoding dblsharp get [ 720.0 0 -355.0 -345.0 355.0 355.0 ] put
+Mcbbox0 Encoding dblwhole get [ 1090.0 0 -535.0 -605.0 545.0 615.0 ] put
+Mcbbox0 Encoding diamond get [ 880.0 0 -435.0 -305.0 435.0 315.0 ] put
+Mcbbox0 Encoding dim get [ 540.0 0 -265.0 -5.0 265.0 905.0 ] put
+Mcbbox0 Encoding dn128n get [ 840.0 0 -415.0 -3545.0 415.0 345.0 ] put
+Mcbbox0 Encoding dn16n get [ 840.0 0 -415.0 -2105.0 415.0 345.0 ] put
+Mcbbox0 Encoding dn256n get [ 840.0 0 -415.0 -3965.0 415.0 345.0 ] put
+Mcbbox0 Encoding dn2n get [ 880.0 0 -435.0 -2105.0 435.0 355.0 ] put
+Mcbbox0 Encoding dn32n get [ 840.0 0 -415.0 -2585.0 415.0 345.0 ] put
+Mcbbox0 Encoding dn4n get [ 840.0 0 -415.0 -2105.0 415.0 345.0 ] put
+Mcbbox0 Encoding dn64n get [ 840.0 0 -415.0 -3065.0 415.0 345.0 ] put
+Mcbbox0 Encoding dn8n get [ 840.0 0 -415.0 -2105.0 415.0 345.0 ] put
+Mcbbox0 Encoding dnbow get [ 810.0 0 -395.0 -5.0 405.0 915.0 ] put
+Mcbbox0 Encoding dnflag get [ 640.0 0 -335.0 -1705.0 295.0 15.0 ] put
+Mcbbox0 Encoding dot get [ 280.0 0 -135.0 -125.0 135.0 135.0 ] put
+Mcbbox0 Encoding dwhdiamond get [ 950.0 0 -465.0 -605.0 475.0 615.0 ] put
+Mcbbox0 Encoding dwhrest get [ 340.0 0 -165.0 -5.0 165.0 615.0 ] put
+Mcbbox0 Encoding endped get [ 480.0 0 -215.0 -45.0 255.0 615.0 ] put
+Mcbbox0 Encoding fclef get [ 1840.0 0 -1015.0 -1705.0 815.0 655.0 ] put
+Mcbbox0 Encoding ferm get [ 1640.0 0 -815.0 -5.0 815.0 1015.0 ] put
+Mcbbox0 Encoding filldiamond get [ 880.0 0 -435.0 -305.0 435.0 315.0 ] put
+Mcbbox0 Encoding flat get [ 580.0 0 -295.0 -405.0 275.0 1115.0 ] put
+Mcbbox0 Encoding gclef get [ 1790.0 0 -915.0 -1605.0 865.0 3015.0 ] put
+Mcbbox0 Encoding halfdim get [ 760.0 0 -375.0 -5.0 375.0 1015.0 ] put
+Mcbbox0 Encoding invmor get [ 1320.0 0 -655.0 -455.0 655.0 465.0 ] put
+Mcbbox0 Encoding invturn get [ 1300.0 0 -645.0 -335.0 645.0 345.0 ] put
+Mcbbox0 Encoding leg get [ 840.0 0 -415.0 -55.0 415.0 65.0 ] put
+Mcbbox0 Encoding ll1rest get [ 840.0 0 -415.0 -5.0 415.0 625.0 ] put
+Mcbbox0 Encoding ll2rest get [ 840.0 0 -415.0 -15.0 415.0 315.0 ] put
+Mcbbox0 Encoding measrpt get [ 1300.0 0 -645.0 -675.0 645.0 685.0 ] put
+Mcbbox0 Encoding mor get [ 1320.0 0 -655.0 -285.0 655.0 295.0 ] put
+Mcbbox0 Encoding nat get [ 520.0 0 -255.0 -855.0 255.0 865.0 ] put
+Mcbbox0 Encoding pedal get [ 1040.0 0 -515.0 -45.0 515.0 675.0 ] put
+Mcbbox0 Encoding qwhrest get [ 340.0 0 -165.0 -605.0 165.0 615.0 ] put
+Mcbbox0 Encoding rr get [ 940.0 0 -465.0 -25.0 465.0 1035.0 ] put
+Mcbbox0 Encoding sharp get [ 700.0 0 -345.0 -935.0 345.0 945.0 ] put
+Mcbbox0 Encoding sign get [ 1340.0 0 -665.0 -825.0 665.0 835.0 ] put
+Mcbbox0 Encoding tr get [ 1440.0 0 -715.0 -5.0 715.0 1015.0 ] put
+Mcbbox0 Encoding triangle get [ 800.0 0 -395.0 -45.0 395.0 785.0 ] put
+Mcbbox0 Encoding turn get [ 1300.0 0 -645.0 -325.0 645.0 345.0 ] put
+Mcbbox0 Encoding uferm get [ 1640.0 0 -815.0 -5.0 815.0 1015.0 ] put
+Mcbbox0 Encoding up128n get [ 1390.0 0 -745.0 -335.0 635.0 3555.0 ] put
+Mcbbox0 Encoding up16n get [ 1390.0 0 -745.0 -335.0 635.0 2115.0 ] put
+Mcbbox0 Encoding up256n get [ 1390.0 0 -745.0 -335.0 635.0 3975.0 ] put
+Mcbbox0 Encoding up2n get [ 880.0 0 -435.0 -345.0 435.0 2115.0 ] put
+Mcbbox0 Encoding up32n get [ 1390.0 0 -745.0 -335.0 635.0 2595.0 ] put
+Mcbbox0 Encoding up4n get [ 850.0 0 -415.0 -335.0 425.0 2115.0 ] put
+Mcbbox0 Encoding up64n get [ 1390.0 0 -745.0 -335.0 635.0 3075.0 ] put
+Mcbbox0 Encoding up8n get [ 1390.0 0 -745.0 -335.0 635.0 2115.0 ] put
+Mcbbox0 Encoding upbow get [ 720.0 0 -355.0 -115.0 355.0 925.0 ] put
+Mcbbox0 Encoding upflag get [ 640.0 0 -335.0 -5.0 295.0 1715.0 ] put
+Mcbbox0 Encoding uwedge get [ 340.0 0 -165.0 -5.0 165.0 505.0 ] put
+Mcbbox0 Encoding wedge get [ 340.0 0 -165.0 5.0 165.0 515.0 ] put
+Mcbbox0 Encoding xnote get [ 880.0 0 -435.0 -365.0 435.0 375.0 ] put
+
+end
+end
+
+/Mfont0 mfont0 definefont
+
+
+% find size of Encoding and make a dictionary
+% that size for bounding box information
+mfont1 begin
+/dictsize Encoding length def
+mfont1 /Mcbbox1 dictsize dict put
+
+% temporarily redefine printmchar1 to get code
+5 dict begin
+/printmchar1 { {} forall } def
+
+Mcbbox1 Encoding blankhead get [ 880.0 0 -435.0 -275.0 435.0 285.0 ] put
+Mcbbox1 Encoding dwhisostriangle get [ 950.0 0 -465.0 -605.0 475.0 615.0 ] put
+Mcbbox1 Encoding dwhpiewedge get [ 950.0 0 -465.0 -605.0 475.0 615.0 ] put
+Mcbbox1 Encoding dwhrectangle get [ 950.0 0 -465.0 -605.0 475.0 615.0 ] put
+Mcbbox1 Encoding dwhrighttriangle get [ 950.0 0 -465.0 -605.0 475.0 615.0 ] put
+Mcbbox1 Encoding dwhsemicircle get [ 950.0 0 -465.0 -605.0 475.0 615.0 ] put
+Mcbbox1 Encoding dwhslashhead get [ 1410.0 0 -695.0 -725.0 705.0 735.0 ] put
+Mcbbox1 Encoding fillisostriangle get [ 880.0 0 -435.0 -275.0 435.0 315.0 ] put
+Mcbbox1 Encoding fillpiewedge get [ 880.0 0 -435.0 -305.0 435.0 285.0 ] put
+Mcbbox1 Encoding fillrectangle get [ 880.0 0 -435.0 -275.0 435.0 285.0 ] put
+Mcbbox1 Encoding fillrighttriangle get [ 880.0 0 -435.0 -305.0 435.0 285.0 ] put
+Mcbbox1 Encoding fillsemicircle get [ 880.0 0 -435.0 -305.0 435.0 285.0 ] put
+Mcbbox1 Encoding fillslashhead get [ 1300.0 0 -645.0 -675.0 645.0 685.0 ] put
+Mcbbox1 Encoding isostriangle get [ 880.0 0 -435.0 -275.0 435.0 315.0 ] put
+Mcbbox1 Encoding piewedge get [ 880.0 0 -435.0 -305.0 435.0 285.0 ] put
+Mcbbox1 Encoding rectangle get [ 880.0 0 -435.0 -275.0 435.0 285.0 ] put
+Mcbbox1 Encoding righttriangle get [ 880.0 0 -435.0 -305.0 435.0 285.0 ] put
+Mcbbox1 Encoding semicircle get [ 880.0 0 -435.0 -305.0 435.0 285.0 ] put
+Mcbbox1 Encoding slashhead get [ 1380.0 0 -685.0 -725.0 685.0 735.0 ] put
+Mcbbox1 Encoding udwhrighttriangle get [ 950.0 0 -465.0 -605.0 475.0 615.0 ] put
+Mcbbox1 Encoding ufillrighttriangle get [ 880.0 0 -435.0 -275.0 435.0 315.0 ] put
+Mcbbox1 Encoding urighttriangle get [ 880.0 0 -435.0 -275.0 435.0 315.0 ] put
+
+end
+end
+
+/Mfont1 mfont1 definefont
+
+/makeExtEncoding {
+	/extendedencoding 256 array def
+	StandardEncoding extendedencoding copy
+	extendedencoding 32 /exclamdown put
+	extendedencoding 33 /cent put
+	extendedencoding 34 /sterling put
+	extendedencoding 35 /yen put
+	extendedencoding 36 /quotedblleft put
+	extendedencoding 37 /guillemotleft put
+	extendedencoding 38 /guillemotright put
+	extendedencoding 39 /guilsinglleft put
+	extendedencoding 40 /guilsinglright put
+	extendedencoding 41 /dagger put
+	extendedencoding 42 /daggerdbl put
+	extendedencoding 43 /bullet put
+	extendedencoding 44 /quotedblbase put
+	extendedencoding 45 /quotedblright put
+	extendedencoding 46 /questiondown put
+	extendedencoding 47 /grave put
+	extendedencoding 48 /acute put
+	extendedencoding 49 /macron put
+	extendedencoding 50 /breve put
+	extendedencoding 51 /dotaccent put
+	extendedencoding 52 /dieresis put
+	extendedencoding 53 /ring put
+	extendedencoding 54 /cedilla put
+	extendedencoding 55 /hungarumlaut put
+	extendedencoding 56 /ogonek put
+	extendedencoding 57 /caron put
+	extendedencoding 58 /emdash put
+	extendedencoding 59 /AE put
+	extendedencoding 60 /ae put
+	extendedencoding 61 /ordfeminine put
+	extendedencoding 62 /ordmasculine put
+	extendedencoding 63 /Lslash put
+	extendedencoding 64 /lslash put
+	extendedencoding 65 /Oslash put
+	extendedencoding 66 /oslash put
+	extendedencoding 67 /OE put
+	extendedencoding 68 /oe put
+	extendedencoding 69 /dotlessi put
+	extendedencoding 70 /germandbls put
+	extendedencoding 71 /Aacute put
+	extendedencoding 72 /aacute put
+	extendedencoding 73 /Acircumflex put
+	extendedencoding 74 /acircumflex put
+	extendedencoding 75 /Adieresis put
+	extendedencoding 76 /adieresis put
+	extendedencoding 77 /Agrave put
+	extendedencoding 78 /agrave put
+	extendedencoding 79 /Aring put
+	extendedencoding 80 /aring put
+	extendedencoding 81 /Atilde put
+	extendedencoding 82 /atilde put
+	extendedencoding 83 /Ccedilla put
+	extendedencoding 84 /ccedilla put
+	extendedencoding 85 /Eacute put
+	extendedencoding 86 /eacute put
+	extendedencoding 87 /Ecircumflex put
+	extendedencoding 88 /ecircumflex put
+	extendedencoding 89 /Edieresis put
+	extendedencoding 90 /edieresis put
+	extendedencoding 91 /Egrave put
+	extendedencoding 92 /egrave put
+	extendedencoding 93 /Iacute put
+	extendedencoding 94 /iacute put
+	extendedencoding 95 /Icircumflex put
+	extendedencoding 96 /icircumflex put
+	extendedencoding 97 /Idieresis put
+	extendedencoding 98 /idieresis put
+	extendedencoding 99 /Igrave put
+	extendedencoding 100 /igrave put
+	extendedencoding 101 /Ntilde put
+	extendedencoding 102 /ntilde put
+	extendedencoding 103 /Oacute put
+	extendedencoding 104 /oacute put
+	extendedencoding 105 /Ocircumflex put
+	extendedencoding 106 /ocircumflex put
+	extendedencoding 107 /Odieresis put
+	extendedencoding 108 /odieresis put
+	extendedencoding 109 /Ograve put
+	extendedencoding 110 /ograve put
+	extendedencoding 111 /Otilde put
+	extendedencoding 112 /otilde put
+	extendedencoding 113 /Scaron put
+	extendedencoding 114 /scaron put
+	extendedencoding 115 /Uacute put
+	extendedencoding 116 /uacute put
+	extendedencoding 117 /Ucircumflex put
+	extendedencoding 118 /ucircumflex put
+	extendedencoding 119 /Udieresis put
+	extendedencoding 120 /udieresis put
+	extendedencoding 121 /Ugrave put
+	extendedencoding 122 /ugrave put
+	extendedencoding 123 /Ydieresis put
+	extendedencoding 124 /ydieresis put
+	extendedencoding 125 /Zcaron put
+	extendedencoding 126 /zcaron put
+	extendedencoding 127 /space put
+} def
+
+/makeExtendedFont {
+	findfont
+	dup length dict /newdict exch def
+	{ 1 index /FID ne
+		{ newdict 3 1 roll put }
+		{ pop pop }
+		ifelse
+	} forall
+	newdict /Encoding extendedencoding put
+	newdict /UniqueID newdict /UniqueID get 1 add put
+	newdict definefont pop
+} def
+/flagsep 1.60 300 mul def	 % 1.60 stepsizes
+/scv 146771 def /sf 877 string def
+/fa {/p 0 def /chr exch -3 bitshift 127 and def {sf exch p add dup /p exch def chr put} forall} def
+[ 74 62 70 54 29 55 36 37 19 26 45 40 41 62 19 73 11 68 55 ] 1905370194 fa
+[ 12 4 5 4 4 2 4 3 3 7 7 3 5 5 4 5 4 2 5 3 ] 881503489 fa
+[ 96 4 4 3 2 4 11 2 6 23 13 16 8 3 28 13 8 3 6 11 ] 856984839 fa
+[ 268 4 13 12 5 4 4 5 4 5 3 2 4 3 4 8 3 3 9 2 ] 892065027 fa
+[ 369 3 4 9 3 3 9 2 4 3 4 7 4 4 4 9 5 3 5 4 ] 1919397126 fa
+[ 498 4 36 4 37 4 49 4 5 13 3 4 4 9 3 5 33 4 5 9 ] 285889792 fa
+[ 762 5 4 3 5 4 4 5 4 4 5 4 3 5 8 4 2 3 4 3 ] 919178497 fa
+[ 845 4 3 2 3 9 ] 509656326 fa
+[ 468 6 4 10 3 30 5 3 24 40 4 3 3 4 2 13 65 4 5 9 ] 728785161 fa
+[ 710 ] 412943633 fa
+[ 463 45 40 41 94 ] 1034651970 fa
+[ 494 40 41 53 83 ] 955160907 fa
+[ 149 203 37 144 ] 457850218 fa
+[ 456 142 ] 1217809781 fa
+[ 0 13 13 10 65 36 6 26 38 17 13 53 4 13 13 25 36 183 7 56 ] 2097571194 fa
+[ 754 5 13 12 13 13 48 ] 352733562 fa
+[ 30 164 254 7 42 4 36 3 1 18 1 18 4 49 4 41 37 1 3 1 ] 801505668 fa
+[ 76 32 135 79 99 8 151 53 30 160 ] 1497130376 fa
+[ 265 70 36 12 25 87 4 36 4 37 53 83 4 83 41 3 ] 1707517335 fa
+[ 193 49 180 8 17 53 ] 1290043803 fa
+[ 353 281 ] 560994720 fa
+[ 266 1 190 39 40 41 53 45 ] 170662315 fa
+[ 423 8 ] 2066228657 fa
+[ 328 6 30 6 31 6 174 ] 670301624 fa
+[ 390 272 2 ] 1172035014 fa
+[ 558 ] 2013683161 fa
+[ 520 ] 72284716 fa
+[ 512 5 2 ] 1758113335 fa
+[ 513 ] 582291009 fa
+[ 514 ] 389012048 fa
+[ 530 154 ] 1931175543 fa
+[ 510 ] 340177531 fa
+[ 150 ] 1270515345 fa
+[ 511 7 ] 640677534 fa
+[ 144 371 ] 1232243366 fa
+[ 464 52 ] 1042429608 fa
+[ 509 81 ] 926567094 fa
+[ 110 11 32 24 22 18 40 12 54 7 17 19 18 19 22 13 292 94 9 11 ] 3939080 fa
+[ 869 ] 1552085774 fa
+[ 80 146 51 78 37 84 8 8 73 5 38 9 72 9 130 9 11 12 ] 1655353111 fa
+[ 19 42 3 22 8 82 63 23 25 13 8 5 176 163 40 73 12 13 13 12 ] 416883481 fa
+[ 22 10 37 42 1 2 19 26 6 38 17 13 38 11 21 13 16 9 27 9 ] 439254817 fa
+[ 405 9 13 46 49 50 178 18 12 13 13 12 45 10 ] 463031075 fa
+[ 1 8 8 6 10 10 16 11 14 8 23 19 13 19 13 7 15 3 9 8 ] 874733356 fa
+[ 234 40 9 15 6 7 6 25 36 37 19 6 47 16 40 41 53 6 5 19 ] 1657064238 fa
+[ 704 16 12 13 3 3 12 6 6 6 7 6 7 6 6 6 45 10 ] 413118253 fa
+[ 24 10 37 45 2 17 5 1 15 4 7 5 8 8 17 17 13 11 8 26 ] 1227467574 fa
+[ 284 21 13 25 18 18 19 18 28 1 7 28 2 4 106 13 6 61 1 7 ] 311086898 fa
+[ 693 1 7 2 37 4 8 5 13 12 13 13 12 45 5 1 4 ] 1910248246 fa
+[ 45 9 155 6 245 68 21 74 108 ] 787501886 fa
+[ 20 27 15 25 8 33 173 13 45 37 83 125 8 114 40 12 13 13 12 ] 1601131333 fa
+[ 27 25 37 13 3 40 12 73 49 77 4 33 4 68 89 134 21 27 3 4 ] 323759950 fa
+[ 466 6 141 6 88 ] 958163793 fa
+[ 42 80 1 55 80 1 80 36 37 155 1 178 40 65 ] 1519875942 fa
+[ 6 31 36 9 43 21 6 185 36 37 ] 994061166 fa
+[ 44 9 101 4 4 20 8 80 3 23 30 5 19 17 20 17 15 7 7 36 ] 2130198391 fa
+[ 552 22 20 32 30 10 33 ] 1386074992 fa
+[ 7 4 54 54 10 22 10 20 8 8 53 5 226 12 128 25 13 36 32 ] 1066346362 fa
+[ 3 63 31 408 18 4 18 6 22 13 16 18 4 15 83 7 ] 1740828550 fa
+[ 228 296 8 25 39 90 14 34 ] 1968366473 fa
+[ 2 2 47 69 19 34 23 20 35 5 187 10 51 2 38 2 39 2 51 2 ] 1455358867 fa
+[ 642 5 13 11 10 40 2 50 80 ] 1524520853 fa
+[ 14 25 10 7 22 49 21 22 1 4 10 23 4 13 15 5 16 15 12 3 ] 161060764 fa
+[ 295 30 24 9 28 9 23 19 13 1 8 24 67 16 3 30 11 6 9 19 ] 578390940 fa
+[ 655 23 1 23 23 22 8 5 1 24 41 9 11 4 5 1 3 8 ] 17714075 fa
+[ 10 5 25 6 4 7 42 39 25 20 4 4 7 2 14 17 126 5 32 5 ] 1393303458 fa
+[ 442 25 4 6 114 23 31 25 20 47 19 112 ] 1620819876 fa
+[ 79 19 131 109 36 37 74 70 1 45 5 9 3 79 11 27 92 9 11 ] 944281514 fa
+[ 8 230 25 23 6 17 130 31 61 64 58 32 ] 1397242802 fa
+[ 130 598 ] 1025422267 fa
+[ 18 10 32 25 5 3 10 3 143 50 13 9 61 93 86 1 1 95 48 58 ] 452151233 fa
+[ 776 13 9 4 12 8 17 3 ] 1814125508 fa
+[ 67 143 8 128 115 350 19 2 ] 1464677324 fa
+[ 490 35 ] 915181524 fa
+[ 5 70 67 32 37 16 14 7 27 18 142 216 17 90 103 ] 541375448 fa
+[ 117 14 33 38 17 13 20 26 3 368 89 3 8 113 10 ] 974257130 fa
+sf cvx exec
+%%EndProlog
+%%Page: 1 1
+save
+1130648748 1130649502 sv
+0.680000 0.680000 scale
+%  S_SSV
+(tye.mup) inputfile
+24 linenum
+%  S_SSV
+38 linenum
+%  S_SSV
+41 linenum
+%  S_SSV
+44 linenum
+%  S_SSV
+48 linenum
+%  S_FEED
+521.15 1113.88 1351.06 5 1.000000 1.000000 stf
+521.15 1058.07 1351.06 5 1.000000 1.000000 stf
+521.15 1003.20 1351.06 5 1.000000 1.000000 stf
+521.15 946.01 1351.06 5 1.000000 1.000000 stf
+/Palatino-Roman findfont
+9 scalefont
+setfont
+52.94 1040.02 moveto
+(Soprano) show
+/Palatino-Roman findfont
+9 scalefont
+setfont
+68.71 982.86 moveto
+(Alto) show
+/Palatino-Roman findfont
+9 scalefont
+setfont
+62.61 928.15 moveto
+(Tenor) show
+/Palatino-Roman findfont
+9 scalefont
+setfont
+68.49 870.99 moveto
+(Bass) show
+0.70 setlinewidth
+89.15 1053.88 moveto
+89.15 862.01 lineto stroke
+%  S_CLEFSIG
+100.94 1035.88 1.000000 gclef
+100.94 980.07 1.000000 gclef
+100.94 903.46 moveto
+/Times-Italic findfont
+9 scalefont
+setfont
+(8) show
+100.94 925.20 1.000000 gclef
+101.20 880.01 1.000000 fclef
+115.56 1053.88 1.000000 sharp
+115.56 998.07 1.000000 sharp
+115.56 943.20 1.000000 sharp
+115.56 880.01 1.000000 sharp
+128.22 1041.88 1.000000 cut
+128.22 986.07 1.000000 cut
+128.22 931.20 1.000000 cut
+128.22 874.01 1.000000 cut
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+restore
+%  S_STAFF
+% staff 2
+save
+restore
+%  S_STAFF
+% staff 3
+save
+restore
+%  S_STAFF
+% staff 4
+save
+restore
+%  S_BAR
+60 linenum
+157.55 1044.88 1.000000 dot
+157.55 1038.88 1.000000 dot
+0.70 setlinewidth
+154.55 1053.88 moveto
+154.55 1029.88 lineto stroke
+3.00 setlinewidth
+150.55 1053.88 moveto
+150.55 1029.88 lineto stroke
+0.70 setlinewidth
+157.55 989.07 1.000000 dot
+157.55 983.07 1.000000 dot
+154.55 998.07 moveto
+154.55 974.07 lineto stroke
+3.00 setlinewidth
+150.55 998.07 moveto
+150.55 974.07 lineto stroke
+0.70 setlinewidth
+157.55 934.20 1.000000 dot
+157.55 928.20 1.000000 dot
+154.55 943.20 moveto
+154.55 919.20 lineto stroke
+3.00 setlinewidth
+150.55 943.20 moveto
+150.55 919.20 lineto stroke
+0.70 setlinewidth
+157.55 877.01 1.000000 dot
+157.55 871.01 1.000000 dot
+154.55 886.01 moveto
+154.55 862.01 lineto stroke
+3.00 setlinewidth
+150.55 886.01 moveto
+150.55 862.01 lineto stroke
+0.70 setlinewidth
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+62 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+211.38 1010.16 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+183.98 1010.16 moveto
+(Lau) show
+168.60 1041.88 1.000000 ll2rest
+190.10 1035.88 1.000000 2n
+194.00 1036.63 moveto
+194.00 1056.88 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+62 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+211.38 955.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+183.98 955.29 moveto
+(Lau) show
+168.60 986.07 1.000000 ll2rest
+190.10 971.07 1.000000 2n
+0.70 setlinewidth
+194.00 971.82 moveto
+194.00 992.07 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+62 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+211.38 899.48 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+183.98 899.48 moveto
+(Lau) show
+168.60 931.20 1.000000 ll2rest
+190.10 931.20 1.000000 2n
+0.70 setlinewidth
+186.20 930.45 moveto
+186.20 910.20 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+62 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+211.38 842.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+183.98 842.29 moveto
+(Lau) show
+168.60 874.01 1.000000 ll2rest
+190.10 883.01 1.000000 2n
+0.70 setlinewidth
+186.20 882.26 moveto
+186.20 862.01 lineto stroke
+restore
+%  S_BAR
+67 linenum
+0.70 setlinewidth
+214.77 1053.88 moveto
+214.77 1029.88 lineto stroke
+214.77 998.07 moveto
+214.77 974.07 lineto stroke
+214.77 943.20 moveto
+214.77 919.20 lineto stroke
+214.77 886.01 moveto
+214.77 862.01 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+69 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+242.26 1010.16 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+221.26 1010.16 moveto
+(da) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+252.94 1010.16 moveto
+(te) show
+225.58 1035.88 1.000000 2n
+235.06 1038.88 1.000000 dot
+229.48 1036.63 moveto
+229.48 1056.88 lineto stroke
+255.35 1035.88 1.000000 4n
+259.04 1036.63 moveto
+259.04 1056.88 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+69 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+242.26 955.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+221.26 955.29 moveto
+(da) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+252.94 955.29 moveto
+(te) show
+225.58 974.07 1.000000 2n
+235.06 977.07 1.000000 dot
+0.70 setlinewidth
+229.48 974.82 moveto
+229.48 995.07 lineto stroke
+255.35 974.07 1.000000 4n
+259.04 974.82 moveto
+259.04 995.07 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+69 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+242.26 899.48 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+221.26 899.48 moveto
+(da) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+252.94 899.48 moveto
+(te) show
+225.58 931.20 1.000000 2n
+235.06 934.20 1.000000 dot
+0.70 setlinewidth
+221.69 930.45 moveto
+221.69 910.20 lineto stroke
+255.35 925.20 1.000000 4n
+259.04 925.95 moveto
+259.04 946.20 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+69 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+242.26 842.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+221.26 842.29 moveto
+(da) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+252.94 842.29 moveto
+(te) show
+225.58 877.01 1.000000 2n
+235.06 877.01 1.000000 dot
+0.70 setlinewidth
+221.69 876.26 moveto
+221.69 856.01 lineto stroke
+255.35 877.01 1.000000 4n
+251.67 876.26 moveto
+251.67 856.01 lineto stroke
+restore
+%  S_BAR
+74 linenum
+0.70 setlinewidth
+270.75 1053.88 moveto
+270.75 1029.88 lineto stroke
+270.75 998.07 moveto
+270.75 974.07 lineto stroke
+270.75 943.20 moveto
+270.75 919.20 lineto stroke
+270.75 886.01 moveto
+270.75 862.01 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+76 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+291.52 1010.16 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+275.69 1010.16 moveto
+(no) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+296.82 1010.16 moveto
+(men) show
+280.06 1038.88 1.000000 2n
+283.96 1039.63 moveto
+283.96 1059.88 lineto stroke
+302.65 1041.88 1.000000 2n
+298.75 1041.13 moveto
+298.75 1020.88 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+76 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+291.52 955.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+275.69 955.29 moveto
+(no) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+296.82 955.29 moveto
+(men) show
+280.06 977.07 1.000000 2n
+0.70 setlinewidth
+283.96 977.82 moveto
+283.96 998.07 lineto stroke
+302.65 977.07 1.000000 2n
+306.55 977.82 moveto
+306.55 998.07 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+76 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+291.52 899.48 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+275.69 899.48 moveto
+(no) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+296.82 899.48 moveto
+(men) show
+280.06 937.20 1.000000 2n
+0.70 setlinewidth
+276.17 936.45 moveto
+276.17 916.20 lineto stroke
+302.65 937.20 1.000000 2n
+298.75 936.45 moveto
+298.75 916.20 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+76 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+291.52 842.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+275.69 842.29 moveto
+(no) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+296.82 842.29 moveto
+(men) show
+280.06 874.01 1.000000 2n
+0.70 setlinewidth
+276.17 873.26 moveto
+276.17 853.01 lineto stroke
+302.65 874.01 1.000000 2n
+298.75 873.26 moveto
+298.75 853.01 lineto stroke
+restore
+%  S_BAR
+81 linenum
+0.70 setlinewidth
+327.68 1053.88 moveto
+327.68 1029.88 lineto stroke
+327.68 998.07 moveto
+327.68 974.07 lineto stroke
+327.68 943.20 moveto
+327.68 919.20 lineto stroke
+327.68 886.01 moveto
+327.68 862.01 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+83 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+354.07 1010.16 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+334.03 1010.16 moveto
+(do) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+381.98 1010.16 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+363.22 1010.16 moveto
+(mi) show
+338.49 1044.88 1.000000 2n
+347.97 1044.88 1.000000 dot
+334.60 1044.13 moveto
+334.60 1023.88 lineto stroke
+367.72 1044.88 1.000000 4n
+364.04 1044.13 moveto
+364.04 1023.88 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+83 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+354.07 955.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+334.03 955.29 moveto
+(do) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+381.98 955.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+363.22 955.29 moveto
+(mi) show
+338.49 980.07 1.000000 2n
+347.97 983.07 1.000000 dot
+0.70 setlinewidth
+342.39 980.82 moveto
+342.39 1001.07 lineto stroke
+367.72 980.07 1.000000 4n
+371.40 980.82 moveto
+371.40 1001.07 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+83 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+354.07 899.48 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+334.03 899.48 moveto
+(do) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+381.98 899.48 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+363.22 899.48 moveto
+(mi) show
+338.49 940.20 1.000000 2n
+347.97 940.20 1.000000 dot
+0.70 setlinewidth
+334.60 939.45 moveto
+334.60 919.20 lineto stroke
+367.72 940.20 1.000000 4n
+364.04 939.45 moveto
+364.04 919.20 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+83 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+354.07 842.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+334.03 842.29 moveto
+(do) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+381.98 842.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+363.22 842.29 moveto
+(mi) show
+338.49 871.01 1.000000 2n
+347.97 871.01 1.000000 dot
+0.70 setlinewidth
+342.39 871.76 moveto
+342.39 892.01 lineto stroke
+367.72 871.01 1.000000 4n
+371.40 871.76 moveto
+371.40 892.01 lineto stroke
+restore
+%  S_BAR
+88 linenum
+0.70 setlinewidth
+383.66 1053.88 moveto
+383.66 1029.88 lineto stroke
+383.66 998.07 moveto
+383.66 974.07 lineto stroke
+383.66 943.20 moveto
+383.66 919.20 lineto stroke
+383.66 886.01 moveto
+383.66 862.01 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+90 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+389.70 1010.16 moveto
+(ni,) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+411.56 1010.16 moveto
+(vos) show
+393.07 1041.88 1.000000 2n
+389.17 1041.13 moveto
+389.17 1020.88 lineto stroke
+416.17 1041.88 1.000000 2n
+412.27 1041.13 moveto
+412.27 1020.88 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+90 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+389.70 955.29 moveto
+(ni,) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+411.56 955.29 moveto
+(vos) show
+393.07 980.07 1.000000 2n
+0.70 setlinewidth
+396.97 980.82 moveto
+396.97 1001.07 lineto stroke
+416.17 980.07 1.000000 2n
+420.07 980.82 moveto
+420.07 1001.07 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+90 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+389.70 899.48 moveto
+(ni,) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+411.56 899.48 moveto
+(vos) show
+393.07 937.20 1.000000 2n
+0.70 setlinewidth
+389.17 936.45 moveto
+389.17 916.20 lineto stroke
+416.17 937.20 1.000000 2n
+412.27 936.45 moveto
+412.27 916.20 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+90 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+389.70 842.29 moveto
+(ni,) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+411.56 842.29 moveto
+(vos) show
+393.07 883.01 1.000000 2n
+0.70 setlinewidth
+389.17 882.26 moveto
+389.17 862.01 lineto stroke
+416.17 883.01 1.000000 2n
+412.27 882.26 moveto
+412.27 862.01 lineto stroke
+restore
+%  S_BAR
+95 linenum
+0.70 setlinewidth
+440.59 1053.88 moveto
+440.59 1029.88 lineto stroke
+440.59 998.07 moveto
+440.59 974.07 lineto stroke
+440.59 943.20 moveto
+440.59 919.20 lineto stroke
+440.59 886.01 moveto
+440.59 862.01 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+97 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+464.52 1010.16 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+444.84 1010.16 moveto
+(ser) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+471.57 1010.16 moveto
+(vi) show
+449.74 1044.88 1.000000 2n
+445.84 1044.13 moveto
+445.84 1023.88 lineto stroke
+474.12 1038.88 1.000000 2n
+478.02 1039.63 moveto
+478.02 1059.88 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+97 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+464.52 955.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+444.84 955.29 moveto
+(ser) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+471.57 955.29 moveto
+(vi) show
+449.74 974.07 1.000000 2n
+0.70 setlinewidth
+453.64 974.82 moveto
+453.64 995.07 lineto stroke
+474.12 977.07 1.000000 2n
+478.02 977.82 moveto
+478.02 998.07 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+97 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+464.52 899.48 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+444.84 899.48 moveto
+(ser) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+471.57 899.48 moveto
+(vi) show
+449.74 934.20 1.000000 2n
+0.70 setlinewidth
+445.84 933.45 moveto
+445.84 913.20 lineto stroke
+474.12 937.20 1.000000 2n
+470.23 936.45 moveto
+470.23 916.20 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+97 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+464.52 842.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+444.84 842.29 moveto
+(ser) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+471.57 842.29 moveto
+(vi) show
+449.74 886.01 1.000000 2n
+0.70 setlinewidth
+445.84 885.26 moveto
+445.84 865.01 lineto stroke
+474.12 880.01 1.000000 2n
+470.23 879.26 moveto
+470.23 859.01 lineto stroke
+restore
+%  S_BAR
+102 linenum
+0.70 setlinewidth
+497.52 1053.88 moveto
+497.52 1029.88 lineto stroke
+497.52 998.07 moveto
+497.52 974.07 lineto stroke
+497.52 943.20 moveto
+497.52 919.20 lineto stroke
+497.52 886.01 moveto
+497.52 862.01 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+108 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+518.94 1010.16 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+502.42 1010.16 moveto
+(do) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+550.20 1010.16 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+524.57 1010.16 moveto
+(mi) show
+506.88 1041.88 1.000000 2n
+502.99 1041.13 moveto
+502.99 1020.88 lineto stroke
+529.07 1038.88 1.000000 4n
+532.75 1039.63 moveto
+532.75 1059.88 lineto stroke
+542.74 1035.88 1.000000 4n
+546.42 1036.63 moveto
+546.42 1056.88 lineto stroke
+531.07 1033.78 moveto
+531.26 1033.97 lineto
+532.03 1032.12 533.38 1030.90 535.29 1030.31 curveto
+537.20 1029.71 539.00 1029.96 540.69 1031.04 curveto
+540.79 1030.53 lineto
+539.11 1028.88 537.16 1028.41 534.92 1029.11 curveto
+532.68 1029.80 531.33 1031.30 530.88 1033.60 curveto
+fill
+restore
+%  S_STAFF
+% staff 2
+save
+108 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+518.94 955.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+502.42 955.29 moveto
+(do) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+550.20 955.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+524.57 955.29 moveto
+(mi) show
+506.88 971.07 1.000000 2n
+0.70 setlinewidth
+510.78 971.82 moveto
+510.78 992.07 lineto stroke
+529.07 974.07 1.000000 2n
+532.97 974.82 moveto
+532.97 995.07 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+108 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+518.94 899.48 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+502.42 899.48 moveto
+(do) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+550.20 899.48 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+524.57 899.48 moveto
+(mi) show
+506.88 931.20 1.000000 2n
+0.70 setlinewidth
+502.99 930.45 moveto
+502.99 910.20 lineto stroke
+529.07 934.20 1.000000 2n
+525.17 933.45 moveto
+525.17 913.20 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+108 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+518.94 842.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+502.42 842.29 moveto
+(do) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+550.20 842.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+524.57 842.29 moveto
+(mi) show
+506.88 883.01 1.000000 2n
+0.70 setlinewidth
+502.99 882.26 moveto
+502.99 862.01 lineto stroke
+529.07 871.01 1.000000 2n
+532.97 871.76 moveto
+532.97 892.01 lineto stroke
+restore
+%  S_BAR
+109 linenum
+0.70 setlinewidth
+557.77 1053.88 moveto
+557.77 1029.88 lineto stroke
+557.77 998.07 moveto
+557.77 974.07 lineto stroke
+557.77 943.20 moveto
+557.77 919.20 lineto stroke
+557.77 886.01 moveto
+557.77 862.01 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+111 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+564.79 1010.16 moveto
+(ni;) show
+568.15 1032.88 1.000000 1n
+restore
+%  S_STAFF
+% staff 2
+save
+111 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+564.79 955.29 moveto
+(ni;) show
+568.15 971.07 1.000000 1n
+restore
+%  S_STAFF
+% staff 3
+save
+113 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+564.79 899.48 moveto
+(ni;) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+588.83 899.48 moveto
+(ab) show
+568.15 928.20 1.000000 2n
+0.70 setlinewidth
+572.05 928.95 moveto
+572.05 949.20 lineto stroke
+591.98 928.20 1.000000 2n
+595.88 928.95 moveto
+595.88 949.20 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+111 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+564.79 842.29 moveto
+(ni;) show
+568.15 874.01 1.000000 1n
+restore
+%  S_BAR
+117 linenum
+0.70 setlinewidth
+615.67 1053.88 moveto
+615.67 1029.88 lineto stroke
+615.67 998.07 moveto
+615.67 974.07 lineto stroke
+615.67 943.20 moveto
+615.67 919.20 lineto stroke
+615.67 886.01 moveto
+615.67 862.01 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+644.14 1041.88 1.000000 ll1rest
+restore
+%  S_STAFF
+% staff 2
+save
+644.14 986.07 1.000000 ll1rest
+restore
+%  S_STAFF
+% staff 3
+save
+121 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+637.99 899.48 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+621.54 899.48 moveto
+(or) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+646.14 899.48 moveto
+(tu) show
+625.36 931.20 1.000000 2n
+0.70 setlinewidth
+621.46 930.45 moveto
+621.46 910.20 lineto stroke
+648.91 937.20 1.000000 2n
+645.01 936.45 moveto
+645.01 916.20 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+122 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+645.76 842.29 moveto
+(ab) show
+625.36 874.01 1.000000 ll2rest
+648.91 874.01 1.000000 2n
+0.70 setlinewidth
+645.01 873.26 moveto
+645.01 853.01 lineto stroke
+restore
+%  S_BAR
+125 linenum
+0.70 setlinewidth
+672.60 1053.88 moveto
+672.60 1029.88 lineto stroke
+672.60 998.07 moveto
+672.60 974.07 lineto stroke
+672.60 943.20 moveto
+672.60 919.20 lineto stroke
+672.60 886.01 moveto
+672.60 862.01 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+701.06 1041.88 1.000000 ll1rest
+restore
+%  S_STAFF
+% staff 2
+save
+128 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+702.69 955.29 moveto
+(ab) show
+682.24 986.07 1.000000 ll2rest
+705.84 971.07 1.000000 2n
+0.70 setlinewidth
+709.73 971.82 moveto
+709.73 992.07 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+129 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+694.92 899.48 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+678.34 899.48 moveto
+(so) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+702.83 899.48 moveto
+(lis) show
+682.24 934.20 1.000000 2n
+0.70 setlinewidth
+678.35 933.45 moveto
+678.35 913.20 lineto stroke
+705.84 931.20 1.000000 2n
+701.94 930.45 moveto
+701.94 910.20 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+130 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+694.90 842.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+678.43 842.29 moveto
+(or) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+703.06 842.29 moveto
+(tu) show
+682.24 877.01 1.000000 2n
+0.70 setlinewidth
+678.35 876.26 moveto
+678.35 856.01 lineto stroke
+705.84 883.01 1.000000 2n
+701.94 882.26 moveto
+701.94 862.01 lineto stroke
+restore
+%  S_BAR
+134 linenum
+0.70 setlinewidth
+729.53 1053.88 moveto
+729.53 1029.88 lineto stroke
+729.53 998.07 moveto
+729.53 974.07 lineto stroke
+729.53 943.20 moveto
+729.53 919.20 lineto stroke
+729.53 886.01 moveto
+729.53 862.01 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+136 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+762.06 1010.16 moveto
+(ab) show
+738.74 1041.88 1.000000 ll2rest
+765.21 1035.88 1.000000 2n
+769.10 1036.63 moveto
+769.10 1056.88 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+137 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+752.83 955.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+734.92 955.29 moveto
+(or) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+762.43 955.29 moveto
+(tu) show
+738.74 974.07 1.000000 4n
+0.70 setlinewidth
+742.42 974.82 moveto
+742.42 995.07 lineto stroke
+751.53 977.07 1.000000 4n
+755.22 977.82 moveto
+755.22 998.07 lineto stroke
+765.21 980.07 1.000000 2n
+769.10 980.82 moveto
+769.10 1001.07 lineto stroke
+740.74 968.97 moveto
+740.79 969.23 lineto
+742.34 968.14 744.01 967.90 745.80 968.51 curveto
+747.60 969.12 748.77 970.33 749.33 972.14 curveto
+749.73 971.79 lineto
+749.53 969.54 748.35 968.05 746.21 967.32 curveto
+744.07 966.59 742.23 967.05 740.69 968.71 curveto
+fill
+restore
+%  S_STAFF
+% staff 3
+save
+138 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+752.14 899.48 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+734.67 899.48 moveto
+(us) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+760.29 899.48 moveto
+(que) show
+738.74 928.20 1.000000 2n
+0.70 setlinewidth
+742.64 928.95 moveto
+742.64 949.20 lineto stroke
+765.21 925.20 1.000000 2n
+769.10 925.95 moveto
+769.10 946.20 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+139 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+752.85 842.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+734.83 842.29 moveto
+(so) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+762.20 842.29 moveto
+(lis) show
+738.74 880.01 1.000000 2n
+0.70 setlinewidth
+734.84 879.26 moveto
+734.84 859.01 lineto stroke
+765.21 877.01 1.000000 2n
+761.31 876.26 moveto
+761.31 856.01 lineto stroke
+restore
+%  S_BAR
+144 linenum
+0.70 setlinewidth
+789.78 1053.88 moveto
+789.78 1029.88 lineto stroke
+789.78 998.07 moveto
+789.78 974.07 lineto stroke
+789.78 943.20 moveto
+789.78 919.20 lineto stroke
+789.78 886.01 moveto
+789.78 862.01 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+146 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+812.02 1010.16 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+795.39 1010.16 moveto
+(or) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+820.34 1010.16 moveto
+(tu) show
+799.21 1038.88 1.000000 2n
+803.11 1039.63 moveto
+803.11 1059.88 lineto stroke
+823.12 1044.88 1.000000 2n
+819.22 1044.13 moveto
+819.22 1023.88 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+146 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+812.02 955.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+795.39 955.29 moveto
+(or) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+820.34 955.29 moveto
+(tu) show
+799.21 977.07 1.000000 2n
+0.70 setlinewidth
+803.11 977.82 moveto
+803.11 998.07 lineto stroke
+823.12 980.07 1.000000 2n
+827.01 980.82 moveto
+827.01 1001.07 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+148 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+795.88 899.48 moveto
+(ad) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+835.62 899.48 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+819.16 899.48 moveto
+(oc) show
+799.21 937.20 1.000000 2n
+0.70 setlinewidth
+795.31 936.45 moveto
+795.31 916.20 lineto stroke
+823.12 940.20 1.000000 2n
+819.22 939.45 moveto
+819.22 919.20 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+146 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+812.02 842.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+795.39 842.29 moveto
+(or) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+820.34 842.29 moveto
+(tu) show
+799.21 874.01 1.000000 2n
+0.70 setlinewidth
+795.31 873.26 moveto
+795.31 853.01 lineto stroke
+823.12 871.01 1.000000 2n
+827.01 871.76 moveto
+827.01 892.01 lineto stroke
+restore
+%  S_BAR
+152 linenum
+0.70 setlinewidth
+846.71 1053.88 moveto
+846.71 1029.88 lineto stroke
+846.71 998.07 moveto
+846.71 974.07 lineto stroke
+846.71 943.20 moveto
+846.71 919.20 lineto stroke
+846.71 886.01 moveto
+846.71 862.01 lineto stroke
+%  S_FEED
+494.96 862.01 1351.06 5 1.000000 1.000000 stf
+/Times-Roman findfont
+11 scalefont
+setfont
+67.46 816.01 moveto
+(13) show
+494.96 804.83 1351.06 5 1.000000 1.000000 stf
+494.96 741.26 1351.06 5 1.000000 1.000000 stf
+494.96 684.15 1351.06 5 1.000000 1.000000 stf
+/Palatino-Roman findfont
+9 scalefont
+setfont
+55.26 786.88 moveto
+(S) show
+/Palatino-Roman findfont
+9 scalefont
+setfont
+52.94 729.64 moveto
+(A) show
+/Palatino-Roman findfont
+9 scalefont
+setfont
+54.45 666.16 moveto
+(T) show
+/Palatino-Roman findfont
+9 scalefont
+setfont
+54.45 609.10 moveto
+(B) show
+62.96 802.01 moveto
+62.96 600.15 lineto stroke
+%  S_CLEFSIG
+74.75 784.01 1.000000 gclef
+74.75 726.83 1.000000 gclef
+74.75 641.52 moveto
+/Times-Italic findfont
+9 scalefont
+setfont
+(8) show
+74.75 663.26 1.000000 gclef
+75.01 618.15 1.000000 fclef
+89.37 802.01 1.000000 sharp
+89.37 744.83 1.000000 sharp
+89.37 681.26 1.000000 sharp
+89.37 618.15 1.000000 sharp
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+154 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+123.52 758.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+107.65 758.29 moveto
+(so) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+130.73 758.29 moveto
+(lis) show
+111.56 790.01 1.000000 2n
+107.66 789.26 moveto
+107.66 769.01 lineto stroke
+133.73 790.01 1.000000 2n
+129.83 789.26 moveto
+129.83 769.01 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+154 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+123.52 694.73 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+107.65 694.73 moveto
+(so) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+130.73 694.73 moveto
+(lis) show
+111.56 726.83 1.000000 2n
+0.70 setlinewidth
+115.45 727.58 moveto
+115.45 747.83 lineto stroke
+133.73 726.83 1.000000 2n
+137.63 727.58 moveto
+137.63 747.83 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+156 linenum
+0.70 setlinewidth
+124.52 637.54 moveto
+169.67 637.54 lineto stroke
+/Palatino-Roman findfont
+12 scalefont
+setfont
+107.24 637.54 moveto
+(ca) show
+111.56 675.26 1.000000 1n
+113.56 680.36 moveto
+113.53 680.51 lineto
+121.60 683.41 129.92 684.85 138.49 684.85 curveto
+147.06 684.85 155.38 683.41 163.45 680.51 curveto
+163.40 680.21 lineto
+155.23 682.31 146.93 683.35 138.49 683.35 curveto
+130.06 683.35 121.75 682.31 113.58 680.21 curveto
+fill
+restore
+%  S_STAFF
+% staff 4
+save
+154 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+123.52 580.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+107.65 580.43 moveto
+(so) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+130.73 580.43 moveto
+(lis) show
+111.56 621.15 1.000000 2n
+0.70 setlinewidth
+107.66 620.40 moveto
+107.66 600.15 lineto stroke
+133.73 621.15 1.000000 2n
+129.83 620.40 moveto
+129.83 600.15 lineto stroke
+restore
+%  S_BAR
+160 linenum
+0.70 setlinewidth
+156.11 802.01 moveto
+156.11 778.01 lineto stroke
+156.11 744.83 moveto
+156.11 720.83 lineto stroke
+156.11 681.26 moveto
+156.11 657.26 lineto stroke
+156.11 624.15 moveto
+156.11 600.15 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+162 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+176.04 758.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+161.36 758.29 moveto
+(us) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+181.41 758.29 moveto
+(que) show
+165.43 787.01 1.000000 2n
+169.32 787.76 moveto
+169.32 808.01 lineto stroke
+186.32 784.01 1.000000 2n
+190.22 784.76 moveto
+190.22 805.01 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+162 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+176.04 694.73 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+161.36 694.73 moveto
+(us) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+181.41 694.73 moveto
+(que) show
+165.43 723.83 1.000000 2n
+0.70 setlinewidth
+169.32 724.58 moveto
+169.32 744.83 lineto stroke
+186.32 720.83 1.000000 2n
+190.22 721.58 moveto
+190.22 741.83 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+164 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+180.60 637.54 moveto
+(sum) show
+165.43 675.26 1.000000 2n
+0.70 setlinewidth
+161.53 674.51 moveto
+161.53 654.26 lineto stroke
+186.32 669.26 1.000000 2n
+182.43 668.51 moveto
+182.43 648.26 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+162 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+176.04 580.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+161.36 580.43 moveto
+(us) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+181.41 580.43 moveto
+(que) show
+165.43 612.15 1.000000 2n
+0.70 setlinewidth
+161.53 611.40 moveto
+161.53 591.15 lineto stroke
+186.32 615.15 1.000000 2n
+182.43 614.40 moveto
+182.43 594.15 lineto stroke
+restore
+%  S_BAR
+168 linenum
+0.70 setlinewidth
+210.06 802.01 moveto
+210.06 778.01 lineto stroke
+210.06 744.83 moveto
+210.06 720.83 lineto stroke
+210.06 681.26 moveto
+210.06 657.26 lineto stroke
+210.06 624.15 moveto
+210.06 600.15 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+170 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+215.91 758.29 moveto
+(ad) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+263.46 758.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+235.70 758.29 moveto
+(oc) show
+219.24 796.01 1.000000 2n
+215.34 795.26 moveto
+215.34 775.01 lineto stroke
+239.66 790.01 1.000000 2n
+235.76 789.26 moveto
+235.76 769.01 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+171 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+215.91 694.73 moveto
+(ad) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+274.56 694.73 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+257.88 694.73 moveto
+(oc) show
+219.24 726.83 1.000000 2n
+228.72 729.83 1.000000 dot
+0.70 setlinewidth
+223.14 727.58 moveto
+223.14 747.83 lineto stroke
+261.84 726.83 1.000000 4n
+265.53 727.58 moveto
+265.53 747.83 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+172 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+227.35 637.54 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+216.81 637.54 moveto
+(e) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+235.12 637.54 moveto
+(jus,) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+274.56 637.54 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+257.88 637.54 moveto
+(oc) show
+219.24 669.26 1.000000 2n
+0.70 setlinewidth
+215.34 668.51 moveto
+215.34 648.26 lineto stroke
+239.66 663.26 1.000000 4n
+243.34 664.01 moveto
+243.34 684.26 lineto stroke
+261.84 663.26 1.000000 4n
+265.53 664.01 moveto
+265.53 684.26 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+170 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+215.91 580.43 moveto
+(ad) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+263.46 580.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+235.70 580.43 moveto
+(oc) show
+219.24 606.15 1.000000 2n
+0.70 setlinewidth
+223.14 606.90 moveto
+223.14 627.15 lineto stroke
+239.66 615.15 1.000000 2n
+235.76 614.40 moveto
+235.76 594.15 lineto stroke
+restore
+%  S_BAR
+177 linenum
+0.70 setlinewidth
+276.80 802.01 moveto
+276.80 778.01 lineto stroke
+276.80 744.83 moveto
+276.80 720.83 lineto stroke
+276.80 681.26 moveto
+276.80 657.26 lineto stroke
+276.80 624.15 moveto
+276.80 600.15 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+179 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+295.91 758.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+282.35 758.29 moveto
+(ca) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+301.17 758.29 moveto
+(sum) show
+286.16 787.01 1.000000 2n
+290.06 787.76 moveto
+290.06 808.01 lineto stroke
+306.90 784.01 1.000000 2n
+310.79 784.76 moveto
+310.79 805.01 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+179 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+295.91 694.73 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+282.35 694.73 moveto
+(ca) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+301.17 694.73 moveto
+(sum) show
+286.16 720.83 1.000000 2n
+0.70 setlinewidth
+290.06 721.58 moveto
+290.06 741.83 lineto stroke
+306.90 720.83 1.000000 2n
+310.79 721.58 moveto
+310.79 741.83 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+181 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+301.65 637.54 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+282.35 637.54 moveto
+(ca) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+312.65 637.54 moveto
+(sum) show
+286.16 672.26 1.000000 2n
+295.64 672.26 1.000000 dot
+0.70 setlinewidth
+282.26 671.51 moveto
+282.26 651.26 lineto stroke
+318.38 669.26 1.000000 4n
+314.69 668.51 moveto
+314.69 648.26 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+179 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+295.91 580.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+282.35 580.43 moveto
+(ca) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+301.17 580.43 moveto
+(sum) show
+286.16 609.15 1.000000 2n
+0.70 setlinewidth
+290.06 609.90 moveto
+290.06 630.15 lineto stroke
+306.90 609.15 1.000000 2n
+310.79 609.90 moveto
+310.79 630.15 lineto stroke
+restore
+%  S_BAR
+185 linenum
+0.70 setlinewidth
+339.05 802.01 moveto
+339.05 778.01 lineto stroke
+339.05 744.83 moveto
+339.05 720.83 lineto stroke
+339.05 681.26 moveto
+339.05 657.26 lineto stroke
+339.05 624.15 moveto
+339.05 600.15 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+187 linenum
+359.30 758.29 moveto
+374.36 758.29 lineto stroke
+/Palatino-Roman findfont
+12 scalefont
+setfont
+347.56 758.29 moveto
+(e) show
+350.49 784.01 1.000000 2n
+354.39 784.76 moveto
+354.39 805.01 lineto stroke
+370.11 781.01 1.000000 2n
+374.01 781.76 moveto
+374.01 802.01 lineto stroke
+352.49 778.91 moveto
+352.62 779.13 lineto
+354.68 777.17 357.11 775.91 359.91 775.38 curveto
+362.71 774.84 365.43 775.10 368.08 776.16 curveto
+368.15 775.67 lineto
+365.52 774.08 362.70 773.57 359.68 774.15 curveto
+356.66 774.73 354.22 776.25 352.37 778.70 curveto
+fill
+restore
+%  S_STAFF
+% staff 2
+save
+187 linenum
+0.70 setlinewidth
+359.30 694.73 moveto
+386.78 694.73 lineto stroke
+/Palatino-Roman findfont
+12 scalefont
+setfont
+347.56 694.73 moveto
+(e) show
+350.49 717.83 1.000000 2n
+359.97 717.83 1.000000 dot
+354.39 718.58 moveto
+354.39 738.83 lineto stroke
+382.75 714.83 1.000000 4n
+376.52 714.83 moveto
+388.98 714.83 lineto stroke
+386.43 715.58 moveto
+386.43 735.83 lineto stroke
+352.49 712.73 moveto
+352.55 712.93 lineto
+356.97 710.93 361.58 709.67 366.40 709.16 curveto
+371.22 708.65 376.00 708.91 380.73 709.94 curveto
+380.77 709.52 lineto
+376.05 707.94 371.22 707.41 366.27 707.93 curveto
+361.32 708.46 356.71 709.99 352.43 712.53 curveto
+fill
+restore
+%  S_STAFF
+% staff 3
+save
+187 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+347.56 637.54 moveto
+(e) show
+350.49 666.26 1.000000 1n
+restore
+%  S_STAFF
+% staff 4
+save
+187 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+347.56 580.43 moveto
+(e) show
+350.49 612.15 1.000000 1n
+restore
+%  S_BAR
+192 linenum
+0.70 setlinewidth
+397.07 802.01 moveto
+397.07 778.01 lineto stroke
+397.07 744.83 moveto
+397.07 720.83 lineto stroke
+397.07 681.26 moveto
+397.07 657.26 lineto stroke
+397.07 624.15 moveto
+397.07 600.15 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+194 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+406.04 758.29 moveto
+(jus.) show
+410.57 784.01 1.000000 1n
+restore
+%  S_STAFF
+% staff 2
+save
+194 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+406.04 694.73 moveto
+(jus.) show
+410.57 711.83 1.000000 1n
+0.70 setlinewidth
+403.15 714.83 moveto
+417.99 714.83 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+194 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+406.04 637.54 moveto
+(jus.) show
+410.57 663.26 1.000000 1n
+restore
+%  S_STAFF
+% staff 4
+save
+194 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+406.04 580.43 moveto
+(jus.) show
+410.57 600.15 1.000000 1n
+restore
+%  S_BAR
+199 linenum
+459.59 793.01 1.000000 dot
+459.59 787.01 1.000000 dot
+445.59 793.01 1.000000 dot
+445.59 787.01 1.000000 dot
+0.70 setlinewidth
+3.00 setlinewidth
+450.09 802.01 moveto
+450.09 778.01 lineto stroke
+455.09 802.01 moveto
+455.09 778.01 lineto stroke
+0.70 setlinewidth
+459.59 735.83 1.000000 dot
+459.59 729.83 1.000000 dot
+445.59 735.83 1.000000 dot
+445.59 729.83 1.000000 dot
+3.00 setlinewidth
+450.09 744.83 moveto
+450.09 720.83 lineto stroke
+455.09 744.83 moveto
+455.09 720.83 lineto stroke
+0.70 setlinewidth
+459.59 672.26 1.000000 dot
+459.59 666.26 1.000000 dot
+445.59 672.26 1.000000 dot
+445.59 666.26 1.000000 dot
+3.00 setlinewidth
+450.09 681.26 moveto
+450.09 657.26 lineto stroke
+455.09 681.26 moveto
+455.09 657.26 lineto stroke
+0.70 setlinewidth
+459.59 615.15 1.000000 dot
+459.59 609.15 1.000000 dot
+445.59 615.15 1.000000 dot
+445.59 609.15 1.000000 dot
+3.00 setlinewidth
+450.09 624.15 moveto
+450.09 600.15 lineto stroke
+455.09 624.15 moveto
+455.09 600.15 lineto stroke
+0.70 setlinewidth
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+201 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+506.57 758.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+484.84 758.29 moveto
+(De) show
+468.89 790.01 1.000000 ll2rest
+489.59 775.01 1.000000 2n
+493.49 775.76 moveto
+493.49 796.01 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+201 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+506.57 694.73 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+484.84 694.73 moveto
+(De) show
+468.89 732.83 1.000000 ll2rest
+489.59 711.83 1.000000 2n
+0.70 setlinewidth
+483.14 714.83 moveto
+496.04 714.83 lineto stroke
+493.49 712.58 moveto
+493.49 732.83 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+201 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+506.57 637.54 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+484.84 637.54 moveto
+(De) show
+468.89 669.26 1.000000 ll2rest
+489.59 663.26 1.000000 2n
+0.70 setlinewidth
+493.49 664.01 moveto
+493.49 684.26 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+201 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+506.57 580.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+484.84 580.43 moveto
+(De) show
+468.89 612.15 1.000000 ll2rest
+489.59 621.15 1.000000 2n
+0.70 setlinewidth
+485.69 620.40 moveto
+485.69 600.15 lineto stroke
+restore
+%  S_BAR
+206 linenum
+0.70 setlinewidth
+512.34 802.01 moveto
+512.34 778.01 lineto stroke
+512.34 744.83 moveto
+512.34 720.83 lineto stroke
+512.34 681.26 moveto
+512.34 657.26 lineto stroke
+512.34 624.15 moveto
+512.34 600.15 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+208 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+535.41 758.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+516.26 758.29 moveto
+(cre) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+541.71 758.29 moveto
+(ta) show
+521.21 778.01 1.000000 2n
+525.11 778.76 moveto
+525.11 799.01 lineto stroke
+544.18 784.01 1.000000 2n
+548.07 784.76 moveto
+548.07 805.01 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+208 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+535.41 694.73 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+516.26 694.73 moveto
+(cre) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+541.71 694.73 moveto
+(ta) show
+521.21 714.83 1.000000 2n
+0.70 setlinewidth
+514.76 714.83 moveto
+527.66 714.83 lineto stroke
+525.11 715.58 moveto
+525.11 735.83 lineto stroke
+544.18 714.83 1.000000 2n
+537.73 714.83 moveto
+550.63 714.83 lineto stroke
+548.07 715.58 moveto
+548.07 735.83 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+208 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+535.41 637.54 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+516.26 637.54 moveto
+(cre) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+541.71 637.54 moveto
+(ta) show
+521.21 663.26 1.000000 2n
+0.70 setlinewidth
+525.11 664.01 moveto
+525.11 684.26 lineto stroke
+544.18 663.26 1.000000 2n
+548.07 664.01 moveto
+548.07 684.26 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+208 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+535.41 580.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+516.26 580.43 moveto
+(cre) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+541.71 580.43 moveto
+(ta) show
+521.21 609.15 1.000000 2n
+0.70 setlinewidth
+525.11 609.90 moveto
+525.11 630.15 lineto stroke
+544.18 615.15 1.000000 2n
+540.28 614.40 moveto
+540.28 594.15 lineto stroke
+restore
+%  S_BAR
+213 linenum
+0.70 setlinewidth
+566.29 802.01 moveto
+566.29 778.01 lineto stroke
+566.29 744.83 moveto
+566.29 720.83 lineto stroke
+566.29 681.26 moveto
+566.29 657.26 lineto stroke
+566.29 624.15 moveto
+566.29 600.15 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+215 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+590.09 758.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+570.51 758.29 moveto
+(De) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+597.62 758.29 moveto
+(i) show
+575.26 781.01 1.000000 2n
+579.16 781.76 moveto
+579.16 802.01 lineto stroke
+598.49 784.01 1.000000 2n
+602.38 784.76 moveto
+602.38 805.01 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+215 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+590.09 694.73 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+570.51 694.73 moveto
+(De) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+597.62 694.73 moveto
+(i) show
+575.26 717.83 1.000000 2n
+0.70 setlinewidth
+579.16 718.58 moveto
+579.16 738.83 lineto stroke
+598.49 711.83 1.000000 2n
+592.04 714.83 moveto
+604.93 714.83 lineto stroke
+602.38 712.58 moveto
+602.38 732.83 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+215 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+590.09 637.54 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+570.51 637.54 moveto
+(De) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+597.62 637.54 moveto
+(i) show
+575.26 666.26 1.000000 2n
+0.70 setlinewidth
+579.16 667.01 moveto
+579.16 687.26 lineto stroke
+598.49 663.26 1.000000 2n
+602.38 664.01 moveto
+602.38 684.26 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+215 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+590.09 580.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+570.51 580.43 moveto
+(De) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+597.62 580.43 moveto
+(i) show
+575.26 612.15 1.000000 2n
+0.70 setlinewidth
+571.36 611.40 moveto
+571.36 591.15 lineto stroke
+598.49 615.15 1.000000 2n
+594.59 614.40 moveto
+594.59 594.15 lineto stroke
+restore
+%  S_BAR
+220 linenum
+0.70 setlinewidth
+620.24 802.01 moveto
+620.24 778.01 lineto stroke
+620.24 744.83 moveto
+620.24 720.83 lineto stroke
+620.24 681.26 moveto
+620.24 657.26 lineto stroke
+620.24 624.15 moveto
+620.24 600.15 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+222 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+648.33 758.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+624.43 758.29 moveto
+(jus) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+660.11 758.29 moveto
+(ta) show
+629.20 778.01 1.000000 2n
+638.68 781.01 1.000000 dot
+633.10 778.76 moveto
+633.10 799.01 lineto stroke
+662.57 778.01 1.000000 4n
+666.26 778.76 moveto
+666.26 799.01 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+223 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+642.21 694.73 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+624.43 694.73 moveto
+(jus) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+647.87 694.73 moveto
+(ta) show
+629.20 711.83 1.000000 2n
+0.70 setlinewidth
+622.75 714.83 moveto
+635.65 714.83 lineto stroke
+633.10 712.58 moveto
+633.10 732.83 lineto stroke
+650.33 708.83 1.000000 2n
+643.88 708.83 moveto
+656.78 708.83 lineto stroke
+643.88 714.83 moveto
+656.78 714.83 lineto stroke
+654.23 709.58 moveto
+654.23 732.83 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+223 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+642.21 637.54 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+624.43 637.54 moveto
+(jus) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+647.87 637.54 moveto
+(ta) show
+629.20 663.26 1.000000 2n
+0.70 setlinewidth
+633.10 664.01 moveto
+633.10 684.26 lineto stroke
+650.33 657.26 1.000000 2n
+654.23 658.01 moveto
+654.23 678.26 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+222 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+648.33 580.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+624.43 580.43 moveto
+(jus) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+660.11 580.43 moveto
+(ta) show
+629.20 609.15 1.000000 2n
+638.68 609.15 1.000000 dot
+0.70 setlinewidth
+633.10 609.90 moveto
+633.10 630.15 lineto stroke
+662.57 609.15 1.000000 4n
+666.26 609.90 moveto
+666.26 630.15 lineto stroke
+restore
+%  S_BAR
+228 linenum
+0.70 setlinewidth
+677.29 802.01 moveto
+677.29 778.01 lineto stroke
+677.29 744.83 moveto
+677.29 720.83 lineto stroke
+677.29 681.26 moveto
+677.29 657.26 lineto stroke
+677.29 624.15 moveto
+677.29 600.15 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+230 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+680.79 758.29 moveto
+(sunt) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+712.10 758.29 moveto
+(et) show
+686.58 775.01 1.000000 2n
+690.48 775.76 moveto
+690.48 796.01 lineto stroke
+714.51 793.01 1.000000 2n
+710.61 792.26 moveto
+710.61 772.01 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+230 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+680.79 694.73 moveto
+(sunt) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+712.10 694.73 moveto
+(et) show
+686.58 711.83 1.000000 2n
+0.70 setlinewidth
+680.13 714.83 moveto
+693.03 714.83 lineto stroke
+690.48 712.58 moveto
+690.48 732.83 lineto stroke
+714.51 726.83 1.000000 2n
+718.41 727.58 moveto
+718.41 747.83 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+230 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+680.79 637.54 moveto
+(sunt) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+712.10 637.54 moveto
+(et) show
+686.58 663.26 1.000000 2n
+0.70 setlinewidth
+690.48 664.01 moveto
+690.48 684.26 lineto stroke
+714.51 678.26 1.000000 2n
+710.61 677.51 moveto
+710.61 657.26 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+230 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+680.79 580.43 moveto
+(sunt) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+712.10 580.43 moveto
+(et) show
+686.58 600.15 1.000000 2n
+0.70 setlinewidth
+690.48 600.90 moveto
+690.48 621.15 lineto stroke
+714.51 609.15 1.000000 2n
+718.41 609.90 moveto
+718.41 630.15 lineto stroke
+restore
+%  S_BAR
+235 linenum
+0.70 setlinewidth
+736.59 802.01 moveto
+736.59 778.01 lineto stroke
+736.59 744.83 moveto
+736.59 720.83 lineto stroke
+736.59 681.26 moveto
+736.59 657.26 lineto stroke
+736.59 624.15 moveto
+736.59 600.15 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+237 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+742.57 758.29 moveto
+(cor) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+787.64 758.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+770.72 758.29 moveto
+(ex) show
+746.73 790.01 1.000000 2n
+756.21 793.01 1.000000 dot
+742.83 789.26 moveto
+742.83 769.01 lineto stroke
+774.69 787.01 1.000000 4n
+778.38 787.76 moveto
+778.38 808.01 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+237 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+742.57 694.73 moveto
+(cor) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+787.64 694.73 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+770.72 694.73 moveto
+(ex) show
+746.73 726.83 1.000000 2n
+756.21 729.83 1.000000 dot
+0.70 setlinewidth
+750.62 727.58 moveto
+750.62 747.83 lineto stroke
+774.69 720.83 1.000000 4n
+778.38 721.58 moveto
+778.38 741.83 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+237 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+742.57 637.54 moveto
+(cor) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+787.64 637.54 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+770.72 637.54 moveto
+(ex) show
+746.73 675.26 1.000000 2n
+756.21 678.26 1.000000 dot
+0.70 setlinewidth
+742.83 674.51 moveto
+742.83 654.26 lineto stroke
+774.69 672.26 1.000000 4n
+771.01 671.51 moveto
+771.01 651.26 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+237 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+742.57 580.43 moveto
+(cor) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+787.64 580.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+770.72 580.43 moveto
+(ex) show
+746.73 600.15 1.000000 2n
+756.21 603.15 1.000000 dot
+0.70 setlinewidth
+750.62 600.90 moveto
+750.62 621.15 lineto stroke
+774.69 603.15 1.000000 4n
+778.38 603.90 moveto
+778.38 624.15 lineto stroke
+restore
+%  S_BAR
+242 linenum
+0.70 setlinewidth
+789.66 802.01 moveto
+789.66 778.01 lineto stroke
+789.66 744.83 moveto
+789.66 720.83 lineto stroke
+789.66 681.26 moveto
+789.66 657.26 lineto stroke
+789.66 624.15 moveto
+789.66 600.15 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+244 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+815.88 758.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+795.61 758.29 moveto
+(hi) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+839.18 758.29 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+828.71 758.29 moveto
+(la) show
+799.21 784.01 1.000000 2n
+808.69 787.01 1.000000 dot
+803.10 784.76 moveto
+803.10 805.01 lineto stroke
+832.06 784.01 1.000000 4n
+835.74 784.76 moveto
+835.74 805.01 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+244 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+815.88 694.73 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+795.61 694.73 moveto
+(hi) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+839.18 694.73 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+828.71 694.73 moveto
+(la) show
+799.21 717.83 1.000000 2n
+808.69 717.83 1.000000 dot
+0.70 setlinewidth
+803.10 718.58 moveto
+803.10 738.83 lineto stroke
+832.06 717.83 1.000000 4n
+835.74 718.58 moveto
+835.74 738.83 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+244 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+815.88 637.54 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+795.61 637.54 moveto
+(hi) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+839.18 637.54 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+828.71 637.54 moveto
+(la) show
+799.21 669.26 1.000000 2n
+808.69 672.26 1.000000 dot
+0.70 setlinewidth
+795.31 668.51 moveto
+795.31 648.26 lineto stroke
+832.06 669.26 1.000000 4n
+828.38 668.51 moveto
+828.38 648.26 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+247 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+809.73 580.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+795.61 580.43 moveto
+(hi) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+833.02 580.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+816.41 580.43 moveto
+(la) show
+799.21 606.15 1.000000 2n
+0.70 setlinewidth
+803.10 606.90 moveto
+803.10 627.15 lineto stroke
+819.75 600.15 1.000000 2n
+823.65 600.90 moveto
+823.65 621.15 lineto stroke
+restore
+%  S_BAR
+250 linenum
+0.70 setlinewidth
+846.71 802.01 moveto
+846.71 778.01 lineto stroke
+846.71 744.83 moveto
+846.71 720.83 lineto stroke
+846.71 681.26 moveto
+846.71 657.26 lineto stroke
+846.71 624.15 moveto
+846.71 600.15 lineto stroke
+%  S_FEED
+494.96 600.15 1351.06 5 1.000000 1.000000 stf
+/Times-Roman findfont
+11 scalefont
+setfont
+67.46 554.15 moveto
+(26) show
+494.96 542.89 1351.06 5 1.000000 1.000000 stf
+494.96 485.64 1351.06 5 1.000000 1.000000 stf
+494.96 428.38 1351.06 5 1.000000 1.000000 stf
+/Palatino-Roman findfont
+9 scalefont
+setfont
+55.26 525.02 moveto
+(S) show
+/Palatino-Roman findfont
+9 scalefont
+setfont
+52.94 467.71 moveto
+(A) show
+/Palatino-Roman findfont
+9 scalefont
+setfont
+54.45 410.53 moveto
+(T) show
+/Palatino-Roman findfont
+9 scalefont
+setfont
+54.45 353.33 moveto
+(B) show
+62.96 540.15 moveto
+62.96 344.38 lineto stroke
+%  S_CLEFSIG
+74.75 522.15 1.000000 gclef
+74.75 464.89 1.000000 gclef
+74.75 385.90 moveto
+/Times-Italic findfont
+9 scalefont
+setfont
+(8) show
+74.75 407.64 1.000000 gclef
+75.01 362.38 1.000000 fclef
+89.37 540.15 1.000000 sharp
+89.37 482.89 1.000000 sharp
+89.37 425.64 1.000000 sharp
+89.37 362.38 1.000000 sharp
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+252 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+104.75 496.43 moveto
+(rant;) show
+110.91 519.15 1.000000 1n
+restore
+%  S_STAFF
+% staff 2
+save
+252 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+104.75 439.17 moveto
+(rant;) show
+110.91 455.89 1.000000 1n
+restore
+%  S_STAFF
+% staff 3
+save
+254 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+104.75 381.92 moveto
+(rant;) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+157.43 381.92 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+133.80 381.92 moveto
+(lau) show
+110.91 410.64 1.000000 2n
+0.70 setlinewidth
+114.81 411.39 moveto
+114.81 431.64 lineto stroke
+138.95 419.64 1.000000 2n
+135.05 418.89 moveto
+135.05 398.64 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+252 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+104.75 324.66 moveto
+(rant;) show
+110.91 356.38 1.000000 2n
+0.70 setlinewidth
+107.01 355.63 moveto
+107.01 335.38 lineto stroke
+138.95 356.38 1.000000 ll2rest
+restore
+%  S_BAR
+258 linenum
+0.70 setlinewidth
+161.35 540.15 moveto
+161.35 516.15 lineto stroke
+161.35 482.89 moveto
+161.35 458.89 lineto stroke
+161.35 425.64 moveto
+161.35 401.64 lineto stroke
+161.35 368.38 moveto
+161.35 344.38 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+189.18 528.15 1.000000 ll1rest
+restore
+%  S_STAFF
+% staff 2
+save
+189.18 470.89 1.000000 ll1rest
+restore
+%  S_STAFF
+% staff 3
+save
+262 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+188.99 381.92 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+167.43 381.92 moveto
+(da) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+200.22 381.92 moveto
+(te) show
+171.75 419.64 1.000000 2n
+181.23 422.64 1.000000 dot
+0.70 setlinewidth
+167.85 418.89 moveto
+167.85 398.64 lineto stroke
+202.63 416.64 1.000000 4n
+198.95 415.89 moveto
+198.95 395.64 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+263 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+210.39 324.66 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+185.59 324.66 moveto
+(lau) show
+171.75 356.38 1.000000 ll2rest
+190.74 365.38 1.000000 2n
+0.70 setlinewidth
+186.84 364.63 moveto
+186.84 344.38 lineto stroke
+restore
+%  S_BAR
+266 linenum
+0.70 setlinewidth
+217.01 540.15 moveto
+217.01 516.15 lineto stroke
+217.01 482.89 moveto
+217.01 458.89 lineto stroke
+217.01 425.64 moveto
+217.01 401.64 lineto stroke
+217.01 368.38 moveto
+217.01 344.38 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+244.84 528.15 1.000000 ll1rest
+restore
+%  S_STAFF
+% staff 2
+save
+269 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+266.72 439.17 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+241.25 439.17 moveto
+(lau) show
+225.88 470.89 1.000000 ll2rest
+246.40 464.89 1.000000 2n
+0.70 setlinewidth
+250.29 465.64 moveto
+250.29 485.89 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+270 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+237.56 381.92 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+221.12 381.92 moveto
+(De) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+241.95 381.92 moveto
+(um) show
+225.88 413.64 1.000000 2n
+0.70 setlinewidth
+221.98 412.89 moveto
+221.98 392.64 lineto stroke
+246.40 413.64 1.000000 2n
+242.50 412.89 moveto
+242.50 392.64 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+271 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+243.88 324.66 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+221.56 324.66 moveto
+(da) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+255.88 324.66 moveto
+(te) show
+225.88 365.38 1.000000 2n
+235.36 365.38 1.000000 dot
+0.70 setlinewidth
+221.98 364.63 moveto
+221.98 344.38 lineto stroke
+258.29 362.38 1.000000 4n
+254.61 361.63 moveto
+254.61 341.38 lineto stroke
+restore
+%  S_BAR
+275 linenum
+0.70 setlinewidth
+272.67 540.15 moveto
+272.67 516.15 lineto stroke
+272.67 482.89 moveto
+272.67 458.89 lineto stroke
+272.67 425.64 moveto
+272.67 401.64 lineto stroke
+272.67 368.38 moveto
+272.67 344.38 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+301.17 528.15 1.000000 ll1rest
+restore
+%  S_STAFF
+% staff 2
+save
+278 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+300.88 439.17 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+278.55 439.17 moveto
+(da) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+312.88 439.17 moveto
+(te) show
+282.87 464.89 1.000000 2n
+292.35 467.89 1.000000 dot
+0.70 setlinewidth
+286.77 465.64 moveto
+286.77 485.89 lineto stroke
+315.29 461.89 1.000000 4n
+318.97 462.64 moveto
+318.97 482.89 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+279 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+303.89 381.92 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+276.29 381.92 moveto
+(prin) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+326.19 381.92 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+312.11 381.92 moveto
+(ci) show
+282.87 413.64 1.000000 2n
+292.35 416.64 1.000000 dot
+0.70 setlinewidth
+278.98 412.89 moveto
+278.98 392.64 lineto stroke
+315.29 413.64 1.000000 4n
+311.61 412.89 moveto
+311.61 392.64 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+280 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+294.56 324.66 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+278.12 324.66 moveto
+(De) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+298.95 324.66 moveto
+(um) show
+282.87 359.38 1.000000 2n
+0.70 setlinewidth
+278.98 358.63 moveto
+278.98 338.38 lineto stroke
+303.39 356.38 1.000000 2n
+299.50 355.63 moveto
+299.50 335.38 lineto stroke
+restore
+%  S_BAR
+284 linenum
+0.70 setlinewidth
+329.67 540.15 moveto
+329.67 516.15 lineto stroke
+329.67 482.89 moveto
+329.67 458.89 lineto stroke
+329.67 425.64 moveto
+329.67 401.64 lineto stroke
+329.67 368.38 moveto
+329.67 344.38 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+287 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+384.58 496.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+360.76 496.43 moveto
+(lau) show
+339.76 528.15 1.000000 ll2rest
+365.91 513.15 1.000000 2n
+369.81 513.90 moveto
+369.81 534.15 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+288 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+354.26 439.17 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+335.00 439.17 moveto
+(De) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+361.47 439.17 moveto
+(um) show
+339.76 458.89 1.000000 2n
+0.70 setlinewidth
+343.65 459.64 moveto
+343.65 479.89 lineto stroke
+365.91 464.89 1.000000 2n
+369.81 465.64 moveto
+369.81 485.89 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+289 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+334.48 381.92 moveto
+(pes,) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+384.58 381.92 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+360.76 381.92 moveto
+(lau) show
+339.76 416.64 1.000000 2n
+0.70 setlinewidth
+335.86 415.89 moveto
+335.86 395.64 lineto stroke
+365.91 407.64 1.000000 2n
+369.81 408.39 moveto
+369.81 428.64 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+290 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+357.64 324.66 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+333.17 324.66 moveto
+(prin) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+381.16 324.66 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+362.73 324.66 moveto
+(ci) show
+339.76 353.38 1.000000 2n
+0.70 setlinewidth
+343.65 354.13 moveto
+343.65 374.38 lineto stroke
+365.91 350.38 1.000000 2n
+369.81 351.13 moveto
+369.81 371.38 lineto stroke
+restore
+%  S_BAR
+295 linenum
+0.70 setlinewidth
+388.47 540.15 moveto
+388.47 516.15 lineto stroke
+388.47 482.89 moveto
+388.47 458.89 lineto stroke
+388.47 425.64 moveto
+388.47 401.64 lineto stroke
+388.47 368.38 moveto
+388.47 344.38 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+297 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+414.95 496.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+394.76 496.43 moveto
+(da) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+424.82 496.43 moveto
+(te) show
+399.08 534.15 1.000000 2n
+408.56 537.15 1.000000 dot
+395.19 533.40 moveto
+395.19 513.15 lineto stroke
+427.23 531.15 1.000000 4n
+423.55 530.40 moveto
+423.55 510.15 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+298 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+417.97 439.17 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+392.50 439.17 moveto
+(prin) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+437.94 439.17 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+424.04 439.17 moveto
+(ci) show
+399.08 461.89 1.000000 2n
+408.56 461.89 1.000000 dot
+0.70 setlinewidth
+402.98 462.64 moveto
+402.98 482.89 lineto stroke
+427.23 461.89 1.000000 4n
+430.91 462.64 moveto
+430.91 482.89 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+299 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+426.62 381.92 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+394.76 381.92 moveto
+(da) show
+399.08 410.64 1.000000 1n
+restore
+%  S_STAFF
+% staff 4
+save
+300 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+393.81 324.66 moveto
+(pes,) show
+399.08 356.38 1.000000 1n
+restore
+%  S_BAR
+305 linenum
+0.70 setlinewidth
+441.61 540.15 moveto
+441.61 516.15 lineto stroke
+441.61 482.89 moveto
+441.61 458.89 lineto stroke
+441.61 425.64 moveto
+441.61 401.64 lineto stroke
+441.61 368.38 moveto
+441.61 344.38 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+307 linenum
+467.09 496.43 moveto
+512.45 496.43 lineto stroke
+/Palatino-Roman findfont
+12 scalefont
+setfont
+446.07 496.43 moveto
+(De) show
+451.33 528.15 1.000000 1n
+453.33 533.25 moveto
+453.30 533.40 lineto
+461.86 536.44 470.68 537.97 479.77 537.97 curveto
+488.85 537.97 497.67 536.44 506.23 533.40 curveto
+506.18 533.10 lineto
+497.52 535.35 488.71 536.47 479.77 536.47 curveto
+470.82 536.47 462.01 535.35 453.35 533.10 curveto
+fill
+restore
+%  S_STAFF
+% staff 2
+save
+308 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+446.05 439.17 moveto
+(pes,) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+494.54 439.17 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+471.57 439.17 moveto
+(lau) show
+451.33 464.89 1.000000 2n
+0.70 setlinewidth
+455.22 465.64 moveto
+455.22 485.89 lineto stroke
+476.72 455.89 1.000000 2n
+480.62 456.64 moveto
+480.62 476.89 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+309 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+448.16 381.92 moveto
+(te,) show
+451.33 407.64 1.000000 1n
+restore
+%  S_STAFF
+% staff 4
+save
+310 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+494.54 324.66 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+471.57 324.66 moveto
+(lau) show
+451.33 356.38 1.000000 ll2rest
+476.72 350.38 1.000000 2n
+0.70 setlinewidth
+480.62 351.13 moveto
+480.62 371.38 lineto stroke
+restore
+%  S_BAR
+315 linenum
+0.70 setlinewidth
+499.12 540.15 moveto
+499.12 516.15 lineto stroke
+499.12 482.89 moveto
+499.12 458.89 lineto stroke
+499.12 425.64 moveto
+499.12 401.64 lineto stroke
+499.12 368.38 moveto
+499.12 344.38 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+317 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+524.06 496.43 moveto
+(um) show
+508.20 528.15 1.000000 2n
+504.31 527.40 moveto
+504.31 507.15 lineto stroke
+528.51 522.15 1.000000 2n
+532.41 522.90 moveto
+532.41 543.15 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+318 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+520.15 439.17 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+503.88 439.17 moveto
+(da) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+526.10 439.17 moveto
+(te) show
+508.20 464.89 1.000000 2n
+0.70 setlinewidth
+512.10 465.64 moveto
+512.10 485.89 lineto stroke
+528.51 470.89 1.000000 2n
+524.61 470.14 moveto
+524.61 449.89 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+319 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+548.77 381.92 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+523.36 381.92 moveto
+(lau) show
+508.20 413.64 1.000000 ll2rest
+528.51 413.64 1.000000 2n
+0.70 setlinewidth
+524.61 412.89 moveto
+524.61 392.64 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+320 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+526.10 324.66 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+503.88 324.66 moveto
+(da) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+537.99 324.66 moveto
+(te) show
+508.20 359.38 1.000000 2n
+517.68 359.38 1.000000 dot
+0.70 setlinewidth
+504.31 358.63 moveto
+504.31 338.38 lineto stroke
+540.41 356.38 1.000000 4n
+536.72 355.63 moveto
+536.72 335.38 lineto stroke
+restore
+%  S_BAR
+325 linenum
+0.70 setlinewidth
+554.78 540.15 moveto
+554.78 516.15 lineto stroke
+554.78 482.89 moveto
+554.78 458.89 lineto stroke
+554.78 425.64 moveto
+554.78 401.64 lineto stroke
+554.78 368.38 moveto
+554.78 344.38 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+327 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+587.88 496.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+558.28 496.43 moveto
+(prin) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+616.61 496.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+598.08 496.43 moveto
+(ci) show
+564.87 531.15 1.000000 2n
+574.35 531.15 1.000000 dot
+560.97 530.40 moveto
+560.97 510.15 lineto stroke
+601.27 531.15 1.000000 4n
+597.59 530.40 moveto
+597.59 510.15 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+328 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+582.29 439.17 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+558.28 439.17 moveto
+(prin) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+611.02 439.17 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+586.91 439.17 moveto
+(ci) show
+564.87 467.89 1.000000 2n
+0.70 setlinewidth
+568.77 468.64 moveto
+568.77 488.89 lineto stroke
+590.10 458.89 1.000000 4n
+599.36 461.89 1.000000 dot
+593.78 459.64 moveto
+593.78 479.89 lineto stroke
+610.57 461.89 1.000000 4n
+614.25 462.64 moveto
+614.25 482.89 lineto stroke
+617.27 482.89 1.000000 dnflag
+592.10 453.79 moveto
+592.13 454.04 lineto
+594.92 452.98 597.77 452.72 600.70 453.25 curveto
+603.64 453.79 606.22 455.04 608.45 457.01 curveto
+608.68 456.58 lineto
+606.65 454.11 604.07 452.60 600.93 452.02 curveto
+597.79 451.45 594.83 451.96 592.07 453.55 curveto
+fill
+restore
+%  S_STAFF
+% staff 3
+save
+329 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+601.16 381.92 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+560.55 381.92 moveto
+(da) show
+564.87 422.64 1.000000 1n
+restore
+%  S_STAFF
+% staff 4
+save
+330 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+587.88 324.66 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+558.28 324.66 moveto
+(prin) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+616.61 324.66 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+598.08 324.66 moveto
+(ci) show
+564.87 353.38 1.000000 2n
+574.35 353.38 1.000000 dot
+0.70 setlinewidth
+568.77 354.13 moveto
+568.77 374.38 lineto stroke
+601.27 353.38 1.000000 4n
+604.95 354.13 moveto
+604.95 374.38 lineto stroke
+restore
+%  S_BAR
+335 linenum
+0.70 setlinewidth
+624.15 540.15 moveto
+624.15 516.15 lineto stroke
+624.15 482.89 moveto
+624.15 458.89 lineto stroke
+624.15 425.64 moveto
+624.15 401.64 lineto stroke
+624.15 368.38 moveto
+624.15 344.38 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+337 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+629.35 496.43 moveto
+(pes) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+655.44 496.43 moveto
+(et) show
+633.87 528.15 1.000000 2n
+629.97 527.40 moveto
+629.97 507.15 lineto stroke
+657.85 528.15 1.000000 2n
+653.95 527.40 moveto
+653.95 507.15 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+337 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+629.35 439.17 moveto
+(pes) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+655.44 439.17 moveto
+(et) show
+633.87 464.89 1.000000 2n
+0.70 setlinewidth
+637.76 465.64 moveto
+637.76 485.89 lineto stroke
+657.85 464.89 1.000000 2n
+661.75 465.64 moveto
+661.75 485.89 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+339 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+631.45 381.92 moveto
+(te) show
+633.87 419.64 1.000000 1n
+restore
+%  S_STAFF
+% staff 4
+save
+337 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+629.35 324.66 moveto
+(pes) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+655.44 324.66 moveto
+(et) show
+633.87 365.38 1.000000 2n
+0.70 setlinewidth
+629.97 364.63 moveto
+629.97 344.38 lineto stroke
+657.85 365.38 1.000000 2n
+653.95 364.63 moveto
+653.95 344.38 lineto stroke
+restore
+%  S_BAR
+343 linenum
+0.70 setlinewidth
+679.39 540.15 moveto
+679.39 516.15 lineto stroke
+679.39 482.89 moveto
+679.39 458.89 lineto stroke
+679.39 425.64 moveto
+679.39 401.64 lineto stroke
+679.39 368.38 moveto
+679.39 344.38 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+345 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+704.93 496.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+684.08 496.43 moveto
+(om) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+711.65 496.43 moveto
+(nes) show
+689.35 537.15 1.000000 2n
+698.83 537.15 1.000000 dot
+685.45 536.40 moveto
+685.45 516.15 lineto stroke
+716.11 534.15 1.000000 4n
+712.43 533.40 moveto
+712.43 513.15 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+345 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+704.93 439.17 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+684.08 439.17 moveto
+(om) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+711.65 439.17 moveto
+(nes) show
+689.35 464.89 1.000000 2n
+698.83 467.89 1.000000 dot
+0.70 setlinewidth
+693.25 465.64 moveto
+693.25 485.89 lineto stroke
+716.11 464.89 1.000000 4n
+719.79 465.64 moveto
+719.79 485.89 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+345 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+704.93 381.92 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+684.08 381.92 moveto
+(om) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+711.65 381.92 moveto
+(nes) show
+689.35 416.64 1.000000 2n
+698.83 416.64 1.000000 dot
+0.70 setlinewidth
+685.45 415.89 moveto
+685.45 395.64 lineto stroke
+716.11 419.64 1.000000 4n
+712.43 418.89 moveto
+712.43 398.64 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+345 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+704.93 324.66 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+684.08 324.66 moveto
+(om) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+711.65 324.66 moveto
+(nes) show
+689.35 353.38 1.000000 2n
+698.83 353.38 1.000000 dot
+0.70 setlinewidth
+693.25 354.13 moveto
+693.25 374.38 lineto stroke
+716.11 350.38 1.000000 4n
+719.79 351.13 moveto
+719.79 371.38 lineto stroke
+restore
+%  S_BAR
+350 linenum
+0.70 setlinewidth
+733.00 540.15 moveto
+733.00 516.15 lineto stroke
+733.00 482.89 moveto
+733.00 458.89 lineto stroke
+733.00 425.64 moveto
+733.00 401.64 lineto stroke
+733.00 368.38 moveto
+733.00 344.38 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+352 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+758.73 496.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+737.60 496.43 moveto
+(po) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+790.52 496.43 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+769.11 496.43 moveto
+(pu) show
+742.03 531.15 1.000000 2n
+751.51 531.15 1.000000 dot
+738.13 530.40 moveto
+738.13 510.15 lineto stroke
+773.70 534.15 1.000000 4n
+770.02 533.40 moveto
+770.02 513.15 lineto stroke
+restore
+%  S_STAFF
+% staff 2
+save
+353 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+753.08 439.17 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+737.60 439.17 moveto
+(po) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+784.86 439.17 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+757.80 439.17 moveto
+(pu) show
+742.03 464.89 1.000000 2n
+0.70 setlinewidth
+745.93 465.64 moveto
+745.93 485.89 lineto stroke
+762.39 461.89 1.000000 2n
+766.29 462.64 moveto
+766.29 482.89 lineto stroke
+restore
+%  S_STAFF
+% staff 3
+save
+353 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+753.08 381.92 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+737.60 381.92 moveto
+(po) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+784.86 381.92 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+757.80 381.92 moveto
+(pu) show
+742.03 422.64 1.000000 2n
+0.70 setlinewidth
+738.13 421.89 moveto
+738.13 401.64 lineto stroke
+762.39 419.64 1.000000 2n
+758.49 418.89 moveto
+758.49 398.64 lineto stroke
+restore
+%  S_STAFF
+% staff 4
+save
+353 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+753.08 324.66 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+737.60 324.66 moveto
+(po) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+784.86 324.66 moveto
+(-) show
+/Palatino-Roman findfont
+12 scalefont
+setfont
+757.80 324.66 moveto
+(pu) show
+742.03 347.38 1.000000 2n
+0.70 setlinewidth
+745.93 348.13 moveto
+745.93 368.38 lineto stroke
+762.39 356.38 1.000000 2n
+758.49 355.63 moveto
+758.49 335.38 lineto stroke
+restore
+%  S_BAR
+358 linenum
+0.70 setlinewidth
+788.66 540.15 moveto
+788.66 516.15 lineto stroke
+788.66 482.89 moveto
+788.66 458.89 lineto stroke
+788.66 425.64 moveto
+788.66 401.64 lineto stroke
+788.66 368.38 moveto
+788.66 344.38 lineto stroke
+%  S_CHHEAD
+%  S_STAFF
+% staff 1
+save
+360 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+800.52 496.43 moveto
+(li.) show
+803.00 528.15 1.000000 1n
+restore
+%  S_STAFF
+% staff 2
+save
+360 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+800.52 439.17 moveto
+(li.) show
+803.00 464.89 1.000000 1n
+restore
+%  S_STAFF
+% staff 3
+save
+360 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+800.52 381.92 moveto
+(li.) show
+803.00 419.64 1.000000 1n
+restore
+%  S_STAFF
+% staff 4
+save
+360 linenum
+/Palatino-Roman findfont
+12 scalefont
+setfont
+800.52 324.66 moveto
+(li.) show
+803.00 344.38 1.000000 1n
+restore
+%  S_BAR
+365 linenum
+837.56 531.15 1.000000 dot
+837.56 525.15 1.000000 dot
+0.70 setlinewidth
+841.56 540.15 moveto
+841.56 516.15 lineto stroke
+3.00 setlinewidth
+845.56 540.15 moveto
+845.56 516.15 lineto stroke
+0.70 setlinewidth
+837.56 473.89 1.000000 dot
+837.56 467.89 1.000000 dot
+841.56 482.89 moveto
+841.56 458.89 lineto stroke
+3.00 setlinewidth
+845.56 482.89 moveto
+845.56 458.89 lineto stroke
+0.70 setlinewidth
+837.56 416.64 1.000000 dot
+837.56 410.64 1.000000 dot
+841.56 425.64 moveto
+841.56 401.64 lineto stroke
+3.00 setlinewidth
+845.56 425.64 moveto
+845.56 401.64 lineto stroke
+0.70 setlinewidth
+837.56 359.38 1.000000 dot
+837.56 353.38 1.000000 dot
+841.56 368.38 moveto
+841.56 344.38 lineto stroke
+3.00 setlinewidth
+845.56 368.38 moveto
+845.56 344.38 lineto stroke
+0.70 setlinewidth
+%  Printing header/footer
+/Times-Roman findfont
+24 scalefont
+setfont
+333.50 1092.32 moveto
+(Laudate Nomen Domini) show
+/Times-Roman findfont
+14 scalefont
+setfont
+52.94 1077.37 moveto
+/Times-Roman findfont
+14 scalefont
+setfont
+641.51 1077.37 moveto
+(Dr. Christopher Tye \(ca. 1505-1571\)) show
+/Times-Roman findfont
+12 scalefont
+setfont
+285.98 70.29 moveto
+291.42 70.73 1.000000 copyright
+296.86 70.29 moveto
+( 1999 by the Choral Public Domain Library \(http://www.cpdl.org\)) show
+/Times-Roman findfont
+12 scalefont
+setfont
+52.94 57.48 moveto
+/Times-Roman findfont
+12 scalefont
+setfont
+283.07 57.48 moveto
+(Edition may be freely distributed, duplicated, performed, or recorded.) show
+/Times-Roman findfont
+12 scalefont
+setfont
+777.79 57.48 moveto
+(ed. 7 sep 1999) show
+showpage
+restore
+%%Trailer
+%%DocumentFonts: /Times-Roman /Times-Italic /Palatino-Roman 
+%%Pages: 1

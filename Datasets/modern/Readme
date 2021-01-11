@@ -1,0 +1,29 @@
+File-Prefix    Author        Program    Description
+------------------------------------------------------------------
+williams       C. Dalitz     abctab2ps  mostly black notes
+bellinzani     C. Dalitz     abctab2ps  many beams
+victoria       C. Dalitz     abctab2ps  mostly white notes, tangential slurs
+carcassi       J. Covey *)   lilypond   guitar music, many beams
+diabelli       A. Simoes *)  lilypond   8va dotted lines
+rameau         L. Sardain *) lilypond   some long ties
+schumann       Y.C. Liu *)   lilypond   many ties and fingerings
+bach           E. Sandberg *) lilypond
+mahler         P. Hazel +)   pmw        late romantic performance hints
+wagner         P. Hazel +)   pmw        late romantic performance hints
+pmw            P. Hazel +)   pmw        different scores typeset with pmw
+dalitz         C. Dalitz     mup        mostly black notes
+tye            M. Winikoff #) mup       many white notes
+brahms         M. Voli #)    finale98   many white notes
+bruckner       R. Ornes #)   finale98
+buxtehude      J. Tuvfesson o) pmx
+
+
+*) from www.mutopiaproject.org
+   as most of these files cannot be processed with newer versions
+   of lilypond nor converted with convert-ly, only the PS files are provided
+
++) contributed by Philip Hazel via email
+
+#) from http://www.cpdl.org/
+
+o) from http://www.lysator.liu.se/~tuben/scores/

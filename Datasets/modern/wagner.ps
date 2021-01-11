@@ -1,0 +1,1226 @@
+%!PS-Adobe-3.0 Resource-Font
+%%Title: PostScript code for a font of musical characters
+%%Version: 54
+%%Copyright: Copyright (c) 1989 - 2003 by Philip Hazel
+%%Creator: Philip Hazel
+%%CreationDate: Last modified on 05-Apr-2003
+%%DocumentSuppliedResources: font PMW-Music
+%%EndComments
+
+%%BeginExitServer: 000000
+%%serverdict begin 000000 exitserver
+%%EndExitServer
+
+%%BeginSetup
+%%BeginResource: font PMW-Music
+
+100 dict begin
+
+% It seems that the font mechanism in Ghostscript is sufficiently different
+% from real PostScript that we can't do the clever thing that applies a
+% non-linear scaling to font lines. So we need to know whether we are using
+% Ghostscript or not. 
+
+% Another difference is that if the short stave characters have a different
+% bounding box to the long stave characters, the stave line thicknesses are
+% not always the same - especially when the PostScript is turned into PDF in 
+% the documentation. So for Ghostscript, we specify a much larger bounding
+% box than necessary for the short stave characters.
+
+% This code works on my version of Ghostscript...
+
+/isghost
+{
+systemdict /product known 
+{product (Ghostscript) search {pop pop pop true}{pop false} ifelse}
+{false} ifelse
+}def
+
+/Rm/rmoveto load def/Rl/rlineto load def/Mt/moveto load def
+/Lt/lineto load def/St/stroke load def/Tr/translate load def
+/Slw/setlinewidth load def/Sc/scale load def/Ct/curveto load def
+/Rc/rcurveto load def
+
+/At{arcto 4{pop}}def/An/arcn load def
+/Pm{transform round exch round exch itransform Mt}def
+/Pl{transform round exch round exch itransform Lt}def
+
+% slthick computes a thickness for stave lines that depends on the current
+% size of font that is being used. However, it doesn't seem to to work 
+% properly for Ghostscript, giving different sizes for different lengths of
+% stave. So we use a fixed size for the moment. This value is also used for
+% things like bar lines and ledger lines.
+
+isghost
+{
+/slthick{30}def
+}
+{
+/slthick{matrix currentmatrix aload pop pop
+pop 4 1 roll mul 3 1 roll mul sub dup 0.00174 le {pop 30}{0.00174 div
+sqrt -0.7 mul 2.718 exch exp 40 mul 10 add}ifelse}def
+} ifelse
+
+/ellipsedict 4 dict def ellipsedict/mtrx matrix put
+/ea{ellipsedict begin/savematrix mtrx currentmatrix def Tr 5 -1
+roll rotate Sc 0 0 1 5 -2 roll arc savematrix setmatrix end}def
+/ec{ellipsedict begin/savematrix mtrx currentmatrix def Tr 5 -1
+roll rotate Sc 0 0 1 5 -2 roll An savematrix setmatrix end}def
+
+/cnh{30 0 360 290 180 350 200 ea fill}def
+/mnh{30 0 360 290 180 350 200 ea 30 360 0 265 130 350 200 ec fill}def
+/bnh{0 0 360 300 210 350 200 ea 0 360 0 190 190 350 200 ec fill}def
+/hcnh{350 400 Mt 610 200 Lt 350 0 Lt 90 200 Lt fill}def
+/hmnh{350 400 Mt 585 200 Lt 350 0 Lt 115 200 Lt 350 400 Lt 40 Slw
+closepath St}def
+/xnh{90 400 Mt 610 0 Lt 610 400 Mt 90 0 Lt 45 Slw St}def
+/dstem{40 Slw 95 150 Pm 95 -1200 Pl St}def
+/ustem{40 Slw 605 250 Pm 605 1600 Pl St}def
+/xdstem{40 Slw 95 20 Pm 95 -1200 Pl St}def
+/xustem{40 Slw 605 380 Pm 605 1600 Pl St}def
+/fdstem{40 Slw 95 200 Pm 95 0 Pl St}def
+/fustem{40 Slw 605 200 Pm 605 400 Pl St}def
+
+/uqtail{ 800 420 Mt 800 388 Lt 1306 1070 585 1220 605 1620 Ct 605 1263
+Lt 676 1263 765 1201 859 1014 Ct 942 847 942 663 800 420 Ct fill}def
+
+/dqtail{ 89 -863 Mt 183 -863 336 -775 419 -609 Ct 469 -510 487 -320 359
+-102 Ct 359 -53 Lt 771 -707 157 -930 89 -1198 Ct fill}def
+
+/usqtail{ 900 820 Mt 900 845 Lt 1017 1009 934 1100 862 1163 Ct 767 1245
+630 1280 605 1280 Ct 605 1554 Lt 626 1554 Lt 766 1205 1173 1154 900 820
+Ct fill} def
+
+/dsqtail{ 484 -357 Mt 484 -398 Lt 573 -612 449 -701 359 -768 Ct 246 -849 133
+-851 90 -851 Ct 90 -1180 Lt 104 -1180 Lt 175 -790 710 -809 484 -357 Ct fill}def
+
+/stave{0 0 Pm dup 0 Pl 0 400 Pm dup 400 Pl 0 800 Pm dup 800 Pl 0
+1200 Pm dup 1200 Pl 0 1600 Pm 1600 Pl slthick Slw St}def
+/pstave{0 800 Pm 800 Pl slthick Slw St}def
+/stave2{0 400 Pm dup 400 Pl 0 1200 Pm 1200 Pl slthick Slw St}def
+/stave3{0 0 Pm dup 0 Pl 0 800 Pm dup 800 Pl 0 1600 Pm 1600 Pl slthick Slw St}def
+/stave4{0 0 Pm dup 0 Pl 0 400 Pm dup 400 Pl 0 800 Pm dup 800 Pl 0
+1200 Pm 1200 Pl slthick Slw St}def
+/stave6{0 0 Pm dup 0 Pl 0 400 Pm dup 400 Pl 0 800 Pm dup 800 Pl 0
+1200 Pm dup 1200 Pl 0 1600 Pm dup 1600 Pl 0 2000 Pm 2000 Pl slthick Slw St}def
+/mord{40 Slw 0 0 Mt 200 400 Rl St 200 400 Mt -75 -150 Rl
+150 -250 Rl currentpoint 75 150 Rl 200 400 Lt -75 -150 Rl
+gsave St grestore fill Mt 200 400 Rl St}def
+/acc{40 Slw -10 -20 Mt 250 500 Rl St 250 500 Mt -75 -150 Rl 200 -350
+Rl 75 150 Rl 250 500 Lt -75 -150 Rl gsave St grestore fill}def
+/acc4{-90 400 Mt 0 0 Lt 90 400 Lt 0 300 0 300 -90 400 Ct fill}def
+/c{560 560 110 0 360 arc fill 500 625 110 -90 83 arc 90 0 245 325 250
+460 400 ea 90 232 -20 400 350 410 400 ec 475 625 180 50 0 An fill}def
+/th{350 325 170 0 360 arc 22 Slw St 390 156 Mt 425 -70 Lt 275 -70 Lt
+305 156 Lt 390 156 Lt fill}def
+/tld{0.06 0.08 Sc 500 -1400 Mt 2{1240 -2000 3800 -360 1000 At 4500 80
+4020 840 3320 400 Ct 1890 -560 -500 1400 1000 At 180 rotate}repeat
+fill}def
+/trn{400 200 Tr 0.15 dup Sc 400 -1200 Mt 2{1200 -2100 2920 -1200
+2920 0 Ct 2920 600 2660 1200 2100 1420 Ct 1500 1720 1474 1585 1204 1545
+Ct 1370 960 571 106 303 arc 1726 474 Lt 1956 590 2290 620 2290 340 Ct
+2290 240 2150 -240 1960 -400 Ct 1400 -800 1200 -680 880 -310 Ct -400
+1200 Lt 180 rotate}repeat fill}def
+/dba{125 25 Mt 125 450 Lt 525 25 Mt 525 450 Lt 40 Slw St 125 400 Mt
+525 400 Lt 100 Slw St}def
+/uba{200 600 Mt 350 25 Lt 500 600 Lt 40 Slw St}def
+/circ{620 400 395 0 360 arc 50 Slw St}def
+/arrow{0 0 Mt 610 0 Lt 40 Slw St 800 0 Mt 600 200 Lt 600 -200 Lt fill}def
+
+/FontType 3 def/FontMatrix[.001 0 0 .001 0 0]def
+/FontBBox[-150 -1400 50000 2300]def/Encoding 256 array def
+
+0 1 31 {Encoding exch/.notdef put}for
+Encoding 32 [/sp/trebleclef/bassclef/altoclef/star
+
+% The shapes of some of the glyphs have been changed. The old versions are
+% still in the file, though commented out.
+% sharp at v46 (sharpold)
+% flat (jdflat for Jon Dixon)
+% natural at v46 (naturalold)
+% crotchet rest at v44 (crestold)
+% quaver rest at v44 (qrestold)
+
+% /sharpold
+/sharp
+/doublesharp
+% /jdflat
+/flat
+% /naturalold
+/natural
+% /tfermataold
+/tfermata
+/brest/sbrest/mrest
+% /crestold
+/crest
+% /qrestold
+/qrest
+% /bfermataold
+/bfermata
+
+/longrest
+/breve/semibreve/uminim/dminim/ucrotchet/dcrotchet/uquaver/dquaver
+/usquaver/dsquaver/usqtail/dsqtail/ledger/vdot/hdot/barsingle/bardouble
+/barthick/stave1/pstave1/uqtail/stave10/pstave10/dqtail/repeatdots
+/ustem/dstem/cnh/mnh/comma/mordent/dmordent/imordent/dimordent/turn
+/hbar/accent1/caesura/accent2/accent3/accent4/accent5/bardotted
+/caesura1/little8/C/cut/tilde/thumba/thumbb/ds1/ds2/downa/downb/upa
+/upb/iturn/seven/four/hcnh/hmnh/xnh/xustem/xdstem/fustem/fdstem/six
+/gdot/gring/d1/d4/u4/l1/r1/bs/ds/fs/us/.notdef/tick/uacc/dacc/grid
+/barshort/breath/vring/cross/trill/scaesura/lcaesura/sbra/sket/rbra
+/rket/rep/repdots/vtilde/trem/circ/cutcirc/slur1/slur2/up/down
+/iC/icut/unibreve/accent6/srbra/srket/angle1/angle2/angle3/angle4
+/ped/uvtilde/dvtilde/nail/angle5/angle6/stave21/stave31/stave41/stave61
+/hclef/oldbassclef/oldaltoclef/bratop/brabot/direct/five
+/.notdef/.notdef/.notdef/.notdef/.notdef/srm1/srm2/u12/d12
+]putinterval
+189 1 246 {Encoding exch/.notdef put}for
+Encoding 247 [/stave210/stave310/stave410/stave610
+/.notdef/.notdef/.notdef/.notdef/.notdef]putinterval
+
+/VMetrics 16 dict def VMetrics begin
+/us 200 def/ds -200 def/u4 400 def/d4 -400 def/d1 -100 def/vtilde 400 def
+/trem 400 def/uvtilde 400 def/dvtilde 400 def/srm1 400 def/srm2 -400 def
+/u12 1200 def/d12 -1200 def
+end
+
+/Metrics 200 dict def Metrics begin
+/.notdef 0 def/sp 750 def/trebleclef 1500 def
+/bassclef 1500 def/altoclef 1500 def/star 1000 def
+/sharp 600 def
+%/sharpold 600 def
+/doublesharp 600 def
+/flat 500 def/jdflat 500 def
+/natural 450 def
+%/naturalold 450 def
+/tfermata 0 def
+%/tfermataold 0 def
+/brest 660 def/sbrest 660 def/mrest 660 def
+%/crestold 660 def
+/crest 660 def
+%/qrestold 590 def
+/qrest 590 def
+%/bfermataold 0 def
+/bfermata 0 def
+/longrest 3500 def/breve 1340 def
+/semibreve 840 def/uminim 840 def/dminim 840 def
+/ucrotchet 840 def/dcrotchet 840 def/uquaver 1200 def
+/dquaver 840 def/usquaver 1200 def/dsquaver 840 def
+/usqtail 0 def/dsqtail 0 def/ledger 0 def/vdot 0 def
+/hdot 400 def/barsingle 600 def/bardouble 760 def
+/barthick 760 def/stave1 1000 def/pstave1 1000 def
+/uqtail 0 def/stave10 10000 def/pstave10 10000 def
+/dqtail 0 def/repeatdots 600 def/ustem 0 def/dstem 0 def
+/cnh 840 def/mnh 840 def/comma 600 def/mordent 0 def
+/dmordent 0 def/imordent 0 def/dimordent 0 def/turn 0 def
+/hbar 0 def/accent1 0 def/caesura 1000 def/accent2 0 def
+/accent3 0 def/accent4 0 def/accent5 0 def/bardotted 600 def
+/caesura1 1000 def/little8 0 def/C 1000 def/cut 1000 def
+/tilde 400 def/thumba 0 def/thumbb 0 def/ds1 1500 def
+/ds2 1500 def/downa 0 def/downb 0 def/upa 0 def/upb 0 def
+/iturn 0 def/seven 550 def/four 760 def/hcnh 840 def
+/hmnh 840 def/xnh 840 def/xustem 0 def/xdstem 0 def
+/fustem 0 def/fdstem 0 def/six 500 def/gdot 550 def/gring 550 def
+/d1 0 def
+/d4 0 def/u4 0 def/l1 -100 def/r1 100 def/bs -330 def/fs 550 def
+/ds 0 def/us 0 def/tick 600 def/uacc 0 def/dacc 0 def
+/grid 0 def/barshort 600 def/breath 0 def/vring 0 def/cross 0 def
+/trill 800 def/scaesura 600 def/lcaesura 600 def/sbra 350 def
+/sket 330 def/rbra 350 def/rket 350 def/rep 500 def/repdots 0 def
+/vtilde 0 def/trem 0 def/circ 1000 def/cutcirc 1000 def
+/slur1 0 def/slur2 0 def/up 0 def/down 0 def
+/iC 1000 def/icut 1000 def/unibreve 1580 def/accent6 0 def
+/srbra 350 def/srket 350 def/angle1 330 def/angle2 330 def
+/angle3 330 def/angle4 330 def/ped 1400 def/uvtilde 0 def/dvtilde 0 def
+/nail 0 def/angle5 333 def/angle6 333 def
+/stave21 1000 def/stave31 1000 def/stave41 1000 def/stave61 1000 def
+/hclef 1500 def/oldbassclef 1500 def/oldaltoclef 1500 def
+/bratop 0 def/brabot 0 def
+/direct 1000 def/five 550 def
+/srm1 -420 def/srm2 -760 def/u12 0 def/d12 0 def
+/stave210 10000 def/stave310 10000 def/stave410 10000 def/stave610 10000 def
+end
+
+/BBox 200 dict def BBox begin
+/.notdef[0 0 0 0]def
+
+% See comment above about these short stave characters
+isghost
+{
+/stave1[0 -20 10000 1620]def
+/pstave1[0 780 10000 820]def
+/stave21[0 380 10000 1220]def
+/stave31[0 -20 10000 1620]def
+/stave41[0 -20 10000 1220]def
+/stave61[0 -20 10000 2020]def
+}
+{
+/stave1[0 -20 1000 1620]def
+/pstave1[0 780 1000 820]def
+/stave21[0 380 1000 1220]def
+/stave31[0 -20 1000 1620]def
+/stave41[0 -20 1000 1220]def
+/stave61[0 -20 1000 2020]def
+} ifelse
+
+% These are the long versions of the staves
+/stave10[0 -20 10000 1620]def
+/pstave10[0 780 10000 820]def
+/stave210[0 380 10000 1220]def
+/stave310[0 -20 10000 1620]def
+/stave410[0 -20 10000 1220]def
+/stave610[0 -20 10000 2020]def
+
+/sp[0 0 0 0]def
+/trebleclef[130 -610 1180 2300]def/bassclef[200 100 1400 1600]def
+/altoclef[200 0 1400 1600]def/star[0 0 750 750]def
+/sharp[0 -430 441 830]def
+%/sharpold[0 -430 441 830]def
+/doublesharp[0 -25 475 425]def
+/flat[10 -66 355 892]def
+/jdflat[10 -10 425 872]def
+/natural[0 -430 320 830]def
+%/naturalold[0 -430 320 830]def
+/tfermata[-150 -100 850 500]def
+%/tfermataold[-150 -100 850 700]def
+/brest[0 0 400 400]def/sbrest[0 200 480 400]def
+/mrest[0 0 480 200]def
+%/crestold[-40 -200 400 1100]def
+/crest[-24 -149 475 1400]def
+%/qrestold[0 0 400 685]def
+/qrest[0 0 400 750]def
+/bfermata[-150 0 850 600]def
+%/bfermataold[-150 -100 850 700]def
+/longrest[0 -200 3000 600]def/breve[0 -115 1180 515]def
+/semibreve[10 -20 650 420]def/uminim[50 -30 650 1600]def
+/dminim[50 -1200 650 420]def/ucrotchet[50 -20 650 1600]def
+/dcrotchet[50 -1200 650 420]def/uquaver[60 -20 1050 1580]def
+/dquaver[60 -1200 650 420]def/usquaver[50 -20 1100 1650]def
+/dsquaver[50 -1200 650 420]def/usqtail[600 700 1100 1650]def
+/dsqtail[50 -1200 550 -400]def/ledger[-70 180 770 220]def
+/vdot[285 535 415 665]def/hdot[0 135 130 265]def
+/barsingle[0 -20 40 1620]def/bardouble[0 -20 200 1620]def
+/barthick[0 -20 200 1620]def
+/uqtail[550 300 1050 1650]def
+/dqtail[60 -1200 550 100]def/repeatdots[0 135 130 665]def
+/dstem[75 -1200 115 150]def/ustem[590 250 630 1600]def
+/cnh[75 -20 630 400]def/mnh[75 -20 630 400]def
+/comma[0 -300 300 300]def/mordent[0 -200 750 600]def
+/dmordent[0 -200 1025 600]def/imordent[0 0 750 400]def
+/dimordent[0 0 1025 400]def/turn[-50 -50 850 450]def
+/hbar[100 580 700 620]def/accent1[0 460 640 740]def
+/caesura[0 0 600 800]def/accent2[110 0 650 700]def
+/accent3[110 0 650 700]def/accent4[250 0 450 400]def
+/accent5[250 0 450 400]def/bardotted[0 0 40 1600]def
+/caesura1[0 0 600 800]def/little8[0 0 360 600]def
+/C[0 0 750 800]def/cut[0 -200 750 1000]def
+/tilde[100 150 600 450]def/thumba[0 -100 550 500]def
+/thumbb[0 -100 550 500]def/ds1[0 -175 1200 1375]def
+/ds2[15 0 993 990]def/downa[100 25 800 450]def
+/downb[100 -50 800 375]def/upa[180 25 600 600]def
+/upb[180 -200 600 375]def/iturn[-50 -50 850 450]def
+/seven[0 -200 500 650]def/four[0 0 684 700]def
+/hcnh[75 0 620 400]def/hmnh[75 -70 620 460]def
+/xnh[90 0 610 400]def/xustem[590 380 630 1600]def
+/xdstem[75 -1200 115 20]def/fustem[590 200 630 400]def
+/fdstem[75 0 115 200]def
+%/six[30 -20 540 800]def
+/six[30 -20  560 850]def
+/gdot[396 296 604 504]def/gring[380 280 620 720]def
+/d1[0 0 0 0]def
+/d4[0 0 0 0]def/u4[0 0 0 0]def
+/l1[0 0 0 0]def/r1[0 0 0 0]def
+/bs[0 0 0 0]def/fs[0 0 0 0]def
+/ds[0 0 0 0]def/us[0 0 0 0]def
+/tick[0 200 400 800]def/uacc[300 720 1050 1250]def
+/dacc[-150 -370 440 -1050]def/grid[490 0 3260 1935]def
+/barshort[0 0 80 530]def/breath[375 -90 975 1200]def
+/vring[120 80 480 340]def/cross[100 -30 600 470]def
+/trill[-32 0 761 680]def/scaesura[0 -200 40 200]def
+/lcaesura[0 0 40 1200]def/sbra[0 -350 250 750]def
+/sket[-50 -350 200 750]def/rbra[0 -350 250 750]def
+/rket[-80 -350 170 750]def/rep[0 0 800 800]def
+/repdots[-50 0 850 800]def/vtilde[-450 0 -150 500]def
+/trem[100 -175 600 175]def/circ[200 -20 1040 820]def
+/cutcirc[200 -200 1040 1400]def/slur1[300 -650 1200 -245]def
+/slur2[300 -650 1600 -245]def/up[0 0 540 613]def
+/down[0 -613 540 0]def
+/iC[0 0 750 800]def/icut[0 -200 750 1000]def
+/unibreve[10 -115 1390 515]def
+/accent6[340 0 360 400]def
+/srbra[69 0 266 642]def
+/srket[-84 0 97 642]def
+/angle1[44 42 290 258]def
+/angle2[44 42 290 258]def
+/angle3[44 194 290 410]def
+/angle4[44 194 290 410]def
+/ped[-1 0 1327 747]def
+/uvtilde[-576 12 -76 595]def
+/dvtilde[-533 -139 -33 444]def
+/nail[-22 447 615 754]def
+/angle5[44 -406 286 258]def
+/angle6[44 194 286 858]def
+/hclef[500 400 1100 1200]def
+/oldbassclef[-151 400 1294 1601]def
+/oldaltoclef[201 0 1153 1600]def
+/bratop[0 0 400 2000]def
+/brabot[0 -400 400 1600]def
+/direct[0 -10 993 713]def
+/five[30 -20 540 750]def
+/srm1[0 0 0 0]def
+/srm2[0 0 0 0]def
+/u12[0 0 0 0]def
+/d12[0 0 0 0]def
+end
+
+/CharacterDefs 200 dict def CharacterDefs begin
+/.notdef{}def/sp{}def
+/trebleclef{140 -1190 Tr 4.75 4.75 Sc 0 0 Mt 2 419 Rm 11 37 39 51 63 80
+Rc 16 19 29 31 44 50 Rc 11 14 20 25 32 40 Rc 8 10 14 17 12 26 Rc 5 11 0
+23 -8 32 Rc -4 5 -11 9 -18 10 Rc -8 -2 -19 -5 -23 -12 Rc -16 -23 -15 -58
+-11 -94 Rc 2 -17 Rl -8 -9 Rl -8 20 -18 84 0 130 Rc 9 24 22 40 39 58 Rc 0
+0 1 1 1 1 Rc 12 -10 19 -19 26 -33 Rc 10 -21 12 -49 11 -63 Rc 2 -16 2 -44
+-5 -67 Rc -6 -20 -15 -34 -29 -49 Rc -63 -64 -77 -56 -93 -107 Rc -6 -19
+-11 -34 -9 -54 Rc 4 -36 25 -63 59 -73 Rc 36 -10 81 -4 93 32 Rc 11 31 -4
+73 -36 80 Rc -22 5 -47 0 -58 -20 Rc -12 -22 -1 -54 21 -64 Rc -27 11 -43
+39 -40 69 Rc 3 31 29 52 59 57 Rc 28 5 54 -6 72 -28 Rc 20 -25 22 -57 10
+-87 Rc -15 -36 -52 -50 -92 -51 Rc -55 -1 -98 32 -115 84 Rc -9 28 -7 51 1
+79 Rc fill 0 0 Mt 43 171 Rm 41 -33 Rm 22 4 46 33 18 56 Rc -27 23 -58 1
+-60 -23 Rc -4 -38 31 -50 62 -52 Rc 11 0 20 1 30 4 Rc 40 15 29 68 22 110
+Rc -53 284 Rl -9 0 Rl 55 -285 Rl 7 -38 14 -94 -24 -101 Rc -14 -2 -28 0
+-41 7 Rc fill}def
+/bassclef{40 Slw 200 740 Tr 188 420 188 0 360 arc fill 440 416 420
+180 100 An St 0 90 0 400 470 520 400 ec 539 378 378 16 -16 An -293
+510 1218 350 327 An 324 0 -27 924 950 -30 370 ec -264 317 1008 295 350
+arc -9 260 740 0 27 arc 299 401 400 30 85 arc 0 40 Rl fill 1090 630 100
+0 360 arc fill 1090 210 100 0 360 arc fill}def
+/altoclef{200 800 Tr 85 800 Pm 85 -800 Pl 168 Slw St 270 800 Pm 270 -800
+Pl 50 Slw St 1 1 2 {pop 504 575 100 0 360 arc fill 90 -5 60 290 330 735
+485 ea St -227 489 714 317 352 arc 100 Slw St 860 450 400 190 270 arc 50
+Slw St 720 405 395 -70 85 arc 97 0 180 335 100 800 415 ec fill 1 -1
+Sc}for}def
+/star{360 360 Tr 0.16 dup Sc 8{670 256 Mt 690 100 1000 100 200 At
+1460 100 1580 230 200 At 1900 0 394 145 215 An 1460 -100 1000 -100 200
+At 690 -100 670 -256 200 At 240 -90 Lt 0 0 260 337 23 arc 670 256 Lt -45
+rotate}repeat fill}def
+
+%/sharpold{84 -430 Pm 84 767 Pl 336 830 Pm 336 -367 Pl 40 Slw St 0 350 Pm
+%440 475 Pl 0 -75 Pm 440 50 Pl 100 Slw St}def
+
+/sharp{110 -430 Pm 110 767 Pl 310 830 Pm 310 -367 Pl 40 Slw St
+0 380 Mt 418 550 Lt 418 415 Lt 0 240  Lt 0 380 Lt fill
+0 -10 Mt 418 155 Lt 418  20 Lt 0 -145 Lt 0 -10 Lt fill}def
+
+% This was what I had before Peter Meanwell played with it
+/sharp{110 -430 Pm 110 767 Pl 310 830 Pm 310 -367 Pl 40 Slw St
+0 405 Mt 440 530 Lt 440 385 Lt 0 260  Lt 0 405 Lt fill
+0 10  Mt 440 135 Lt 440 -10 Lt 0 -125 Lt 0 10  Lt fill}def
+
+/doublesharp{84 358 Pm 400 42 Pl 84 42 Pm 400 358 Pl 40 Slw St [[84
+350] [400 50] [84 50] [400 350]] {aload pop 0 0 360 70 70 7 -2 roll
+ea fill} forall}def
+/flat{ 50 308 Mt 50 358 155 430 220 353 Ct 310 242 120 -26 50 -26 Ct 50 308 Lt
+50 366 Mt 110 458 248 481 322 392 Ct 451 247 166 -35 50 -64 Ct 19 -71 10 -56 10
+-37 Ct 10 892 Lt 50 892 Lt 50 366 Lt eofill}def
+/jdflat{40 Slw 30 872 Pm 30 10 Pl St 50 -10 Mt 30 -95 85 350 180 110 200
+ea 0 -35 Rl 40 30 -90 240 130 70 180 ec 50 10 Lt fill}def
+
+%/naturalold{20 830 Pm 20 -95 Pl 300 -430 Pm 300 495 Pl 40 Slw St 30 -50
+%Pm 290 50 Pl 290 450 Pm 30 350 Pl 90 Slw St}def
+
+/natural{20 830 Pm 20 -100 Pl 300 -430 Pm 300 495 Pl 40 Slw St
+0 -140 Pm 280 0   Pl 280 140 Lt  0   0 Pl  0 -140 Lt fill
+40 255 Pm 320 395 Pl 320 535 Lt 40 395 Pl 40  255 Lt fill
+}def
+
+%/tfermataold{350 0 Tr 0 40 80 0 360 arc fill 0 0 500 0 180 arc
+%0 180 0 500 650 0 0 ec fill}def
+/tfermata{-150 -100 Mt -50 250 100 365 350 365 Ct 600 365 750 250 850 -100 Ct
+850 290 600 500 350 500 Ct 100 500 -150 290 -150 -100 Ct 270 40 Mt 270 -5 305
+-40 350 -40 Ct 395 -40 430 -5 430 40 Ct 430 85 395 120 350 120 Ct 305 120 270
+85 270 40 Ct fill}def
+/brest{0 0 Mt 400 0 Lt 400 400 Lt 0 400 Lt fill}def
+/sbrest{0 200 Mt 480 200 Lt 480 400 Lt 0 400 Lt fill}def
+/mrest{0 0 Mt 480 0 Lt 480 200 Lt 0 200 Lt fill}def
+%/crestold{40 Slw 105 500 Pm 305 805 Pl 210 1100 Pl 210 920 Pl 0 615 Pl
+%fill 105 540 Pm 380 195 Pl St 60 0 80 273 273 220 -25 ea 142 0 110 190
+%147 126 0 ea 65 126 0 231 231 284 -35 ec fill}def
+/crest{204 -140 Mt 213 -151 196 -152 189 -146 Ct -221 194 52 444 258 238 Ct 9
+530 Lt 166 745 254 888 119 1031 Ct 62 1091 Lt 80 1101 Lt 380 787 Lt 181 499 105
+452 256 270 Ct 416 80 Lt 432 61 423 44 409 60 Ct 230 271 -39 126 204 -140 Ct
+fill}def
+%/qrestold{40 Slw 0 0 360 85 85 85 600 ea fill 280 0 22 825 850 -42 1350 ea
+%400 690 Pm 84 -10 Pl St}def
+/qrest{ 0 600 Mt 0 820 238 774 158 539 Ct 139 491 193 503 224 529 Ct 264 564
+342 647 352 671 Ct 395 671 Lt 123 28 Lt 80 28 Lt 309 573 Lt 262 503 149 411 44
+485 Ct 19 505 0 538 0 600 Ct fill}def
+%/bfermataold{350 600 Tr 0 -40 80 0 360 arc fill 0 0 500 180 0 arc
+%0 360 180 500 650 0 0 ec fill}def
+/bfermata{-150 600 Mt -50 250 100 135 350 135 Ct 600 135 750 250 850 600 Ct 850
+210 600 0 350 0 Ct 100 0 -150 210 -150 600 Ct 270 480 Mt 270 435 305 400 350
+400 Ct 395 400 430 435 430 480 Ct 430 525 395 560 350 560 Ct 305 560 270 525
+270 480 Ct fill}def
+/longrest{20 -200 Mt 0 800 Rl 2960 0 Rm 0 -800 Rl 40 Slw St 0 200 Mt
+3000 0 Rl 300 Slw St}def
+/breve{40 Slw 20 -115 Pm 20 515 Pl 160 -115 Pm 160 515 Pl 1000 -115 Pm
+1000 515 Pl 1140 -115 Pm 1140 515 Pl St 230 0 Tr bnh}def
+/semibreve{bnh}def/uminim{mnh ustem}def
+/dminim{mnh dstem}def/ucrotchet{cnh ustem}def
+/dcrotchet{cnh dstem}def
+/uquaver{cnh ustem uqtail}def
+/dquaver{cnh dstem dqtail}def
+/dsquaver{ cnh dstem 428 -231 Mt 421 -125 368 -67 344 -67 Ct 350 -76 357
+-84 372 -111 Ct 428 -211 400 -371 279 -492 Ct 240 -531 158 -582 109 -582
+Ct 69 -582 Lt 69 -1198 Lt 109 -1198 Lt 109 -1138 Lt 122 -931 811 -648
+430 -257 Ct 428 -308 Lt 547 -452 508 -580 344 -744 Ct 268 -820 181 -860
+109 -860 Ct 116 -673 446 -575 428 -231 Ct fill}def
+/usquaver{ cnh ustem 625 1280 Mt 664 990 1051 1018 805 490 Ct 798 540 Lt
+838 642 892 781 799 903 Ct 749 970 652 1015 625 1015 Ct 585 1015 Lt 585
+1594 Lt 625 1594 Lt 677 1258 1213 1155 885 741 Ct 889 791 Lt 965 903 968
+1009 879 1122 Ct 808 1211 660 1280 625 1280 Ct fill} def
+/dsqtail{dsqtail}def/usqtail{usqtail}def
+/ledger{-70 200 Pm 770 200 Pl slthick Slw St}def
+/vdot{350 600 65 0 360 arc fill}def
+/hdot{65 200 65 0 360 arc fill}def
+/barsingle{slthick dup 2 div dup neg 20 exch Pm 1600 add 20 exch Pl
+Slw St}def
+/bardouble{slthick dup 2 div dup neg 20 exch Pm dup 1600 add 20 exch Pl
+dup neg 180 exch Pm 1600 add 180 exch Pl Slw St}def
+/barthick{slthick 2 div dup neg 0 exch Pm
+dup 1600 add dup 0 exch Pl 200 exch Pl
+neg dup 200 exch Pl 0 exch Pl fill}def
+/stave1{1000 stave}def/pstave1{1000 pstave}def/uqtail{uqtail}def
+/stave10{10000 stave}def/pstave10{10000 pstave}def/dqtail{dqtail}def
+/repeatdots{0 0 360 65 65 65 200 ea fill 0 0 360 65 65 65 600 ea
+fill}def
+/ustem{ustem}def/dstem{dstem}def/cnh{cnh}def/mnh{mnh}def
+/comma{150 150 150 0 360 arc fill 300 150 Mt 300 -250 0 -300 500 At
+repeat 200 -265 200 0 500 At repeat fill}def
+/mordent{mord 370 600 Mt 0 -800 Rl St 275 0 Tr mord}def
+/dmordent{mord 275 0 Tr mord 370 600 Mt 0 -800 Rl St 275 0 Tr mord}def
+/imordent{mord 275 0 Tr mord}def
+/dimordent{mord 2{275 0 Tr mord}repeat}def
+/turn{trn}def
+/hbar{100 600 Mt 500 0 Rl 60 Slw St}def
+/accent1{0 460 Mt 600 140 Rl -600 140 Rl 30 Slw St}def
+/caesura{40 Slw 0 0 Mt 300 800 Lt 300 0 Mt 600 800 Lt St}def
+/accent2{150 100 Tr acc}def
+/accent3{180 rotate -570 -550 Tr acc}def
+/accent4{350 0 Tr acc4}def
+/accent5{350 400 Tr 180 rotate acc4}def
+/bardotted{20 0 Pm 20 1600 Pl slthick Slw [150 100] 0 setdash St}def
+/caesura1{40 Slw 0 0 Mt 300 800 Lt St}def
+/little8{30 40 Tr 0.2 dup Sc -88 0 Tr 1.13 1 Sc 680 1280 Mt -210
+800 290 -90 610 -90 Ct 990 -90 1390 670 680 1280 Ct closepath 907 1510
+Mt 1520 1580 1370 2590 1000 2590 Ct 720 2590 480 2110 640 1820 Ct 970
+1510 Lt closepath 600 1340 Mt 100 1920 500 2700 1050 2700 Ct 1610 2700
+1795 1720 1030 1440 Ct 1690 740 1170 -180 520 -180 Ct -130 -180 -300
+1000 600 1340 Ct fill}def
+/C{c}def
+/cut{c 415 -200 Mt 0 1200 Rl 25 Slw St}def
+/tilde{350 300 Tr tld}def
+/thumba{th}def/thumbb{0 400 Tr 1 -1 Sc th}def
+
+/ds1{ 90 0 360 500 410 560 500 ea 90 360 0 430 250 560 500 ec fill 60
+Slw 1 setlinecap 0 500 Mt 1120 500 Lt 560 -150 Mt 560 1150 Lt St}def
+
+/ds2{ 873 616 Mt 846 585 845 552 872 516 Ct 901 490 940 487 973 516 Ct
+999 549 1000 582 972 616 Ct 939 646 907 641 873 616 Ct fill 36 492 Mt 9
+465 7 425 36 392 Ct 60 364 112 367 134 392 Ct 161 428 163 460 134 492 Ct
+108 520 67 518 36 492 Ct fill 566 611 Mt 926 960 Lt 982 925 Lt 621 575
+Lt 738 492 870 410 870 263 Ct 870 91 778 23 660 5 Ct 545 -9 493 0 389 85
+Ct 346 124 339 180 370 211 Ct 426 267 517 222 517 166 Ct 517 111 468 83
+425 96 Ct 598 -35 706 77 706 157 Ct 706 273 543 357 461 415 Ct 80 42 Lt
+22 74 Lt 408 450 Lt 314 513 148 632 147 773 Ct 147 869 213 950 310 975
+Ct 391 996 527 1007 616 927 Ct 658 889 694 806 633 776 Ct 570 745 508
+784 508 841 Ct 508 891 568 909 592 902 Ct 452 1021 272 910 344 788 Ct
+389 716 458 683 566 611 Ct fill }def
+/downa{dba}def/downb{0 400 Tr 1 -1 Sc dba}def
+/upa{uba}def/upb{0 400 Tr 1 -1 Sc uba}def
+/iturn{trn 0 -2100 Mt 0 2100 Lt 340 Slw St}def
+/seven{0 -40 Tr 0.35 dup Sc 580 80 Mt 740 80 Lt 1360 1950 Lt 1360
+1980 Lt 340 1980 Lt 170 1580 Lt 210 1550 Lt 303 1695 450 1780 520 1780
+Ct 1140 1780 Lt 580 80 Lt fill -40 890 Mt 1500 1080 Lt 120 Slw St}def
+/four{0.36 dup Sc 940 0 Mt 940 1750 Lt  200 Slw St 985 1750 Mt 985
+1890 Lt 110 Slw St 960 1860 Mt 100 630 Lt 80 Slw St 60 570 Mt 1880 570
+Lt 160 Slw St 1410 60 Mt 1410 1080 Lt 180 Slw St}def
+/hcnh{hcnh}def/hmnh{hmnh}def/xnh{xnh}def
+/dsqtail{dsqtail}def/usqtail{usqtail}def
+/ustem{ustem}def/dstem{dstem}def/xustem{xustem}def/xdstem{xdstem}def
+/fustem{fustem}def/fdstem{fdstem}def
+
+%/six{1.15 1.15 Sc 0 -100 Tr 0.31 dup Sc 1540 2310 Mt 720 2160 200 1570
+%200 1100 Ct 200 700 500 320 850 320 Ct 1130 320 1380 650 1380 1000 Ct
+%1380 1390 870 1530 500 1410 Ct 700 1900 1000 2150 1545 2280 Ct 1540 2310
+%Lt closepath 480 1300 Mt 820 1480 1060 1370 1130 1030 Ct 1200 640 1080
+%400 850 400 Ct 590 400 360 860 480 1300 Ct fill 1220 1710 Mt 860 2490 Lt
+%0 setlinecap 160 Slw St}def
+
+%/six{119 341 Mt 86 213 129 100 183 43 Ct 219 14 317 -3 359 53 Ct 421 135 432
+%288 357 345 Ct 303 404 185 411 119 341 Ct 506 684 Mt 505 676 507 672 505 665 Ct
+%477 667 441 663 411 655 Ct 453 587 Lt 417 565 Lt 373 637 Lt 323 625 261 600 209
+%547 Ct 176 510 135 451 125 387 Ct 187 435 341 445 401 385 Ct 474 339 509 154
+%399 39 Ct 330 -23 223 -43 121 39 Ct 9 136 3 353 121 529 Ct 181 595 247 654 353
+%669 Ct 311 737 Lt 351 757 Lt 399 677 Lt 435 684 470 681 506 684 Ct fill}def
+
+/six{135 337 Mt 112 199 133 108 187 51 Ct 223 22 295 -3 343 49 Ct 393
+125 394 292 333 345 Ct 279 404 195 389 135 337 Ct 556 656 Mt 540 646 Lt
+514 657 437 658 407 650 Ct 499 504 Lt 470 479 Lt 373 637 Lt 323 625 269
+590 217 537 Ct 184 496 159 449 149 385 Ct 211 433 341 445 401 385 Ct 474
+339 511 178 399 39 Ct 314 -23 223 -43 121 39 Ct 9 136 3 353 121 529 Ct
+181 595 250 652 353 669 Ct 262 826 Lt 292 846 Lt 392 679 Lt 429 688 531
+694 556 656 Ct fill}def
+
+/gdot{500 400 104 0 360 arc fill}def
+/gring{500 400 120 0 360 arc 10 Slw St}def
+/d1{}def/d4{}def/u4{}def/bs{}def/fs{}def/ds{}def/us{}def/l1{}def/r1{}def
+/tick{20 350 Mt 50 50 Rl 80 -190 Rl 220 570 Rl 30 Slw St}def
+/uacc{352 750 Pm 1008 1225 Pl 64 Slw St}def
+/dacc{424 -1014 Pm -72 -515 Pl 64 Slw St}def
+/grid{0 200 Tr 500 -200 Pm 500 1725 Pl 3250 1725 Pl 3250 -200 Pl 20 Slw
+St 500 0 Pm 3250 0 Pl St 500 400 Pm 3250 400 Pl St 500 800 Pm 3250 800
+Pl St 500 1200 Pm 3250 1200 Pl St 500 1600 Pm 3250 1600 Pl St 1050 -200
+Pm 1050 1600 Pl St 1600 -200 Pm 1600 1600 Pl St 2150 -200 Pm 2150 1600
+Pl St 2700 -200 Pm 2700 1600 Pl St}def
+/barshort{40 0 Pm 40 530 Pl 80 Slw St}def
+/breath{335 -80 Pm 575 -80 Pl 575 1200 Pl 735 1200 Pm 735 -80 Pl 975 -80
+Pl 20 Slw St}def
+/vring{350 210 120 0 360 arc 10 Slw St}def
+/cross{350 -30 Pm 0 500 Rl 100 220 Pm 500 0 Rl 50 Slw St}def
+/trill{ 529 501 Mt 461 541 373 505 273 501 Ct 321 673 Lt 301 686 241 675
+221 669 Ct 169 493 Lt 123 490 78 495 33 485 Ct -53 453 -46 381 5 309 Ct
+37 287 57 286 113 281 Ct 73 141 Lt 49 41 113 -11 217 9 Ct 286 46 311 95
+313 189 Ct 298 266 279 279 221 309 Ct 261 437 Lt 389 465 Lt 433 467 465
+486 465 429 Ct 373 1 Lt 469 1 Lt 557 405 Lt 565 461 569 465 617 477 Ct
+642 485 643 501 657 469 Ct 694 398 759 411 761 485 Ct 763 530 742 543
+709 557 Ct 651 577 562 533 529 501 Ct 121 325 Mt 153 437 Lt 73 433 Lt 29
+423 17 394 41 349 Ct 58 333 79 313 121 325 Ct 209 257 Mt 253 246 249 211
+253 169 Ct 251 125 254 93 213 57 Ct 155 50 154 71 173 125 Ct 209 257 Lt
+eofill}def
+/scaesura{20 -200 Pm 20 200 Pl slthick Slw St}def
+/lcaesura{20 0 Pm 20 1200 Pl slthick Slw St}def
+/sbra{40 -350 Pm 40 750 Pl 80 Slw St 40 -330 Pm 250 -330 Pl
+40 730 Pm 250 730 Pl 40 Slw St}def
+/sket{130 -350 Pm 130 750 Pl 80 Slw St -80 -330 Pm 130 -330 Pl
+-80 730 Pm 130 730 Pl 40 Slw St}def
+/rbra{250 750 Mt -50 200 -50 200 250 -350 Ct 50 200 50 200 250 750 Ct
+fill}def
+/rket{-80 750 Mt 220 200 220 200 -80 -350 Ct 120 200 120 200 -80 750 Ct
+fill}def
+/rep{0 0 Mt 550 800 Rl 250 0 Rl -550 -800 Rl fill}def
+/repdots{50 650 100 0 360 arc fill 750 150 100 0 360 arc fill}def
+/vtilde{-300 250 Tr 90 rotate tld}def
+/trem{100 -175 Mt 100 0 Lt 600 175 Lt 600 0 Lt fill}def
+/circ{circ}def
+/cutcirc{circ 620 -200 Mt 0 1200 Rl 25 Slw St}def
+/slur1{720 -250 Tr -420 -5 Mt -140 -500 140 -500 420 -5 Ct 420 5 Lt
+140 -400 -140 -400 -420 5 Ct fill}def
+/slur2{920 -250 Tr -620 -5 Mt -200 -500 200 -500 620 -5 Ct 620 5 Lt
+200 -400 -200 -400 -620 5 Ct fill}def
+/up{50 rotate arrow}def
+/down{-50 rotate arrow}def
+/iC{gsave 709 0 Tr -1 1 scale c grestore}def
+/icut{gsave 709 0 Tr -1 1 scale c grestore 315 -200 Mt 0 1200 Rl 25
+Slw St}def
+/unibreve{ 40 Slw 1380 -115 Pm 1380 515 Pl 1240 -115 Pm 1240 515 Pl 160
+-115 Pm 160 515 Pl 20 -115 Pm 20 515 Pl St 789 25 Mt 960 107 950 307 768
+380 Ct 924 391 967 255 991 197 Ct 1052 34 921 -7 789 25 Ct 1150 197 Mt
+1150 360 933 450 698 402 Ct 485 450 250 369 250 197 Ct 250 196 Lt 250 20
+502 -52 701 -6 Ct 896 -51 1150 18 1150 196 Ct 1150 197 Lt 738 49 Mt 688
+81 572 257 659 344 Ct 706 306 819 130 738 49 Ct 515 380 Mt 551 383 598
+376 610 370 Ct 429 280 466 72 631 17 Ct 584 17 490 10 422 145 Ct 344 297
+406 372 515 380 Ct fill}def
+/accent6{360 400 Mt 360 0 Lt 340 0 Lt 340 40 Lt fill}def
+/srbra{252 642 Mt 12 416 4 262 252 0 Ct 253 0 258 0 260 0 Ct 124 318 122 364
+266 642 Ct 264 642 262 642 252 642 Ct fill}def
+/srket{ -80 642 Mt 160 416 152 262 -80 0 Ct -82 0 -81 0 -84 0 Ct 50 318 50 364
+-84 642 Ct -80 642 Lt fill}def
+/angle1{290 42 Mt 290 258 Lt 44 258 Lt 44 194 Lt 240 194 Lt 240 42 Lt
+290 42 Lt fill}def
+/angle2{94 42 Mt 94 194 Lt 290 194 Lt 290 258 Lt 44 258 Lt 44 42 Lt 94 42 Lt
+fill}def
+/angle3{290 410 Mt 290 194 Lt 44 194 Lt 44 258 Lt 240 258 Lt 240 410 Lt
+290 410 Lt fill}def
+/angle4{94 410 Mt 94 258 Lt 290 258 Lt 290 194 Lt 44 194 Lt 44 410 Lt
+94 410 Lt fill}def
+/angle5{226 194 Mt 226 42 Lt 290 42 Lt 290 258 Lt 44 258 Lt 44 194 Lt 226 194
+Lt 290 -190 Mt 226 -190 Lt 226 -406 Lt 290 -406 Lt 290 -190 Lt fill}def
+/angle6{290 410 Mt 290 194 Lt 44 194 Lt 44 258 Lt 226 258 Lt 226 410 Lt 290
+410 Lt 290 858 Mt 290 642 Lt 226 642 Lt 226 858 Lt 290 858 Lt fill}def
+/ped{286 744 Mt 380 753 464 751 557 646 Ct 613 584 642 420 500 453 Ct
+453 466 433 517 426 560 Ct 671 464 517 744 337 726 Ct 286 724 295 597
+380 455 Ct 435 364 395 213 355 155 Ct 422 146 491 97 535 71 Ct 597 106
+Lt 488 295 613 406 686 406 Ct 760 406 808 366 808 282 Ct 808 117 611 135
+713 73 Ct 780 33 904 71 882 117 Ct 837 217 911 328 982 395 Ct 1004 417
+1028 400 1006 382 Ct 851 244 1006 71 1066 60 Ct 1117 51 1146 75 1171 106
+Ct 1204 155 1168 268 1122 353 Ct 1062 468 926 611 753 611 Ct 724 611 724
+626 753 626 Ct 975 626 1128 522 1200 377 Ct 1268 242 1244 135 1202 75 Ct
+1173 42 1140 4 1073 0 Ct 988 -2 948 11 911 64 Ct 822 -22 675 -20 615 75
+Ct 493 4 Lt 435 57 375 104 333 113 Ct 295 73 233 0 168 0 Ct 148 0 100 2
+131 44 Ct 188 131 277 160 328 155 Ct 357 153 357 251 328 297 Ct 213 477
+266 695 295 724 Ct 2 686 -28 308 160 511 Ct 173 522 173 482 173 424 Ct
+142 333 35 302 0 437 Ct -17 646 191 733 286 744 Ct 653 366 Mt 700 391
+744 340 744 277 Ct 744 211 728 184 657 142 Ct 611 222 584 328 653 366 Ct
+1286 66 Mt 1342 66 1340 0 1284 0 Ct 1237 0 1233 66 1286 66 Ct eofill
+}def
+/uvtilde{-146 295 Mt -302 485 Lt -301 477 -289 450 -275 421 Ct -178 213 -524
+140 -282 33 Ct -282 12 Lt -695 86 -254 267 -326 421 Ct -336 449 -349 476 -349
+485 Ct -506 295 Lt -576 295 Lt -326 595 Lt -76 295 Lt -146 295 Lt fill }def
+/dvtilde{-463 161 Mt -307 -29 Lt -308 -21 -320 6 -334 35 Ct -431 243 -85 316
+-326 423 Ct -326 444 Lt 87 370 -355 189 -283 35 Ct -273 7 -260 -20 -260 -29 Ct
+-103 161 Lt -33 161 Lt -283 -139 Lt -533 161 Lt -463 161 Lt fill }def
+/nail{18 447 Mt 18 487 27 527 39 555 Ct 554 555 Lt 567 527 575 487 575 447 Ct
+615 447 Lt 615 856 -22 856 -22 447 Ct 18 447 Lt 533 595 Mt 60 595 Lt 163 751
+430 751 533 595 Ct fill}def
+/stave21{1000 stave2}def
+/stave31{1000 stave3}def
+/stave41{1000 stave4}def
+/stave61{1000 stave6}def
+/hclef{900 400 Mt 1100 400 Lt 1100 1200 Lt 900 1200 Lt 900 400 Lt
+700 400 Mt 700 1200 Lt 500 1200 Lt 500 400 Lt 700 400 Lt fill}def
+/oldbassclef{1269 1048 Mt 1236 1083 1182 1083 1149 1048 Ct 1111 1010 1113 956
+1149 920 Ct 1182 885 1236 885 1269 920 Ct 1302 955 1302 1012 1269 1048 Ct 1266
+1464 Mt 1233 1499 1179 1499 1146 1464 Ct 1113 1429 1113 1371 1146 1336 Ct 1179
+1301 1233 1301 1266 1336 Ct 1299 1371 1299 1429 1266 1464 Ct 546 1174 Mt 581
+1209 581 1224 546 1259 Ct 460 1345 318 1350 212 1244 Ct 53 1085 130 904 267 835
+Ct 375 781 498 777 613 835 Ct 860 958 955 1237 722 1470 Ct 556 1635 257 1665 28
+1437 Ct -209 1200 -215 839 36 588 Ct 287 337 561 337 812 588 Ct 1040 816 1050
+1050 1050 1200 Ct 1010 1200 Lt 1010 880 832 738 730 670 Ct 535 540 353 530 128
+680 Ct -52 800 -197 1141 65 1402 Ct 261 1598 533 1586 688 1431 Ct 875 1244 835
+1002 573 875 Ct 495 836 384 836 307 875 Ct 172 943 125 1096 282 1174 Ct 411
+1217 400 1028 546 1174 Ct fill}def
+/oldaltoclef{795 390 Mt 795 0 795 0 1087 0 Ct 1127 0 1153 40 1153 125 Ct 1153
+210 1127 250 1087 250 Ct 845 250 845 250 845 390 Ct 845 700 845 700 680 700 Ct
+495 700 Pl 495 900 Pl 680 900 Pl 845 900 845 900 845 1211 Ct 845 1350 845 1350
+1087 1350 Ct 1127 1350 1153 1390 1153 1475 Ct 1153 1560 1127 1600 1087 1600 Ct
+795 1600 795 1600 795 1211 Ct 795 950 795 950 680 950 Ct 445 950 Pl 445 650 Pl
+680 650 Pl 795 650 795 650 795 390 Ct 495 1600 Pm 445 1600 Pl 445 0 Pl 495 0 Pl
+495 1600 Pl 369 1600 Pm 369 0 Pl 201 0 Pl 201 1600 Pl 369 1600 Pl fill}def
+/bratop{0 0 Pm 0 1600 Pl 150 1600 400 1850 400 2000 Ct 400 1750 250 1600 200
+1600 transform round exch round exch itransform Ct 200 0 Pl 0 0 Pl fill}def
+/brabot{0 0 Pm 150 0 400 -250 400 -400 Ct 400 -150 250 0 200 0 transform round
+exch round exch itransform Ct 200 1600 Pl 0 1600 Pl 0 0 Pl fill}def
+/direct{990 612 Mt 902 784 766 728 662 516 Ct 498 188 Lt 352 404 Lt 226 166 Lt
+77 404 Lt 0 268 Lt 164 -10 Lt 291 244 Lt 439 -10 Lt 698 512 Lt 776 669 891 734
+978 592 Ct 986 580 998 597 990 612 Ct fill}def
+/five{401 582 Mt 401 493 Lt 451 493 Lt 451 581 Lt 539 581 Lt 539 661 Lt 451
+661 Lt 451 748 Lt 402 748 Lt 402 662 Lt 177 662 Lt 80 446 Lt 411 462 406 53 230
+27 Ct 190 23 134 69 89 91 Ct 51 104 -14 31 76 -2 Ct 413 -111 617 424 146 497 Ct
+186 582 Lt 401 582 Lt fill}def
+/srm1{}def
+/srm2{}def
+/u12{}def
+/d12{}def
+/stave210{10000 stave2}def
+/stave310{10000 stave3}def
+/stave410{10000 stave4}def
+/stave610{10000 stave6}def
+end
+
+/BuildChar{1 index /Encoding get exch get 1 index /BuildGlyph get exec}bind def
+/BuildGlyph{/charname exch def begin Metrics charname get
+VMetrics charname known {VMetrics charname get}{0}ifelse BBox charname
+get aload pop setcachedevice CharacterDefs charname get exec end}def
+currentdict end /PMW-Music exch definefont pop
+
+%%EndResource
+%%EndSetup
+%%EOF
+%!PS-Adobe-3.0
+%%Creator: Philip's Music Scribe 4.00 (7-Feb-2003)
+%%CreationDate: Sun Feb  9 17:23:08 2003
+%%Pages: (atend)
+%%DocumentNeededResources: font Times-Roman Times-Italic 
+%%+ font Times-Bold Times-BoldItalic Symbol 
+%%+ font PMW-Music 
+%%Requirements: numcopies(1)
+%%EndComments
+
+%%BeginProlog
+/PMSencoding StandardEncoding length array def
+PMSencoding dup dup dup dup 0 StandardEncoding putinterval
+28 [/tilde/circumflex/cedilla/dotlessi]putinterval
+39/quotesingle put 96/grave put
+143 [/bullet/quoteleft/quoteright/guilsinglleft/guilsinglright
+/quotedblleft/quotedblright/quotedblbase/endash/endash/emdash
+/minus/OE/oe/dagger/fi/fl/space/exclamdown/cent/sterling
+/currency/yen/brokenbar/section/dieresis/copyright/ordfeminine
+/guillemotleft/logicalnot/hyphen/registered/macron
+/degree/plusminus/twosuperior/threesuperior/acute/mu
+/paragraph/periodcentered/cedilla/onesuperior/ordmasculine
+/guillemotright/onequarter/onehalf/threequarters/questiondown
+/Agrave/Aacute/Acircumflex/Atilde/Adieresis/Aring/AE/Ccedilla
+/Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute/Icircumflex
+/Idieresis/Eth/Ntilde/Ograve/Oacute/Ocircumflex/Otilde/Odieresis
+/multiply/Oslash/Ugrave/Uacute/Ucircumflex/Udieresis/Yacute/Thorn
+/germandbls/agrave/aacute/acircumflex/atilde/adieresis/aring/ae
+/ccedilla/egrave/eacute/ecircumflex/edieresis/igrave/iacute
+/icircumflex/idieresis/eth/ntilde/ograve/oacute/ocircumflex/otilde
+/odieresis/divide/oslash/ugrave/uacute/ucircumflex/udieresis
+/yacute/thorn/ydieresis]putinterval
+/F/fill load def
+/GS/gsave load def
+/GR/grestore load def
+/Mt/moveto load def/Lt/lineto load def
+/R/rotate load def
+/Rl/rlineto load def/Rm/rmoveto load def
+/Ct/curveto load def/Rc/rcurveto load def
+/S/stroke load def
+/Slw/setlinewidth load def
+/Slc/setlinecap load def
+/Slj/setlinejoin load def
+/Sg/setgray load def
+/Sd/setdash load def
+/T/translate load def
+/clx 0 def/cly 0 def/crx 0 def/cry 0 def
+/inf{dup dup findfont 3 1 roll FontDirectory exch known {pop}{(**** Font ")print
+100 string cvs print (" is not loaded ****\r\n)print stop}ifelse
+dup dup/Encoding get StandardEncoding eq{maxlength dict/newfont
+exch def{1 index/FID eq{pop pop}{newfont 3 1 roll put}ifelse}forall
+newfont/Encoding PMSencoding put dup newfont definefont}{pop}ifelse def
+}bind def
+/ss{scalefont setfont}bind def
+/sm{makefont setfont}bind def
+/b{/y exch def/x exch def/w exch def/z exch def/v exch def
+{x y Mt w show
+y z gt{/y y v sub def y z lt{/y z def}if}
+{exit}ifelse}loop}bind def
+/br{gsave translate dup 0.11 gt {0.11}{dup 2.0 div 0.055 add}ifelse
+exch scale 2{0.0 0.0 Mt 100.0 20.0 -50.0 245.0 60.0 260.0
+curveto -50.0 245.0 60.0 20.0 0.0 0.0
+curveto fill 1.0 -1.0 scale}repeat grestore}bind def
+/br2{gsave translate dup 0.11 gt {0.11}{dup 2.0 div 0.055 add}ifelse
+exch scale 2{0.0 0.0 Mt 95.0 40.0 -43.0 218.0 37.0 256.0
+curveto -59.0 219.0 66.0 34.0 0.0 0.0
+curveto fill 1.0 -1.0 scale}repeat grestore}bind def
+/cc{/u exch def/y1 exch def/x1 exch def/y0 exch def/x0 exch def
+/w y1 y0 sub dup mul x1 x0 sub dup mul add sqrt 2 div def
+/v w 2 mul 3 div dup 10 gt {pop 10} if def
+x0 x1 add 2.0 div y0 y1 add 2.0 div translate
+y1 y0 sub x1 x0 sub atan rotate}bind def
+/cA{/cry exch def/crx exch def/cly exch def/clx exch def}bind def
+/cd{w neg 0.05 moveto v w sub clx add u cly add w v sub crx add u cry add
+w 0.05 curveto w -0.05 lineto w v sub crx add u cry add 1 sub v w sub clx add
+u cly add 1 sub w neg -0.05 curveto closepath fill}bind def
+/cv{gsave cc cd grestore}bind def
+/cwd{w neg 0.05 moveto v w sub clx add u cly add w v sub crx add cry u sub
+w 0.05 curveto w -0.05 lineto w v sub crx add cry u sub 1 sub v w sub clx add
+u cly add 1 sub w neg -0.05 curveto closepath fill}bind def
+/cvw{gsave cc cwd grestore}bind def
+/cem{dup 1 eq cly cry eq and{pop 0 u cly add 0.75 mul /t2 0 def}
+{/x1 v w sub clx add def /x2 w v sub crx add def
+/y1 u cly add def u mul cry add /y2 exch def
+/t 0.5 def
+/a 2 w mul x1 x2 sub 3 mul add def
+/b x2 2 x1 mul sub w sub 3 mul def
+/c x1 w add 3 mul def 
+a t mul b add t mul c add t mul w sub
+/t1 a 3 mul t mul b 2 mul add t mul c add def
+/a y1 y2 sub 3 mul def
+/b 3 y2 mul 6 y1 mul sub def
+/c 3 y1 mul def
+a t mul b add t mul c add t mul
+/t2 a 3 mul t mul b 2 mul add t mul c add def
+}ifelse 
+translate t2 0 ne {t2 t1 atan rotate} if
+0 2 moveto 4 add neg 0 exch rlineto 0.4 Slw stroke}bind def
+/cve{gsave cc cd 0.8 1 cem grestore}bind def
+/cvwe{gsave cc cwd 0.8 -1 cem grestore}bind def
+/dl{gsave 0 Sd 0 dtransform exch floor exch idtransform pop
+Slw Mt Lt stroke grestore}bind def
+/k{/y1 exch def/y2 exch def/x exch def
+currentfont mf
+y2 y1 sub dup 16 gt {pop 16}if 
+dup 1 sub /y exch def
+dup y2 exch sub /y2 exch def
+16 div 10 mul ss
+x y2 Mt
+(\260) show
+{/y2 y2 y sub def 
+y2 y1 le {exit}if x y2 Mt (B)show}loop
+x y1 Mt (\261)show
+setfont}bind def
+/l{Slw Mt Lt stroke}bind def
+/ll{Slw Mt 1 1 3 -1 roll{pop Lt}for stroke}bind def
+/m{/y0 exch def/x0 exch def/y1 exch def/x1 exch def/z exch def
+x0 y0 Mt x1 y1 Lt x1 y1 z add Lt x0 y0 z add Lt fill}bind def
+/rs{rmoveto show}bind def
+/s{moveto show}bind def
+/wrs{rmoveto 0 32 4 -1 roll widthshow}bind def
+/ws{moveto 0 32 4 -1 roll widthshow}bind def
+%%EndProlog
+
+%%BeginSetup
+%%IncludeResource: font Times-Roman
+/rm /Times-Roman inf
+%%IncludeResource: font Times-Italic
+/it /Times-Italic inf
+%%IncludeResource: font Times-Bold
+/bf /Times-Bold inf
+%%IncludeResource: font Times-BoldItalic
+/bi /Times-BoldItalic inf
+%%IncludeResource: font Symbol
+/sy /Symbol inf
+%%IncludeResource: font PMW-Music
+/mf /PMW-Music inf
+%%EndSetup
+
+%%Page: 1 1
+%%BeginPageSetup
+/pagesave save def
+%%EndPageSetup
+it 14 ss(G\366tter)234.924 760 s(d\344mmerung)-0.518 0 rs(, )-0.14 0 rs rm 14 ss
+(Act I)344.698 760 s rm 12 ss(W)536.98 746 s(agner)-0.96 0 rs mf 10 ss(!)
+36 717 s(!)36 637 s(!)36 637 s(")35.5 581 s(")35.5 581 s
+16 581(@)34 717 b 0.138 27 617 br2
+%1/5
+(@)237.129 581 s
+%1/4
+-1.894 107.226 611.132 73.45 600.02 m
+-1.894 107.226 608.132 73.45 597.02 m(\243)67.6 565 s(J)67.6 584.02 s(JL)
+67.6 581 s(J)77.793 587.373 s(JL)77.793 587 s(%)85.892 591 s(J)
+90.892 591.683 s(JL)90.892 591 s(5)100.976 595 s
+1.894 142.465 585.085 111.811 575 m 1.894 142.465 588.085 111.811 578 m(6)
+111.061 587 s(K)121.146 590.317 s(KL)121.146 591 s(K)131.23 593.635 s(KL)
+131.23 595 s(=)141.315 599 s(K)141.315 596.953 s(KL)141.315 601 s
+1.894 185.818 590.076 152.15 579 m 1.894 185.818 593.076 152.15 582 m(6)
+151.4 591 s(K)161.484 594.317 s(KL)161.484 595 s(=)171.569 599 s(K)
+171.569 597.635 s(KL)171.569 601 s(%)179.668 605 s(=x=)184.668 599 s(K)
+184.668 601.945 s(KL)184.668 605 s 1.894 228.194 593.755 195.503 583 m
+1.894 228.194 596.755 195.503 586 m(6)194.753 595 s(=)204.837 599 s(K)
+204.837 598.317 s(KL)204.837 601 s(=x=)214.921 599 s(K)214.921 601.635 s
+(KL)214.921 605 s mf 9 ss($)227.044 565 s mf 10 ss(=x=x=)227.044 599 s(K)
+227.044 605.623 s(KL)227.044 609 s 70.6 579 225.044 583.623 -17.311 cv
+(@)237.129 581 s
+%1/3
+bi 10 ss(p)67.6 616 s mf 10 ss(6)67.6 641 s 54.6 641 65.6 641 -3.3 cv(=)
+111.061 655 s(6)111.061 657 s(?)119.461 657 s(=)171.569 655 s(8)
+171.569 655 s 1.8 222.16 633 195.503 633 m(K)194.753 645 s(KL)
+194.753 651 s(%)204.982 645 s(6)209.982 645 s(K)221.01 645 s(KL)
+221.01 647 s it 9 ss(3)205.631 623 s mf 10 ss 16 597(@)237.129 637 b
+%1/2
+-1.806 97.142 667.034 73.45 665.044 m(%)62.6 649 s(J)67.6 649.044 s(JL)
+67.6 649 s(%)85.892 651 s(5)90.892 651 s 75.6 667.044 225.01 653 12 cv
+(@)237.129 637 s
+%1/1
+bf 10 ss(Br\374nnh.)68.6 737 s mf 10 ss(-)68.6 721 s(.)112.061 721 s
+rm 9.5 ss(ge)129.746 705.5 s it 9.5 ss(the)128.426 695.5 s mf 10 ss(7)
+131.23 721 s rm 9.5 ss(-)139.568 705.5 s(denk\221)143.585 705.5 s it 9.5 ss
+(lo)146.534 695.5 s(ve)-0.095 0 rs mf 10 ss(5)151.4 721 s(?)159.8 721 s
+rm 9.5 ss(der)211.856 705.5 s it 9.5 ss(we)212.644 695.5 s mf 10 ss(%)
+209.921 731 s(8)214.921 731 s(@)237.129 717 s
+%2/5
+(@)400.545 581 s
+%2/4
+-1.894 273.289 609.131 252.612 602.329 m(\243)246.762 565 s(J)
+246.762 586.329 s(JL)246.762 581 s(J)256.955 589.682 s(JL)256.955 589 s(5)
+267.039 593 s it 9 ss(3)260.9 574 s
+1.894 309.82 574.799 280.888 584.317 m mf 10 ss(%)275.138 599 s(=)
+280.138 599 s(K)280.138 596.317 s(KL)280.138 599 s(6)290.223 593 s(K)
+308.67 586.93 s(KL)308.67 589 s 1.894 355.327 580.868 334.758 587.635 m
+(=x=)334.008 599 s(K)334.008 599.635 s(KL)334.008 603 s(=)344.093 599 s(K)
+344.093 596.318 s(KL)344.093 599 s(6)354.177 593 s
+1.894 391.61 580.25 365.012 589 m mf 9 ss($)364.262 565 s mf 10 ss(=x=x=)
+364.262 599 s(K)364.262 601 s(KL)364.262 607 s(=)377.361 599 s(K)
+377.361 596.691 s(KL)377.361 601 s(\243)380.46 564.381 s(K)390.46 592.381 s
+(KL)390.46 597 s(%)385.46 607 s(=x=x=)390.46 599 s(K)390.46 602.381 s(KL)
+390.46 607 s 254.762 613.329 393.46 616 8 cv
+393.46 596.381 408.46 596.381 -4.5 cv 393.46 613 408.46 612 4.5 cv
+(@)400.545 581 s
+%2/3
+(%)241.762 647 s(6)246.762 647 s rm 7 ss(1)280.138 657 s mf 10 ss(6)
+280.138 649 s 286.138 632.5 246.762 629 0.2 l
+286.138 625.5 246.762 629 0.2 l rm 7 ss(1)336.008 642 s mf 10 ss(6)
+334.008 653 s 1.82 391.61 636.94 365.012 640.929 m(K)364.262 652.929 s(KL)
+364.262 653 s 337.008 651 363.262 651 -5 cv(%)372.361 651 s(K)
+377.361 650.965 s(KL)377.361 651 s(%)385.46 649 s(6)390.46 649 s it 9 ss
+(3)381.361 661 s 396.46 630 334.008 633.5 0.2 l
+396.46 630 334.008 626.5 0.2 l mf 10 ss 16 597(@)400.545 637 b
+%2/2
+(5)246.762 653 s(?)255.162 653 s -1.8 330.173 671 299.52 671 m
+-1.8 330.173 668 299.52 668 m -1.8 330.173 665 299.52 665 m(%)
+288.67 651 s(J)293.67 655 s(JL)293.67 651 s(J)303.755 655 s(JL)
+303.755 653 s(=)313.839 655 s(5)313.839 655 s(J)323.923 655 s(JL)
+323.923 653 s(=x=x=)334.008 655 s(5)334.008 663 s(?)342.408 665 s(=)
+386.866 655 s(7)386.866 657 s(@)400.545 637 s
+%2/1
+rm 9.5 ss(Lie)243.431 705.5 s it 9.5 ss(live)242.903 695.5 s mf 10 ss(%)
+241.762 727 s(6)246.762 727 s rm 9.5 ss(______)257.621 695.5 s mf 10 ss(4)
+280.138 729 s 249.762 734 283.138 735 5 cv rm 9.5 ss(- - - - - )
+12.516 271.746 705.5 ws(be)362.778 705.5 s it 9.5 ss(for)361.719 695.5 s
+mf 10 ss(5)364.262 721 s(@)400.545 717 s
+%3/5
+(@)573.997 581 s
+%3/4
+1.894 438.996 580.076 405.328 569 m 1.894 438.996 583.076 405.328 572 m(6)
+404.578 581 s(K)414.662 584.317 s(KL)414.662 587 s mf 9 ss($)
+427.761 560.627 s mf 10 ss(%)422.761 591 s(K)427.761 588.627 s(KL)
+427.761 591 s(K)437.846 591.945 s(KL)437.846 595 s
+1.894 479.334 585.085 448.68 575 m 1.894 479.334 588.085 448.68 578 m(\243)
+447.93 563 s(6)447.93 587 s(K)458.015 590.317 s(KL)458.015 591 s(K)
+468.1 593.635 s(KL)468.1 595 s(=)478.184 599 s(K)478.184 596.953 s(KL)
+478.184 601 s 1.894 522.687 590.076 489.019 579 m
+1.894 522.687 593.076 489.019 582 m(6)488.269 591 s(K)498.354 594.317 s
+(KL)498.354 595 s(=)508.438 599 s(K)508.438 597.635 s(KL)508.438 601 s(%)
+516.537 605 s(=x=)521.537 599 s(K)521.537 601.945 s(KL)521.537 605 s
+1.894 565.063 593.755 532.372 583 m 1.894 565.063 596.755 532.372 586 m(6)
+531.622 595 s(=)541.707 599 s(K)541.707 598.317 s(KL)541.707 601 s(=x=)
+551.79 599 s(K)551.79 601.635 s(KL)551.79 605 s mf 9 ss($)563.913 565 s
+mf 10 ss(=x=x=)563.913 599 s(K)563.913 605.623 s(KL)563.913 609 s
+407.578 590 566.913 615 20 cv(@)573.997 581 s
+%3/3
+1.806 428.911 638.98 405.328 637 m bi 10 ss(p)404.578 623 s mf 10 ss(6)
+404.578 649 s 393.46 647 403.578 647 -2.035 cv(%)422.761 651 s(K)
+427.761 650.947 s(KL)427.761 651 s mf 7 ss(\2017)435.93 641.6 s mf 10 ss(6)
+447.93 647 s(?)456.33 649 s(\221\221\221\221)447.93 646 s(6)447.93 651 s(?)
+456.33 653 s(=)447.93 655 s(6)447.93 657 s(?)456.33 657 s(=)
+508.438 655 s(8)508.438 655 s 1.82 558.364 634.939 532.372 638.915 m(K)
+531.622 650.915 s(KL)531.622 651 s rm 7 ss(1)546.366 629 s mf 10 ss(\()
+542.116 649 s(K)546.366 648.66 s(KL)546.366 649 s rm 7 ss(2)
+557.214 629 s mf 10 ss(6)557.214 647 s it 9 ss(3)549.418 656 s
+411.578 655 560.214 659 21 cv mf 10 ss 16 597(@)573.997 637 b
+%3/2
+(=x=)404.578 655 s(5)404.578 661 s 254.762 668 407.578 676 12 cv
+(@)573.997 637 s
+%3/1
+(-)405.578 721 s rm 9.5 ss(der)444.865 705.5 s it 9.5 ss(aye)
+444.337 695.5 s mf 10 ss(3)447.93 721 s rm 9.5 ss(wir)528.291 705.5 s
+it 9.5 ss(r)530.841 695.5 s(e)-0.351 0 rs mf 10 ss(5)531.622 721 s
+rm 9.5 ss(-)553.618 695.5 s mf 10 ss(@)573.997 717 s
+(FFFFFCCC)34 717 s (C)563.997 717 s
+(FFFFFCCC)34 637 s (C)563.997 637 s
+(FFFFFCCC)34 581 s (C)563.997 581 s
+(!)36 453 s(!)36 373 s(!)36 373 s(")35.5 317 s(")35.5 317 s
+16 317(@)34 453 b 0.138 27 353 br2
+%4/5
+(4)66 317 s(')150.984 319 s(4)155.934 319 s(@)224.109 317 s
+%4/4
+(zzx.w{{y.w{{y.)67 329 s -1.8 95.992 345 79.938 345 m
+-1.8 95.992 342 79.938 342 m -1.8 95.992 339 79.938 339 m(5)74.088 329 s
+(J)81.915 329 s(JL)81.915 325 s(5)89.742 329 s(5)97.569 325 s(5)
+110.353 329 s -1.88 114.047 344.22 105.975 341.774 m
+-1.88 114.047 341.22 105.975 338.774 m
+-1.88 114.047 338.22 105.975 335.774 m(zzx.w{{y.w{{y.)156.934 329 s
+-1.8 185.665 345 169.611 345 m -1.8 185.665 342 169.611 342 m
+-1.8 185.665 339 169.611 339 m(5)163.761 329 s(J)171.588 329 s(JL)
+171.588 325 s(5)179.415 329 s(5)187.242 325 s(5)200.026 329 s
+-1.88 203.72 344.22 195.648 341.774 m
+-1.88 203.72 341.22 195.648 338.774 m
+-1.88 203.72 338.22 195.648 335.774 m(@)224.109 317 s
+%4/3
+it 10 ss(poco accel.)54 411 s it 9.5 ss(        cr)48.466 353.5 s(esc.)
+-0.351 0 rs mf 10 ss(6)66 375 s(\221\221\221)66 375 s(6)66 383 s rm 7 ss(1)
+106.613 373 s mf 10 ss(%)99.613 381 s(4)104.613 381 s(6)192.123 383 s
+16 333(@)224.109 373 b
+%4/2
+(5)72 389 s(?)80.4 389 s(5)72 385 s(?)80.4 385 s
+-1.8 152.27 407 128.389 407 m -1.8 152.27 404 128.389 404 m
+-1.8 152.27 401 128.389 401 m(%)117.539 387 s(J)122.539 391 s(JL)
+122.539 387 s(J)130.366 391 s(JL)130.366 389 s(=)138.193 391 s(5)
+138.193 391 s(J)146.02 391 s(JL)146.02 389 s(=x=x=)155.934 391 s(5)
+155.934 399 s(?)164.334 401 s(7)210.125 385 s(@)224.109 373 s
+%4/1
+rm 9.5 ss(le)65.571 442.5 s(-)56 432.5 s it 9.5 ss(mem)60.032 432.5 s
+mf 10 ss(2)66 469 s(@)224.109 453 s
+%5/5
+(\()228.089 319 s(4)232.339 319 s 69 309 230.339 311 -8 cv(4)
+318.553 321 s(A)383.316 317 s
+%5/4
+(zzx.w{{y.w{{y.)233.339 329 s -1.8 268.397 345 246.238 345 m
+-1.8 268.397 342 246.238 342 m -1.8 268.397 339 246.238 339 m(5)
+240.388 329 s(')249.82 325 s(J)254.32 329 s(JL)254.32 325 s(5)
+262.147 329 s(5)269.974 325 s(5)305.769 329 s
+-1.81 304.86 344.193 282.983 341.787 m
+-1.81 304.86 341.193 282.983 338.787 m
+-1.81 304.86 338.193 282.983 335.787 m(zzx.w{{y.w{{y.)319.553 329 s
+-1.8 350.371 347 334.317 347 m -1.8 350.371 344 334.317 344 m
+-1.8 350.371 341 334.317 341 m(5)328.467 331 s(J)336.294 331 s(JL)
+336.294 325 s(5)344.121 331 s(5)351.948 325 s(5)364.731 329 s
+-1.88 368.425 344.219 360.354 341.774 m
+-1.88 368.425 341.219 360.354 338.774 m
+-1.88 368.425 338.219 360.354 335.774 m(A)383.316 317 s
+%5/3
+(')227.839 385 s(6)232.339 385 s(6)302.325 389 s(=x=x=x=)302.325 391 s(6)
+302.325 403 s(8)318.553 389 s(=x=x=x=)318.553 391 s(6)318.553 403 s
+305.325 387 317.803 387 -2.743 cv 305.325 409 321.553 409 3.868 cv(6)
+351.948 389 s(=x=x=x=)351.948 391 s(6)351.948 403 s rm 9.5 ss
+(- - - - - - - - - - - - - - - - )11.498 104.114 353.5 ws it 9.5 ss( )
+375.023 353.5 s mf 10 ss(')368.71 389 s(8)373.21 389 s(')368.71 403 s
+(=x=x=x=)373.21 391 s(6)373.21 403 s 16 333(A)383.316 373 b
+%5/2
+-1.8 299.705 407 238.189 407 m -1.8 284.051 404 275.824 404 m
+-1.8 291.878 404 283.651 404 m -1.8 299.705 404 291.478 404 m
+-1.8 284.051 401 275.824 401 m -1.8 291.878 401 283.651 401 m
+-1.8 299.705 401 291.478 401 m(J)232.339 391 s(JL)232.339 389 s(%)
+264.474 387 s(J)269.974 391 s(JL)269.974 387 s(J)277.801 391 s(JL)
+277.801 389 s(=)285.628 391 s(5)285.628 391 s(J)293.455 391 s(JL)
+293.455 389 s(6)302.325 389 s 296.455 387 301.325 387 -1.461 cv
+(A)383.316 373 s
+%5/1
+(4)232.339 469 s(?)240.739 469 s 69 475 235.339 475 5 cv rm 9.5 ss
+(- - - - - - - - - - - - - - - - )11.498 82.472 442.5 ws(ben:)
+351.217 442.5 s(- - - - - - - - - - - - - - - )11.524 93.71 432.5 ws
+it 9.5 ss(ber:)351.483 432.5 s mf 10 ss(7)356.396 457 s(.)374.21 457 s
+(A)383.316 453 s
+%6/5
+(')388.329 319 s(')392.829 325 s(')397.329 317 s(z.w{{y.)413.031 329 s
+1.8 459.464 319 427.756 319 m 1.8 459.464 322 427.756 322 m(')
+422.506 335 s(=)427.006 335 s(K)427.006 331 s(KL)427.006 335 s(6)
+434.833 331 s(=)442.66 335 s(K)442.66 331 s(KL)442.66 335 s(6)
+450.487 331 s(=)458.314 335 s(K)458.314 331 s(KL)458.314 335 s it 9 ss(6)
+433.422 305 s mf 10 ss(6)468.228 331 s(=)476.055 335 s(6)476.055 335 s
+2.001 475.64 322.237 470.543 319.76 m
+2.001 475.64 325.237 470.543 322.76 m
+2.001 475.64 328.237 470.543 325.76 m it 9 ss(6)473.141 305 s mf 10 ss
+(z.w{{y.)493.231 329 s 1.8 533.559 319 501.852 319 m
+1.8 533.559 322 501.852 322 m(=)501.102 335 s(K)501.102 331 s(KL)
+501.102 335 s(6)508.929 331 s(=)516.756 335 s(K)516.756 331 s(KL)
+516.756 335 s(6)524.583 331 s(=)532.409 335 s(K)532.409 331 s(KL)
+532.409 335 s it 9 ss(6)510.57 305 s mf 10 ss(6)545.194 327 s(\221\221)
+545.194 327 s(6)545.194 331 s(@)573.997 317 s
+%6/4
+(')388.329 319 s(')392.829 325 s(')397.329 317 s(')407.531 323 s(4)
+412.031 323 s(')487.281 323 s(4)492.231 323 s(=x=)412.031 335 s(3)
+412.031 339 s(\()487.556 337 s(=)492.231 335 s(5)492.231 337 s
+-1.808 571.376 351.008 551.044 353 m(')540.694 337 s(=)545.194 335 s(5)
+545.194 337 s(\()560.876 335 s(=)565.126 335 s(J)565.126 335.047 s(JL)
+565.126 335 s 420.031 343 568.126 353.537 10 cv(@)573.997 317 s
+%6/3
+(')388.329 379 s(')392.829 385 s(')397.329 377 s it 10 ss(pi\371 )
+412.031 357 s bi 10 ss(f)427.311 357 s mf 10 ss(6)412.031 389 s(=x=x=x=)
+412.031 391 s(6)412.031 403 s 380.71 392 411.281 392 5 cv
+376.21 409 415.031 409 5 cv(\()463.553 387 s(4)468.228 387 s(\()
+463.553 401 s(=x=x=)468.228 391 s(4)468.228 401 s
+1.82 566.276 368.94 552.944 370.939 m(')542.694 383 s(K)
+552.194 382.939 s(KL)552.194 383 s(\()560.876 381 s(6)565.126 381 s
+16 333(@)573.997 373 b
+%6/2
+(')388.329 379 s(')392.829 385 s(')397.329 377 s(5)545.194 387 s(5)
+545.194 373 s 80 401 548.194 403 23 cv 548.194 371 573.997 371 -6 cv
+553.194 393 573.997 393 6 cv(@)573.997 373 s
+%6/1
+(')388.329 459 s(')392.829 465 s(')397.329 457 s rm 9.5 ss(Br\374nn)
+403.156 442.5 s it 9.5 ss(Br\374nn)403.156 432.5 s mf 10 ss(')407.531 469 s
+(6)412.031 469 s rm 9.5 ss(-)444.977 442.5 s(hil)466.212 442.5 s(-)
+444.977 432.5 s it 9.5 ss(hil)466.212 432.5 s mf 10 ss(4)468.228 467 s
+rm 9.5 ss(- - - )13.905 488.952 442.5 ws(de)543.71 442.5 s(- - - )
+13.905 488.952 432.5 ws it 9.5 ss(de)543.71 432.5 s mf 10 ss(6)
+545.194 467 s(@)573.997 453 s
+(FFFFFCCC)34 453 s (C)563.997 453 s
+(FFFFFCCC)34 373 s (C)563.997 373 s
+(FFFFFCCC)34 317 s (C)563.997 317 s
+(!)36 189 s(')52 195 s(')56.5 201 s(')61 193 s(!)36 109 s(')52 115 s(')
+56.5 121 s(')61 113 s(!)36 109 s(')52 115 s(')56.5 121 s(')61 113 s(")
+35.5 53 s(')52 55 s(')56.5 61 s(')61 53 s(")35.5 53 s(')52 55 s(')
+56.5 61 s(')61 53 s 16 53(@)34 189 b 0.138 27 89 br2
+%7/5
+(\()79.35 59 s(4)83.6 59 s(4)130.457 61 s(@)190.361 53 s
+%7/4
+(.)84.6 69 s(5)95.942 67 s(')106.059 71 s(=)110.559 71 s(7)110.559 71 s
+103.942 74 113.559 79 1.885 cv(.)131.457 69 s
+-1.851 165.135 87.096 148.49 83.102 m(J)142.64 67.102 s(JL)142.64 67 s(=)
+158.885 71 s(5)158.885 71 s 150.64 73 161.885 77 2.373 cv(.)179.179 69 s
+(@)190.361 53 s
+%7/3
+bi 10 ss(f)83.6 90 s(f)-0.18 0 rs mf 10 ss(')81.1 117 s(4)90.6 117 s(?)
+99 117 s 1.884 179.329 104.935 166.635 101 m(6)165.885 113 s
+91.6 139 162.885 135 8 cv(K)178.179 116.811 s(KL)178.179 117 s
+16 69(@)190.361 109 b
+%7/2
+(5)83.6 123 s(5)83.6 109 s 66 107 86.6 107 -6 cv 66 129 86.6 129 6 cv(')
+99.969 123 s(3)104.469 123 s(')99.969 109 s(3)104.469 109 s(5)
+158.885 121 s(5)158.885 107 s(@)190.361 109 s
+%7/1
+rm 9.5 ss(brennt)74.464 178.5 s it 9.5 ss(then)78.421 168.5 s mf 10 ss(6)
+83.6 203 s rm 9.5 ss(__)99.736 178.5 s(_)104.719 178.5 s(___)
+95.78 168.5 s mf 10 ss(')99.969 203 s(4)104.469 203 s
+86.6 210 107.469 210 5 cv rm 9.5 ss(dann)152.651 178.5 s it 9.5 ss(will)
+154.756 168.5 s mf 10 ss(6)158.885 201 s(@)190.361 189 s
+%8/5
+(')195.833 63 s(2)200.333 63 s 86.6 51 203.333 58 -10 cv(@)315.655 53 s
+%8/4
+(\243)201.333 37 s(=x=x=)212.596 71 s(5)212.596 81 s(=x=)227.214 71 s(5)
+227.214 75 s(')275.946 71 s(=)280.896 71 s(5)280.896 71 s mf 9 ss($)
+295.513 37 s mf 10 ss(7)295.513 67 s(@)315.655 53 s
+%8/3
+(')195.833 117 s(6)200.333 117 s 181.179 115 199.333 115 -4.446 cv(8)
+200.333 107 s(')195.833 117 s(6)200.333 117 s 161.885 99 198.333 107
+-6 cv(\()222.964 119 s(<xv<xv<v|v|K)227.214 117 s(KL)227.214 119 s
+1.8 265.275 109 240.146 109 m 1.8 265.275 112 240.146 112 m
+1.8 265.275 115 240.146 115 m it 9.5 ss(dim. e r)239.396 97.5 s(all.)
+-0.142 0 rs mf 10 ss(6)239.396 121 s(')247.442 123 s(K)251.942 121 s(KL)
+251.942 123 s rm 7 ss(1)264.125 130 s mf 10 ss(6)264.125 121 s(4)
+276.307 121 s 267.125 119 275.307 119 -1.454 cv 16 69(@)315.655 109 b
+%8/2
+(5)200.333 121 s(?)208.733 121 s 166.885 125 203.333 125 6 cv(=x=x=)
+276.307 127 s(5)276.307 135 s(?)284.707 137 s(=)295.513 127 s(7)
+295.513 127 s 203.333 105 298.513 83 -8 cvw(@)315.655 109 s
+%8/1
+rm 9.5 ss(e)201.224 178.5 s it 9.5 ss(b)194.456 168.5 s(urn)-0.19 0 rs
+mf 10 ss(4)200.333 201 s(?)208.733 201 s rm 9.5 ss(- - - - )
+12.979 214.459 178.5 ws(wig)282.191 178.5 s it 9.5 ss(for)
+283.773 168.5 s mf 10 ss(5)286.316 193 s(@)315.655 189 s
+%9/5
+(\()321.127 63 s(2)330.377 63 s(\()326.127 73 s(=)330.377 71 s(2)
+330.377 73 s(@)441.192 53 s
+%9/4
+(2)337.377 67 s(\210)337.377 75 s 303.513 69 332.377 69 6 cv
+-1.318 435.567 78.886 429.287 76.94 m
+-1.318 435.567 76.786 429.287 74.84 m mf 7 ss(\()422.217 65.6 s(J)
+425.192 65.809 s(JL)425.192 65.6 s(J)431.192 67.669 s(JL)431.192 67.6 s
+428.192 63 434.192 64 -1.8 cv mf 10 ss(@)441.192 53 s
+%9/3
+(')325.877 117 s(6)330.377 117 s rm 7 ss(1)359.772 130 s mf 10 ss(4)
+359.772 119 s(?)368.172 121 s 348.772 119 357.772 119 -2.7 cv
+16 69(@)441.192 109 b
+%9/2
+(')325.877 131 s(=x=)330.377 127 s(7)330.377 131 s rm 7 ss(2)
+350.431 130 s mf 10 ss(\()346.181 119 s(5)350.431 119 s(\()365.878 123 s(5)
+370.128 123 s(=)384.747 127 s(7)384.747 127 s
+-1.823 435.259 147.065 410.495 143.078 m(=)404.645 127 s(J)
+404.645 127.078 s(JL)404.645 127 s 392.747 133 407.645 133 3.469 cv(=)
+416.827 127 s(J)416.827 129.039 s(JL)416.827 129 s(=x=)429.009 127 s(5)
+429.009 131 s it 9 ss(3)420.827 120 s 208.333 137 432.009 149 18 cv
+mf 10 ss(@)441.192 109 s
+%9/1
+rm 9.5 ss(hei)327.573 178.5 s it 9.5 ss(e)331.268 168.5 s mf 10 ss(')
+325.877 197 s(2)330.377 197 s(@)441.192 189 s
+%10/5
+(')446.664 51 s(6)451.164 51 s(@)573.998 53 s
+%10/4
+(\243)457.164 37 s(')446.664 65 s(5)451.164 65 s(')490.921 71 s(=)
+495.871 71 s(6)495.871 71 s(=x=)510.489 71 s(K)510.489 73 s(KL)
+510.489 75 s(')532.501 79 s(=x=x=)537.451 71 s(K)537.451 73 s(KL)
+537.451 79 s mf 9 ss($)561.998 37 s mf 8 ss(!)564.763 53.8 s
+459.164 77 565.451 86 12 cv mf 10 ss(@)573.998 53 s
+%10/3
+1.85 477.123 112.081 451.914 106.082 m bi 10 ss(p)451.164 94.082 s
+rm 9.5 ss(- - - - - - - - - )11.822 297.129 97.5 ws it 9.5 ss( )
+452.977 97.5 s mf 10 ss(\()446.914 119 s(K)451.164 118.082 s(KL)
+451.164 119 s 362.772 113 450.164 113 -5 cv it 10 ss(dolce)471.427 94 s
+mf 10 ss(6)463.427 121 s(')471.473 125 s(K)475.973 123.986 s(KL)
+475.973 125 s it 9 ss(3)461.318 98.082 s mf 10 ss(=x=)495.871 127 s(K)
+495.871 129 s(KM)495.871 131 s(6)537.451 125 s 16 69(@)573.998 109 b
+%10/2
+(')446.664 131 s(=x=)451.164 127 s(5)451.164 131 s
+437.009 138 454.164 138 4.146 cv(=x=x=)475.973 127 s(7)475.973 135 s
+(=x=x=x=)495.871 127 s(5)495.871 141 s(?)504.271 141 s rm 7 ss(5)
+517.553 148 s mf 10 ss(')513.053 139 s(=x=x=x=)517.553 127 s(7)
+517.553 139 s -1.851 568.066 145.007 543.301 151 m rm 7 ss(4)
+537.451 144 s mf 10 ss(=x=x=)537.451 127 s(5)537.451 135 s(=x=)
+549.634 127 s(J)549.634 132.052 s(JL)549.634 131 s(=)561.816 127 s(J)
+561.816 129.104 s(JL)561.816 129 s it 9 ss(3)552.483 156 s
+459.164 147 564.816 149.314 15.343 cv mf 10 ss(@)573.998 109 s
+%10/1
+(')446.664 197 s(4)451.164 197 s 333.377 204 454.164 204 5 cv rm 9.5 ss
+(- - - - - - - - - )11.822 352.806 178.5 ws(lig)508.473 178.5 s
+(- - - - - - - - - )11.822 350.433 168.5 ws it 9.5 ss(ver)
+507.424 168.5 s mf 10 ss(3)510.489 187 s(@)573.998 189 s
+(FFFFFCCC)34 189 s (C)563.998 189 s
+(FFFFFCCC)34 109 s (C)563.998 109 s
+(FFFFFCCC)34 53 s (C)563.998 53 s
+
+pagesave restore showpage
+
+%%Trailer
+%%Pages: 1
