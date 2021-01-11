@@ -10,7 +10,7 @@ from skimage.transform import hough_circle, hough_circle_peaks, hough_ellipse
 
 from util import *
 
-path = 'cases/01.PNG'
+path = 'cases/02.PNG'
 The_image = read_image(path)
 if path.lower().endswith('.jpg'):
     gray = rgb2gray(The_image)
@@ -63,9 +63,7 @@ show_images([withoutLines_dilated], ["Dilated"])
 # withoutLines_dilated = withoutLines
 
 # regionproprs object
-notes, sorted_images = CCA(withoutLines_dilated)
-print([notes[0]])
-show_images(sorted_images)
+notes = CCA(withoutLines_dilated)
 boxes = RetrieveComponentBox(notes)
 binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)
 gray_notes_with_lines = segmentBoxesInImage(boxes, gray)

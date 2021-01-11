@@ -340,21 +340,8 @@ def CCA(binary):
     # Perform CCA on the mask
     labeled_image = skimage.measure.label(binary, connectivity=2, return_num=True, background=0)
     components = skimage.measure.regionprops(labeled_image[0])
-    thisdict = {}
-    sorted_notes_images = []
-    index = 0
-    keys = []
-    for component in components:
-        if component.area >= 44:
-            minR, minC, maxR, maxC = component.bbox
-            thisdict[minC] = []
-            thisdict[minC].append(binary[minR:maxR+2, minC:maxC+2])
-            keys.append(str(index))
-            index += 1
-    print(thisdict.keys())
-    for key in sorted(thisdict.keys()):
-        sorted_notes_images.append(thisdict[key][0])
-    return components, sorted_notes_images
+
+    return components
 
 def componentsAreas(components):
     area = []
