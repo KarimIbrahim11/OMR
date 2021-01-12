@@ -18,17 +18,15 @@ image = gray.copy()
 # TODO SKEWNESS NEDIF AGAINST CAPTURED PERSPECTIVE // AMIR
 
 rotated, gray = deskew(gray)
+rotated_copy = rotated.copy()
 # show_images([gray], ["Gray: "])
 # show_images([rotated], ["binary"])
 
 # TODO STAFF LINE REMOVAL
-rotated_copy = rotated.copy()
 
-imagesNotes=split_images(rotated_copy,1)
-show_images([imagesNotes[0]])
-
-
-#for loo l 3amyy kimoooo
+imagesNotes=split_images(rotated_copy, 1)
+show_images([imagesNotes[0]],["sora"])
+rotated = imagesNotes[0]
 # withoutLines = removeHLines(rotated_copy)
 # show_images([rotated, withoutLines], ["Binary", " After Line Removal"])
 
@@ -70,6 +68,9 @@ show_images(notesImages)
 binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)
 gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
 show_images(binary_notes_with_lines)
+
+# for image in notesImages:
+    # Classification Comes next
 # notesImages = componentsToImages(notes)
 # displayComponents(withoutLines_dilated, notes)
 
