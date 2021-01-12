@@ -1,10 +1,10 @@
 # import imutils as imutils
 from cv2 import CV_32F
 
-# from OMR.util import *
+from util import *
 from scipy.signal import find_peaks
 
-from util import *
+# from util import *
 
 folder = 'cases/'
 path = '04.PNG'
@@ -58,6 +58,9 @@ accuracy_knn = calc_accuracy(knns, true_values, ntest)
 # show_images([rotated], ["Binary"])
 # imagesNotes = split_images(rotated_copy, 1)
 clef = False
+f = open("demofile2.txt", "w")
+f.write("{[ ")
+f.close()
 for image in imagesNotes:
     # image = rotated
     show_images([image], ["VIGOOO"])
@@ -319,9 +322,15 @@ for image in imagesNotes:
     if four_two == True and four_four == True:
         print("Meter is 4/2")
         meter = '\meter<"4/2">'
+        f = open("demofile2.txt", "a")
+        f.write(meter)
+        f.close()
     elif four_two == False and four_four == True:
         print("Mtere is 4/4")
         meter = '\meter<"4/4">'
+        f = open("demofile2.txt", "a")
+        f.write(meter)
+        f.close()
     elif four_four == False and four_two == False:
         print("No meter")
 
@@ -329,3 +338,10 @@ for image in imagesNotes:
     for alb in olobna:
         output_line += alb + " "
     print("output: ", output_line)
+    f = open("demofile2.txt", "a")
+    f.write(output_line)
+    f.close()
+
+f = open("demofile2.txt", "a")
+f.write("]}")
+f.close()
