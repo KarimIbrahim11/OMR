@@ -495,6 +495,44 @@ def bin_image_to_opencvimage(bin_img):
 
     return binary
 
+def split_images(img, s):
+    imgs = []
+    row_hist = np.array([sum(img[i, :]) for i in range(img.shape[0])])
+
+    for i in range(len(row_hist) - 4*s):
+        if row_hist[i] <= 0.03 * img.shape[1] < row_hist[i + 1]:
+            start = i
+            break
+    if start < s:
+        start = s
+
+    cum_hist = np.array([sum(row_hist[i:i + s]) for i in range(start, len(row_hist), s)])
+
+    print(cum_hist)
+
+    thresh = img.shape[1] * s * 0.01
+    print(thresh)
+
+    temp = start
+    last = temp + 7 * s
+    for c in range(0, len(cum_hist)):
+        if c == len(cum_hist) - 1:
+            print("pppp")
+            print("temp",temp,"last",last)
+            print(last - temp)
+            if last - temp > 4 * s:
+                imgs.append(img[temp - s:last + s])
+        elif cum_hist[c] <= thresh < cum_hist[c + 1]:
+            print("hhhh")
+            print((c * s)+start - temp)
+            if int(c * s) + start - temp > 4 * s:
+                imgs.append(img[temp - s:int(c * s) + start + s])
+            temp = int(c * s) + start
+            last = 0
+        elif cum_hist[c] <= thresh and last == 0:
+            last = c * s + start
+
+    return imgs
 
 def classifyNotePositionInSegment(img):
     top_image = img[0:img.shape[0] // 2, :]

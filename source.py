@@ -1,4 +1,4 @@
-import imutils as imutils
+#import imutils as imutils
 from cv2 import CV_32F
 
 # from OMR.util import *
@@ -23,6 +23,12 @@ rotated, gray = deskew(gray)
 
 # TODO STAFF LINE REMOVAL
 rotated_copy = rotated.copy()
+
+imagesNotes=split_images(rotated_copy,1)
+show_images([imagesNotes[0]])
+
+
+#for loo l 3amyy kimoooo
 # withoutLines = removeHLines(rotated_copy)
 # show_images([rotated, withoutLines], ["Binary", " After Line Removal"])
 
@@ -66,3 +72,4 @@ gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
 show_images(binary_notes_with_lines)
 # notesImages = componentsToImages(notes)
 # displayComponents(withoutLines_dilated, notes)
+
