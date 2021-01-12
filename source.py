@@ -7,7 +7,7 @@ from scipy.signal import find_peaks
 from util import *
 
 folder = 'cases/'
-path = '01.PNG'
+path = '04.PNG'
 The_image = read_image(folder + path)
 if path.lower().endswith('.jpg'):
     gray = rgb2gray(The_image)
@@ -28,7 +28,7 @@ show_images(imagesNotes)
 
 shapes = ['triple_eighth_down', 'double_eighth_down', 'double_sixteenth_down', 'quadruple_sixteenth_down', "Clef",
           "double_flats", "double_sharps", "flat", "half_note", "quarter_note", "single_eighth note",
-          "sharp", "whole_note", "single_sixteenth_note", "single_32th_note", "chord"]
+          "sharp", "whole_note", "single_sixteenth_note", "single_32th_note", "chord", "bar_line", "44", "42"]
 # , "triple_sixteenth", "bar_line",   "single_quarter_note_head up"]
 
 x_train, y_train = training_data(shapes)
@@ -49,7 +49,7 @@ for i in range(training_features.shape[0]):
 test_images = sorted(glob.glob('KNN Attempt/test/*'))
 ntest = len(test_images)
 
-true_values = [1, 1, 2, 3, 0, 4, 5, 6, 7, 8, 8, 8, 9, 10, 11, 11, 12, 13, 14, 15]
+true_values = [1, 1, 2, 3, 0, 4, 5, 6, 7, 8, 8, 8, 9, 10, 11, 11, 12, 13, 14, 15, 16, 17, 18]
 
 knns = predict(test_images, shapes, true_values, training_features, y_train)
 
@@ -61,11 +61,15 @@ clef = False
 for image in imagesNotes:
     # image = rotated
     show_images([image], ["VIGOOO"])
-    # # withoutLines = removeHLines(rotated_copy)
+    # withoutLines, staff_lines_beginnings = removeHLines(rotated_copy)
+    # print("staff linessss: ", staff_lines_beginnings)
+
     #
     # # Remove Staff TIFA
-    # # staff_indices =find_stafflines(rotated, 0, 0)
-    # print(staff_indices)
+    staff_indices = find_stafflines(rotated, 0, 0)
+    print("staff linessss: ", staff_indices)
+    staffbegginings, countofstaffs = countStaffLines(staff_indices)
+    print("Staff beginnings:", staffbegginings)
     # rotated[staff_indices, :] = 0
 
     ## space = s, wel height = t
@@ -105,11 +109,16 @@ for image in imagesNotes:
     gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
     # show_images(binary_notes_with_lines)
 
-    rhythm = ["/8", "/8", "/16", "/16", "clef", "bb", "##", "b", "/2", "/4", "/8", "#", "/1", "/16", "/32", "/4"]
+    rhythm = ["/8", "/8", "/16", "/16", "clef", "&&", "##", "&", "/2", "/4", "/8", "#", "/1", "/16", "/32", "/4", "",
+              "", ""]
+    # Todo reflect previous accidental in present note
     double_flats = False
     double_sharps = False
     flat_note = False
     sharp_note = False
+    four_four = False
+    four_two = False
+    olobna = []
     for i in range(len(notesImages)):
         show_images([notesImages[i]])
         io.imsave(path + str(i) + '.jpg', 1 - notesImages[i])
@@ -122,27 +131,34 @@ for image in imagesNotes:
         note_rhythm = rhythm[classification]
         # "double_flats", "double_sharps", "flat", "half_note", "quarter_note", "single_eighth note",
         #           "sharp", "whole_note", "single_sixteenth_note", "single_32th_note", "chord"
-        # TODO PITCH
-        if classification == 5:  # double flats
+        if classification == 16:
+            print("bar line")
+        elif classification == 5:  # double flats
             double_flats = True
         elif classification == 6:  # double sharps
             double_sharps = True
         elif classification == 7:  # flat
             flat_note = True
         elif classification == 11:  # sharp / natural
-            # TODO classify natural men sharp
+            # TODO classify NATURAL men SHARP
             sharp_note = True
         elif classification == 4:
             if clef == True:  # A new line to write into
-                # Todo write in a second line
+                # Todo if Clef again yeb2a enzel 3l line elly t7tiih
                 print(" Second Line")
             else:
                 clef = True
+        elif classification == 17:  # sharp / natural
+            print("4/4")
+            four_four = True
+        elif classification == 18:  # sharp / natural
+            print("4/2")
+            four_two = True
         else:
             # Find whether it is up or down
             tb, top_image, bot_image = classifyNotePositionInSegment(notesImages[i])
 
-            # Find the number of notes:
+            # TODO Find the number of notes in beamed and their pitch:
             if classification == 0 or classification == 3:
                 print(" triple eighth or quadruple sixteenth")
                 # Run row histogram peak finding on the stemless half
@@ -195,7 +211,7 @@ for image in imagesNotes:
                     plt.show()
 
             elif classification == 15:  # Chord
-                # TODO ADJUST CHORDS
+                # TODO ADJUST CHORDS pitch and find number of notes
                 if tb == 0:
                     ##### Find Row Histogram
                     row_histogram = np.array([sum(top_image[i, :]) for i in range(top_image.shape[0])])
@@ -293,9 +309,23 @@ for image in imagesNotes:
                     elif numberOfPeaks == 3:
                         print("Three Notes Chord")
                 print("Number of notes in chord = ", numberOfPeaks)
-            # Todo find Pitch
-            indices = getfirst_staff_line(image)
-            #print("Indices: ", indices)
-            get_position(notesImages[i][1, :], indices[0, 0], t, s, tb)
 
+            pitch = single_note_pitch(boxes[i], staffbegginings[0], t, s, tb)
+            if rhythm[classification] != "":
+                note_str = pitch + rhythm[classification]
+            olobna.append(note_str)
+    # Todo write in file
+    meter = ""
+    if four_two == True and four_four == True:
+        print("Meter is 4/2")
+        meter = '\meter<"4/2">'
+    elif four_two == False and four_four == True:
+        print("Mtere is 4/4")
+        meter = '\meter<"4/4">'
+    elif four_four == False and four_two == False:
+        print("No meter")
 
+    output_line = meter
+    for alb in olobna:
+        output_line += alb + " "
+    print("output: ", output_line)

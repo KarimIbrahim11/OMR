@@ -334,6 +334,14 @@ def countStems(stems_indices):
     return stems, len(stems)
 
 
+def countStaffLines(staff_indices):
+    staffs = []
+    for i in range(len(staff_indices)):
+        temp_staff = staff_indices[i]
+        if i == 0 or temp_staff > staff_indices[i - 1] + 1:
+            staffs.append(temp_staff)
+    return staffs, len(staffs)
+
 def draw_contours(img):
     # se = np.ones((3, 3))
     # closing_card = binary_erosion(binary_dilation(new_image, se), se)
@@ -670,6 +678,8 @@ def regionVolume(region):
     area = region.shape[0] * region.shape[1]
     b_area = len(region == 0)
     # print("Black area= ", b_area)
+    if area == 0:
+        area = 1
     vol = b_area / area
     return vol
 
@@ -788,6 +798,9 @@ def KNN(test_point, training_features, y_train, k):
     # features_bar_line = training_features[y_train==15]
     # features_triple_sixteenth = training_features[y_train==15]
     features_chord = training_features[y_train == 15]
+    features_bar_line = training_features[y_train == 16]
+    features_four_four = training_features[y_train == 17]
+    features_four_two = training_features[y_train == 18]
 
     for i in features_triple_eighth_down:
         c = calculateDistance(i, test_point)
@@ -869,13 +882,22 @@ def KNN(test_point, training_features, y_train, k):
         if c < max(minDist):
             minDist[minDist.index(max(minDist))] = c
             minClass[minDist.index(max(minDist))] = 15
-    '''
     for i in features_bar_line:
         c = calculateDistance(i,test_point)
         if c < max(minDist):
             minDist[minDist.index(max(minDist))] = c
-            minClass[minDist.index(max(minDist))] = 15
-    '''
+            minClass[minDist.index(max(minDist))] = 16
+    for i in features_four_four:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 17
+    for i in features_four_two:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 18
+
     '''
     for i in features_triple_sixteenth:
         c = calculateDistance(i,test_point)
@@ -909,11 +931,12 @@ def KNN(test_point, training_features, y_train, k):
     thirteen = minClass.count(13)
     fourteen = minClass.count(14)
     fifteen = minClass.count(15)
-    # fifteen = minClass.count(15)
-    # sixteen = minClass.count(16)
+    sixteen = minClass.count(16)
+    seventeen = minClass.count(17)
+    eighteen = minClass.count(18)
 
     temp = [zero, one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen,
-            fifteen]  # ,sixteen]
+            fifteen, sixteen, seventeen, eighteen]
     classification = temp.index(max(temp))
     return classification
 
@@ -958,37 +981,55 @@ def predict(test_images, shapes, true_values, training_features, y_train):
     return knns
 
 
-def get_position(segment, staff_beg, staff_height, staff_space, is_d):
-    if is_d == 1:
-        if segment[3] - (staff_space / 2) >= staff_beg + (5 * staff_height) + (5 * staff_space):
+def single_note_pitch(bbox, first_staff, h, s, topbot):
+    if topbot == 1:
+        if bbox[2] - (s / 2) >= first_staff + (5 * h) + (5 * s) - 0.2 * s:
             print("c")
-        elif segment[3] >= staff_beg + (5 * staff_height) + (5 * staff_space):
+            return "c"
+        elif bbox[2] >= first_staff + (5 * h) + (5 * s):
             print("d")
-        elif segment[3] - (staff_space / 2) >= staff_beg + (4 * staff_height) + (4 * staff_space):
+            return "d"
+        elif bbox[2] - (s / 2) >= first_staff + (4 * h) + (4 * s) - 0.2 * s:
             print("e")
-        elif segment[3] >= staff_beg + (4 * staff_height) + (4 * staff_space):
+            return "e"
+        elif bbox[2] >= first_staff + (4 * h) + (4 * s):
             print("f")
-        elif segment[3] - (staff_space / 2) >= staff_beg + (3 * staff_height) + (3 * staff_space):
+            return "f"
+        elif bbox[2] - (s / 2) >= first_staff + (3 * h) + (3 * s) - 0.2 * s:
             print("g")
-        elif segment[3] >= staff_beg + (3 * staff_height) + (3 * staff_space):
+            return "g"
+        elif bbox[2] >= first_staff + (3 * h) + (3 * s):
             print("a")
-    else:
-        if segment[2] <= staff_beg - staff_height - (2 * staff_space):
-            print("b2")
-        elif segment[2] + (staff_space / 2) <= staff_beg - staff_space:
-            print("a2")
-        elif segment[2] <= staff_beg - staff_space:
-            print("g2")
-        elif segment[2] + (staff_space / 2) <= staff_beg + staff_height:
-            print("f2")
-        elif segment[2] <= staff_beg + staff_height:
-            print("e2")
-        elif segment[2] + (staff_space / 2) <= staff_beg + (2 * staff_height) + staff_space:
-            print("d2")
-        elif segment[2] <= staff_beg + (2 * staff_height) + staff_space:  # tmam
-            print("c2")
-        elif segment[2] + (staff_space / 2) <= staff_beg + (2 * staff_height) + (2 * staff_space):  # tmam
+            return "a"
+        elif bbox[2] - (s / 2) >= first_staff + (2 * h) + (2 * s) - 0.2 * s:
             print("b")
+            return "b"
+    else:
+        if bbox[0] <= first_staff - h - (2 * s):
+            print("b2")
+            return "b2"
+        elif bbox[0] + (s / 2) <= first_staff - s + 0.2 * s:
+            print("a2")
+            return "a2"
+        elif bbox[0] <= first_staff - s:
+            print("g2")
+            return "g2"
+        elif bbox[0] + (s / 2) <= first_staff + h + 0.2 * s:
+            print("f2")
+            return "f2"
+        elif bbox[0] <= first_staff + h:
+            print("e2")
+            return "e2"
+        elif bbox[0] + (s / 2) <= first_staff + (2 * h) + s + 0.2 * s:
+            print("d2")
+            return "d2"
+        elif bbox[0] <= first_staff + (2 * h) + s:
+            print("c2")
+            return "c2"
+        elif bbox[0] + (s / 2) <= first_staff + (2 * h) + (2 * s) + 0.2 * s:
+            print("b")
+            return "b"
+
 
 
 def getfirst_staff_line(img):
