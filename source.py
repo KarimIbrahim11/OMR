@@ -1,4 +1,4 @@
-#import imutils as imutils
+# import imutils as imutils
 from cv2 import CV_32F
 
 # from OMR.util import *
@@ -19,58 +19,93 @@ image = gray.copy()
 
 rotated, gray = deskew(gray)
 rotated_copy = rotated.copy()
-# show_images([gray], ["Gray: "])
-# show_images([rotated], ["binary"])
 
-# TODO STAFF LINE REMOVAL
+imagesNotes = split_images(rotated_copy, 1)
+show_images([imagesNotes[0]])
 
-imagesNotes=split_images(rotated_copy, 1)
-show_images([imagesNotes[0]],["sora"])
-rotated = imagesNotes[0]
-# withoutLines = removeHLines(rotated_copy)
-# show_images([rotated, withoutLines], ["Binary", " After Line Removal"])
+shapes = ['triple_eighth_down', 'double_eighth_down', 'double_sixteenth_down', 'quadruple_sixteenth_down', "Clef",
+          "double_flats", "double_sharps", "flat", "half_note", "quarter_note", "single_eighth note",
+          "sharp", "whole_note", "single_sixteenth_note", "single_32th_note", "chord"]
+# , "triple_sixteenth", "bar_line",   "single_quarter_note_head up"]
 
-# Remove Staff TIFA
-# staff_indices = find_stafflines(rotated, 0, 0)
-# print(staff_indices)
-# rotated[staff_indices, :] = 0
-s, t = get_references(rotated)
-withoutLines = binary_opening(rotated, np.ones((t + 2, 1)))
-# Added another opening for noise removal:
-# withoutLines = binary_opening(withoutLines, np.ones((3, 3)))
-show_images([rotated, withoutLines], ["Rotated", "After Line Removal"])
+x_train, y_train = training_data(shapes)
+x_train = np.asarray(x_train)
+y_train = np.asarray(y_train)
+print(x_train.shape)
+print("y_train:", y_train)
+number_of_features = 13
+training_features = np.zeros((x_train.shape[0], number_of_features))
 
-# TODO replace the 6 with a variable dependant on the ratio between The width and the height of the image And remove
-#  the non uniform closing
+for i in range(training_features.shape[0]):
+    components = find_regionprop(x_train[i])
+    # print(y_train[i])
+    features = extract_features(components)
+    # print(features)
+    training_features[i, :] = features
 
-# Non uniform Closing
-# First dilate if there's a horizontal skip
-withoutLines_dilated = withoutLines
-selem = np.array([[1, 1, 1], [0, 0, 0], [0, 0, 0], [1, 1, 1]])
-withoutLines_dilated = binary_dilation(withoutLines, selem)
-# Second Erode for vertical segmentations
-selem = np.array([[0, 0, 1, 0] * 3]).reshape((4, 3))
-withoutLines_dilated = binary_erosion(withoutLines_dilated, selem)
-withoutLines_dilated = binary_closing(withoutLines_dilated, np.ones((6, 1)))
+test_images = sorted(glob.glob('KNN Attempt/test/*'))
+ntest = len(test_images)
 
-# show_images([withoutLines_dilated], ["Dilated"])
+true_values = [1, 1, 2, 3, 0, 4, 5, 6, 7, 8, 8, 8, 9, 10, 11, 11, 12, 13, 14, 15]
 
-# withoutLines_dilated = binary_closing(withoutLines_dilated, np.ones((5, 5)))
-# withoutLines_dilated = binary_opening(withoutLines_dilated, np.ones((5, 5)))
-# io.imsave('savedImage2.png', withoutLines_dilated)
-# path = 'savedImage.png'
-# rtt = read_image(path)
-# withoutLines_dilated = withoutLines
+knns = predict(test_images, shapes, true_values, training_features, y_train)
 
-notes, notesImages, boxes = CCA(withoutLines_dilated)
-show_images(notesImages)
-# boxes = RetrieveComponentBox(notesImages)
-binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)
-gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
-show_images(binary_notes_with_lines)
+accuracy_knn = calc_accuracy(knns, true_values, ntest)
 
-# for image in notesImages:
+show_images([rotated], ["Binary"])
+imagesNotes = split_images(rotated_copy, 1)
+
+for image in imagesNotes:
+    show_images([image], ["VIGOOO"])
+    # # withoutLines = removeHLines(rotated_copy)
+    #
+    # # Remove Staff TIFA
+    # # staff_indices =find_stafflines(rotated, 0, 0)
+    # print(staff_indices)
+    # rotated[staff_indices, :] = 0
+    s, t = get_references(image)
+    withoutLines = binary_opening(image, np.ones((t + 2, 1)))
+    # Added another opening for noise removal:
+    # withoutLines = binary_opening(withoutLines, np.ones((3, 3)))
+    show_images([image, withoutLines], ["Rotated", "After Line Removal"])
+
+    # TODO replace the 6 with a variable dependant on the ratio between The width and the height of the image And remove
+    #  the non uniform closing
+
+    # Non uniform Closing
+    # First dilate if there's a horizontal skip
+    withoutLines_dilated = withoutLines
+    selem = np.array([[1, 1, 1], [0, 0, 0], [0, 0, 0], [1, 1, 1]])
+    withoutLines_dilated = binary_dilation(withoutLines, selem)
+    # Second Erode for vertical segmentations
+    selem = np.array([[0, 0, 1, 0] * 3]).reshape((4, 3))
+    withoutLines_dilated = binary_erosion(withoutLines_dilated, selem)
+    withoutLines_dilated = binary_closing(withoutLines_dilated, np.ones((6, 1)))
+
+    # show_images([withoutLines_dilated], ["Dilated"])
+
+    # withoutLines_dilated = binary_closing(withoutLines_dilated, np.ones((5, 5)))
+    # withoutLines_dilated = binary_opening(withoutLines_dilated, np.ones((5, 5)))
+    # io.imsave('savedImage2.png', withoutLines_dilated)
+    # path = 'savedImage.png'
+    # rtt = read_image(path)
+    # withoutLines_dilated = withoutLines
+
+    notes, notesImages, boxes = CCA(withoutLines_dilated)
+    show_images(notesImages)
+
+    # boxes = RetrieveComponentBox(notesImages)
+    binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)
+    gray_notes_with_lines = segmentBoxesInImage(boxes, gray)
+    # show_images(binary_notes_with_lines)
+
+    for i in range(len(notesImages)):
+        show_images([notesImages[i]])
+        test_point = extract_features_single_img(notesImages[i], boxes[i])
+        classification = KNN(test_point, training_features, y_train, 3)
+        print("Classification: ", shapes[classification])
+
+    # for image in notesImages:
     # Classification Comes next
-# notesImages = componentsToImages(notes)
-# displayComponents(withoutLines_dilated, notes)
-
+    # notesImages = componentsToImages(notes)
+    # displayComponents(withoutLines_dilated, notes)

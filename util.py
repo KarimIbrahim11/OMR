@@ -37,6 +37,29 @@ from skimage.feature import canny
 from skimage.transform import probabilistic_hough_line, rotate
 import os
 from statistics import mode
+# Always make all imports in the first cell of the notebook, run them all once.
+import cv2
+import numpy as np
+import math
+import glob
+import matplotlib.pyplot as plt
+import skimage.io as io
+from mpl_toolkits.mplot3d import Axes3D
+
+from skimage.color import rgb2gray, rgb2hsv
+from scipy import fftpack
+from scipy.signal import convolve2d
+import skimage
+from skimage.util import random_noise
+from skimage.filters import median, gaussian, threshold_otsu
+from skimage.filters import threshold_otsu, threshold_sauvola
+from skimage.filters import roberts, sobel, sobel_h, scharr
+from skimage.exposure import rescale_intensity, equalize_hist
+from skimage.morphology import binary_erosion, binary_dilation, binary_closing, binary_opening, skeletonize, thin
+from skimage import img_as_ubyte
+from skimage.io import imread, imshow
+from skimage.filters import gaussian, threshold_otsu
+from skimage.measure import moments_hu, moments_central, moments_normalized, moments
 
 from skimage.io import imsave
 
@@ -349,7 +372,7 @@ def CCA(binary):
         if component.area >= 44:
             minR, minC, maxR, maxC = component.bbox
             thisdict[minC] = []
-            thisdict[minC].append(binary[minR:maxR+2, minC:maxC+2])
+            thisdict[minC].append(binary[minR:maxR + 2, minC:maxC + 2])
             thisdict[minC].append(component.bbox)
             keys.append(str(index))
             index += 1
@@ -358,6 +381,7 @@ def CCA(binary):
         sorted_notes_images.append(thisdict[key][0])
         boxes.append(thisdict[key][1])
     return components, sorted_notes_images, boxes
+
 
 def componentsAreas(components):
     area = []
@@ -383,6 +407,7 @@ def displayComponents(binary, components):
     ax.set_axis_off()
     plt.tight_layout()
     plt.show()
+
 
 '''
 # Retrieve Boxes bs
@@ -445,6 +470,8 @@ def template_Match(img, template):
     plt.show()
 
 '''
+
+
 def findBoundingCircleArea(img, contours):
     (x, y), radius = cv2.minEnclosingCircle(contours[0])
     center = (int(x), int(y))
@@ -495,11 +522,12 @@ def bin_image_to_opencvimage(bin_img):
 
     return binary
 
+
 def split_images(img, s):
     imgs = []
     row_hist = np.array([sum(img[i, :]) for i in range(img.shape[0])])
 
-    for i in range(len(row_hist) - 4*s):
+    for i in range(len(row_hist) - 4 * s):
         if row_hist[i] <= 0.03 * img.shape[1] < row_hist[i + 1]:
             start = i
             break
@@ -508,23 +536,23 @@ def split_images(img, s):
 
     cum_hist = np.array([sum(row_hist[i:i + s]) for i in range(start, len(row_hist), s)])
 
-    print(cum_hist)
+    # print(cum_hist)
 
     thresh = img.shape[1] * s * 0.01
-    print(thresh)
+    # print(thresh)
 
     temp = start
     last = temp + 7 * s
     for c in range(0, len(cum_hist)):
         if c == len(cum_hist) - 1:
-            print("pppp")
-            print("temp",temp,"last",last)
-            print(last - temp)
+            # print("pppp")
+            # print("temp", temp, "last", last)
+            # print(last - temp)
             if last - temp > 4 * s:
                 imgs.append(img[temp - s:last + s])
         elif cum_hist[c] <= thresh < cum_hist[c + 1]:
-            print("hhhh")
-            print((c * s)+start - temp)
+            # print("hhhh")
+            # print((c * s) + start - temp)
             if int(c * s) + start - temp > 4 * s:
                 imgs.append(img[temp - s:int(c * s) + start + s])
             temp = int(c * s) + start
@@ -533,6 +561,7 @@ def split_images(img, s):
             last = c * s + start
 
     return imgs
+
 
 def classifyNotePositionInSegment(img):
     top_image = img[0:img.shape[0] // 2, :]
@@ -609,7 +638,321 @@ def four_point_transform(image, pts):
     # return the warped image
     return warped
 
-##################### USING WARP PERSPECTIVE
+
+##################### KNN
+
+def training_data(shapes):
+    x_train = []
+    y_train = []
+    for i in range(len(shapes)):
+        str1 = 'KNN Attempt/images/'
+        str2 = i
+        str3 = '/*'
+        str4 = str1 + str(str2) + str3
+        for filename in sorted(glob.glob(str4)):
+            print(filename)
+            img = read_training_image(filename)  ## cv2.imread reads images in RGB format
+            x_train.append(img)
+            y_train.append(i)
+    return x_train, y_train
+
+
+def find_regionprop(img):
+    labeled_image = skimage.measure.label(img, connectivity=2, return_num=True, background=1)
+    components = skimage.measure.regionprops(labeled_image[0])
+    return components
+
+
+def regionVolume(region):
+    area = region.shape[0] * region.shape[1]
+    b_area = len(region == 0)
+    # print("Black area= ", b_area)
+    vol = b_area / area
+    return vol
+
+
+def region16(image):
+    regions = []
+    for i in range(2):
+        for j in range(2):
+            regions.append(image[i * image.shape[0] // 2: (i + 1) * image.shape[0] // 2,
+                           j * image.shape[1] // 2: (j + 1) * image.shape[1] // 2])
+
+    return regions
+
+
+def extract_features(components):
+    features = []
+    # print("ana hena ya salama",len(components))
+    for component in components:
+        if component.area >= 44:
+            # show_images([component.image])
+            # feature 1
+            features.append(component.area / component.bbox_area)
+            features.append(component.image.shape[0] / component.image.shape[1])
+            # feature 2
+            moments = cv2.HuMoments(cv2.moments(component.image.astype(np.uint8))).flatten()
+            #print(m)
+            #mu = moments_central(component.image)
+            #nu = moments_normalized(mu)
+            #moments = moments_hu(nu)
+
+            # for moment in moments:
+            # print(len(moments_hu(nu)))
+            # print(len(moments))
+            for moment in moments:
+                features.append(moment)
+            # feature 3
+            regions = region16(component.image)
+            for region in regions:
+                volume = regionVolume(region)
+                features.append(volume)
+            # print("features:",len(features))
+    return features
+
+
+def extract_features_single_img(img, box):
+    features = []
+    # print("ana hena ya salama",len(components))
+    area = img.shape[0] * img.shape[1]
+    if area >= 44:
+        # show_images([component.image])
+        minR, minC, maxR, maxC = box
+        height = maxR - minR
+        width = maxC - minC
+        bbox_area = height*width
+        # feature 1
+        features.append(area / bbox_area)
+        features.append(img.shape[0] / img.shape[1])
+        # feature 2
+        moments = cv2.HuMoments(cv2.moments((1-img).astype(np.uint8))).flatten()
+        # print(m)
+        #mu = moments_central(1-img)
+        #nu = moments_normalized(mu)
+        #moments = moments_hu(nu)
+
+        # for moment in moments:
+        # print(len(moments_hu(nu)))
+        # print(len(moments))
+        for moment in moments:
+            features.append(moment)
+        # feature 3
+        regions = region16(img)
+        for region in regions:
+            volume = regionVolume(region)
+            features.append(volume)
+        # print("features:",len(features))
+    return features
+
+
+def calculateDistance(x1, x2):
+    distance = np.linalg.norm(x1 - x2)
+    return distance
+
+
+def read_training_image(path):
+    gray = rgb2gray(io.imread(path))
+    # gray = gaussian(gray,1)
+    thresh = threshold_sauvola(gray, window_size=61)
+    normalize = gray > thresh
+    return normalize
+
+
+def KNN(test_point, training_features, y_train, k):
+    classification = 0
+
+    minDist = [999999 for i in range(k)]
+    minClass = [3 for i in range(k)]
+
+    features_triple_eighth_down = training_features[y_train == 0]
+    features_double_eighth_down = training_features[y_train == 1]
+    features_double_sixteenth_down = training_features[y_train == 2]
+    features_quadruple_sixteenth_down = training_features[y_train == 3]
+    features_clef = training_features[y_train == 4]
+    features_double_flat = training_features[y_train == 5]
+    features_double_sharp = training_features[y_train == 6]
+    features_flat = training_features[y_train == 7]
+    features_half_note = training_features[y_train == 8]
+    features_quarter_note = training_features[y_train == 9]
+    features_eighth_note = training_features[y_train == 10]
+    features_sharp = training_features[y_train == 11]
+    # features_natural = training_features[y_train==12]
+    features_whole_note = training_features[y_train == 12]
+    features_sixteenth_note = training_features[y_train == 13]
+    features_32th_note = training_features[y_train == 14]
+    # features_bar_line = training_features[y_train==15]
+    # features_triple_sixteenth = training_features[y_train==15]
+    features_chord = training_features[y_train == 15]
+
+    for i in features_triple_eighth_down:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 0
+    for i in features_double_eighth_down:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 1
+    for i in features_double_sixteenth_down:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 2
+    for i in features_quadruple_sixteenth_down:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 3
+    for i in features_clef:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 4
+    for i in features_double_flat:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 5
+    for i in features_double_sharp:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 6
+    for i in features_flat:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 7
+    for i in features_half_note:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 8
+    for i in features_quarter_note:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 9
+    for i in features_eighth_note:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 10
+    for i in features_sharp:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 11
+    for i in features_whole_note:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 12
+    for i in features_sixteenth_note:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 13
+    for i in features_32th_note:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 14
+    for i in features_chord:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 15
+    '''
+    for i in features_bar_line:
+        c = calculateDistance(i,test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 15
+    '''
+    '''
+    for i in features_triple_sixteenth:
+        c = calculateDistance(i,test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 15
+    '''
+    '''
+    for i in features_natural:
+        c = calculateDistance(i,test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 12
+    '''
+
+    # ------------------------------------------------------------------------------------------------------
+
+    zero = minClass.count(0)
+    one = minClass.count(1)
+    two = minClass.count(2)
+    three = minClass.count(3)
+    four = minClass.count(4)
+    five = minClass.count(5)
+    six = minClass.count(6)
+    seven = minClass.count(7)
+    eight = minClass.count(8)
+    nine = minClass.count(9)
+    ten = minClass.count(10)
+    eleven = minClass.count(11)
+    twelve = minClass.count(12)
+    thirteen = minClass.count(13)
+    fourteen = minClass.count(14)
+    fifteen = minClass.count(15)
+    # fifteen = minClass.count(15)
+    # sixteen = minClass.count(16)
+
+    temp = [zero, one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen,
+            fifteen]  # ,sixteen]
+    classification = temp.index(max(temp))
+    return classification
+
+
+def calc_accuracy(knns, true_values, ntest):
+    total_predictions = ntest  # np.array(test_images).shape[0]
+    correct_knn = 0
+    for i in range(len(true_values)):
+        if true_values[i] == knns[i]:
+            correct_knn += 1
+    accuracy_knn = correct_knn / len(true_values)
+    print("K-Nearest Neighbour Classifier Accuracy: ", accuracy_knn, "%")
+    return accuracy_knn
+
+
+def predict(test_images, shapes, true_values, training_features, y_train):
+    knns = []
+    for i in range(len(test_images)):
+        # Read each image in the test directory, preprocess it and extract its features.
+        img_original = read_training_image(test_images[i])
+        components = find_regionprop(img_original)
+        test_point = extract_features(components)
+
+        # Print the actual class of each test figure.
+        print("Actual class :", shapes[true_values[i]])
+        print("---------------------------------------")
+
+        k = 3
+        knn_prediction = KNN(test_point, training_features, y_train, k)
+        knns.append(knn_prediction)
+
+        print("K-Nearest Neighbours Prediction          :", shapes[knn_prediction])
+        print("===========================================================================")
+        '''
+        # Visualize each test figure.
+        fig = plt.figure()
+        plt.imshow(img_original)
+        plt.axis("off")
+        plt.show()
+        '''
+
+    return knns
+
+
 '''
 thresh = threshold_sauvola(image, window_size=51)
 binary = image > thresh
