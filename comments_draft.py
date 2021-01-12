@@ -443,3 +443,39 @@ img3 = cv2.drawMatches(img1, kp1, wawa, kp2, good, None, **draw_params)
 plt.imshow(img3, 'gray'), plt.show()
 '''
 # show_images(notesImages)
+
+# TODO TEMPALTE MATCH THE CLEFS //JOE
+'''
+clef_template = read_image('clef.jpg')
+clef_template = resize(clef_template, (clef_template.shape[0] // 10, clef_template.shape[1] // 10))
+grayyyyyyyy = rgb2gray(clef_template)
+print(grayyyyyyyy.shape)
+binaryclef = grayyyyyyyy > threshold_otsu(grayyyyyyyy)
+print(binaryclef.shape, notesImages[1].shape)
+template_Match(notesImages[24], binaryclef)
+'''
+
+# TODO AMIR: FIND PITCH
+'''
+num_lines = 0
+num_lines_list = []
+for img in binary_notes_with_lines:
+    lm, no = img.shape
+    num_lines = 0
+    for i in range(1, lm):
+        if img[i][1] == 0:
+            continue
+        elif img[i][1] == 1 and img[i - 1][1] == 0:
+            num_lines += 1
+
+    # print(num_lines)
+    num_lines_list.append(num_lines)
+
+    if num_lines == 3:
+        print("g")
+    elif num_lines == 4:
+        print("d")
+    else:
+        print("none")
+    # show_images([img])
+'''
