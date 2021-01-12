@@ -295,6 +295,7 @@ for image in imagesNotes:
                 print("Number of notes in chord = ", numberOfPeaks)
             # Todo find Pitch
             indices = getfirst_staff_line(image)
+            #print("Indices: ", indices)
             get_position(notesImages[i][1, :], indices[0, 0], t, s, tb)
 
 
