@@ -138,7 +138,7 @@ def deskew(gray):
     # OTSU
     # thresh = threshold_otsu(image)
     # SAUVOLA
-    thresh = threshold_sauvola(image, window_size=51)
+    thresh = threshold_sauvola(image, window_size=61)
     # NIBLACK
     # thresh = threshold_niblack(image, window_size=25, k=0.8)
     # LOCAL
@@ -368,19 +368,22 @@ def CCA(binary):
     index = 0
     keys = []
     boxes = []
+    areas_over_bbox = []
     for component in components:
         if component.area >= 44:
             minR, minC, maxR, maxC = component.bbox
             thisdict[minC] = []
             thisdict[minC].append(binary[minR:maxR + 2, minC:maxC + 2])
             thisdict[minC].append(component.bbox)
+            thisdict[minC].append(component.area / component.bbox_area)
             keys.append(str(index))
             index += 1
     print(thisdict.keys())
     for key in sorted(thisdict.keys()):
         sorted_notes_images.append(thisdict[key][0])
         boxes.append(thisdict[key][1])
-    return components, sorted_notes_images, boxes
+        areas_over_bbox.append(thisdict[key][2])
+    return components, sorted_notes_images, boxes, areas_over_bbox
 
 
 def componentsAreas(components):
@@ -692,10 +695,10 @@ def extract_features(components):
             features.append(component.image.shape[0] / component.image.shape[1])
             # feature 2
             moments = cv2.HuMoments(cv2.moments(component.image.astype(np.uint8))).flatten()
-            #print(m)
-            #mu = moments_central(component.image)
-            #nu = moments_normalized(mu)
-            #moments = moments_hu(nu)
+            # print(m)
+            # mu = moments_central(component.image)
+            # nu = moments_normalized(mu)
+            # moments = moments_hu(nu)
 
             # for moment in moments:
             # print(len(moments_hu(nu)))
@@ -711,25 +714,27 @@ def extract_features(components):
     return features
 
 
-def extract_features_single_img(img, box):
+def extract_features_single_img(img, area_over_bbox):
     features = []
     # print("ana hena ya salama",len(components))
     area = img.shape[0] * img.shape[1]
     if area >= 44:
         # show_images([component.image])
+        '''
         minR, minC, maxR, maxC = box
         height = maxR - minR
         width = maxC - minC
         bbox_area = height*width
+        '''
         # feature 1
-        features.append(area / bbox_area)
+        features.append(area_over_bbox)
         features.append(img.shape[0] / img.shape[1])
         # feature 2
-        moments = cv2.HuMoments(cv2.moments((1-img).astype(np.uint8))).flatten()
+        moments = cv2.HuMoments(cv2.moments((img).astype(np.uint8))).flatten()
         # print(m)
-        #mu = moments_central(1-img)
-        #nu = moments_normalized(mu)
-        #moments = moments_hu(nu)
+        # mu = moments_central(1-img)
+        # nu = moments_normalized(mu)
+        # moments = moments_hu(nu)
 
         # for moment in moments:
         # print(len(moments_hu(nu)))
@@ -951,6 +956,48 @@ def predict(test_images, shapes, true_values, training_features, y_train):
         '''
 
     return knns
+
+
+def get_position(segment, staff_beg, staff_height, staff_space, is_d):
+    if is_d == 1:
+        if segment[3] - (staff_space / 2) >= staff_beg + (5 * staff_height) + (5 * staff_space):
+            print("c")
+        elif segment[3] >= staff_beg + (5 * staff_height) + (5 * staff_space):
+            print("d")
+        elif segment[3] - (staff_space / 2) >= staff_beg + (4 * staff_height) + (4 * staff_space):
+            print("e")
+        elif segment[3] >= staff_beg + (4 * staff_height) + (4 * staff_space):
+            print("f")
+        elif segment[3] - (staff_space / 2) >= staff_beg + (3 * staff_height) + (3 * staff_space):
+            print("g")
+        elif segment[3] >= staff_beg + (3 * staff_height) + (3 * staff_space):
+            print("a")
+    else:
+        if segment[2] <= staff_beg - staff_height - (2 * staff_space):
+            print("b2")
+        elif segment[2] + (staff_space / 2) <= staff_beg - staff_space:
+            print("a2")
+        elif segment[2] <= staff_beg - staff_space:
+            print("g2")
+        elif segment[2] + (staff_space / 2) <= staff_beg + staff_height:
+            print("f2")
+        elif segment[2] <= staff_beg + staff_height:
+            print("e2")
+        elif segment[2] + (staff_space / 2) <= staff_beg + (2 * staff_height) + staff_space:
+            print("d2")
+        elif segment[2] <= staff_beg + (2 * staff_height) + staff_space:  # tmam
+            print("c2")
+        elif segment[2] + (staff_space / 2) <= staff_beg + (2 * staff_height) + (2 * staff_space):  # tmam
+            print("b")
+
+
+def getfirst_staff_line(img):
+    rows = img.shape[0]
+    cols = img.shape[1]
+    h = np.sum(img == 0, 1)
+    staff = h > 0.59 * cols
+    return np.argwhere(staff)
+
 
 
 '''
