@@ -37,33 +37,58 @@ shapes = ['triple_eighth_down', 'double_eighth_down', 'double_sixteenth_down', '
           "sharp", "whole_note", "single_sixteenth_note", "single_32th_note", "chord", "bar_line", "44", "42",
           "natural", "dots"]
 # , "triple_sixteenth", "bar_line",   "single_quarter_note_head up"]
+#
+# x_train, y_train = training_data(shapes)
+# x_train = np.asarray(x_train)
+# y_train = np.asarray(y_train)
+# print(x_train.shape)
+# print("y_train:", y_train)
+# number_of_features = 13
+# training_features = np.zeros((x_train.shape[0], number_of_features))
+#
+# for i in range(training_features.shape[0]):
+#     components = find_regionprop(x_train[i])
+#     print(y_train[i])
+#     features = extract_features(components)
+#     # print(features)
+#     training_features[i, :] = features
+#
+# test_images = sorted(glob.glob('KNN Attempt/test/*'))
+# ntest = len(test_images)
+#
+# true_values = [1, 1, 2, 3, 0, 4, 5, 6, 7, 8, 8, 8, 9, 10, 11, 19, 12, 13, 14, 15, 16, 17, 18, 20]
+#
+# knns = predict(test_images, shapes, true_values, training_features, y_train)
+#
+# accuracy_knn = calc_accuracy(knns, true_values, ntest)
 
-x_train, y_train = training_data(shapes)
-x_train = np.asarray(x_train)
-y_train = np.asarray(y_train)
-print(x_train.shape)
-print("y_train:", y_train)
-number_of_features = 13
-training_features = np.zeros((x_train.shape[0], number_of_features))
-
-for i in range(training_features.shape[0]):
-    components = find_regionprop(x_train[i])
-    print(y_train[i])
-    features = extract_features(components)
-    # print(features)
-    training_features[i, :] = features
-
-test_images = sorted(glob.glob('KNN Attempt/test/*'))
-ntest = len(test_images)
-
-true_values = [1, 1, 2, 3, 0, 4, 5, 6, 7, 8, 8, 8, 9, 10, 11, 19, 12, 13, 14, 15, 16, 17, 18, 20]
-
-knns = predict(test_images, shapes, true_values, training_features, y_train)
-
-accuracy_knn = calc_accuracy(knns, true_values, ntest)
+# data = training_features
+#
+# # opening the csv file in 'w+' mode
+# file = open('training_features_x.csv', 'w+', newline='')
+#
+# # writing the data into the file
+# with file:
+#     write = csv.writer(file)
+#     write.writerows(data)
+#
+# data1 = y_train
+# print(y_train)
+# file = open('training_features_y.csv', 'w+', newline='')
+#
+# # writing the data into the file
+# with file:
+#     write = csv.writer(file)
+#     write.writerow(data1)
 
 # show_images([rotated], ["Binary"])
 # imagesNotes = split_images(rotated_copy, 1)
+
+training_features = np.asarray(pd.read_csv('training_features_x.csv', sep=',', header=None))
+y_train = np.asarray(pd.read_csv('training_features_y.csv',sep=',', header=None))[0]
+
+
+
 clef = False
 
 f = open("demofile2.txt", "w")
@@ -113,7 +138,7 @@ for image in imagesNotes:
     # withoutLines_dilated = withoutLines
     # withoutLines_dilated = binary_erosion(withoutLines_dilated, np.ones((3,3)))
     notes, notesImages, boxes, areas_over_bbox = CCA(withoutLines_dilated)
-    show_images(notesImages)
+    # show_images(notesImages)
 
     # boxes = RetrieveComponentBox(notesImages)
     binary_notes_with_lines = segmentBoxesInImage(boxes, rotated)

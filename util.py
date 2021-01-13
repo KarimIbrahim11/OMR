@@ -1,7 +1,8 @@
 import numpy as np
 import skimage
 import skimage.io as io
-
+import csv
+import pandas as pd
 # Show the figures / plots inside the notebook
 
 from skimage.color import rgb2gray, rgb2hsv, rgba2rgb
