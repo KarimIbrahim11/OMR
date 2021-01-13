@@ -7,7 +7,7 @@ from scipy.signal import find_peaks
 # from util import *
 
 folder = 'cases/'
-path = '01.PNG'
+path = '06.PNG'
 The_image = read_image(folder + path)
 if path.lower().endswith('.jpg'):
     gray = rgb2gray(The_image)
@@ -129,9 +129,10 @@ for image in imagesNotes:
     natural_note = False
     four_four = False
     four_two = False
-    dots = False
+    dots = 0
     olobna = []
     for i in range(len(notesImages)):
+        note_str = ""
         show_images([notesImages[i]])
         io.imsave(path + str(i) + '.jpg', 1 - notesImages[i])
         test_point = extract_features_single_img(notesImages[i], areas_over_bbox[i])
@@ -156,8 +157,6 @@ for image in imagesNotes:
             sharp_note = True
         elif classification == 19:
             natural_note = True
-        elif classification == 20:
-            dots = True
         elif classification == 4:
             if clef == True:  # A new line to write into
                 f = open("demofile2.txt", "w")
@@ -406,7 +405,6 @@ for image in imagesNotes:
                     for o in range(numberOfPeaks):
                         peaks[o] += top_image.shape[0]
                 print("Number of notes in chord = ", numberOfPeaks)
-                note_str = ""
                 if classification == 15:  # a chord
                     # pitch = '{'
                     pitch = ""
@@ -442,6 +440,9 @@ for image in imagesNotes:
             elif classification == 12: # whole note
                 minR, minC, maxR, maxC = boxes[i]
                 pitch, octave = beamed_note_pitch(minR + notesImages[i].shape[0], staffbegginings[0], t, s)
+            elif classification == 20:
+                print("set")
+                note_str = "."
             else:
                 print(staffbegginings[0])
                 print("tb:", tb)
@@ -463,13 +464,14 @@ for image in imagesNotes:
                         accidental = "#"
                     elif natural_note:
                         natural_note = False
-                    if accidental is None:
+                    if accidental is None :
                         note_str = pitch + octave + rhythm[classification]
                     else:
-                        note_str = pitch + accidental + octave + rhythm[classification]
+                       note_str = pitch + accidental + octave + rhythm[classification]
             elif rhythm[classification] == "" and pitch is not None and classification == 15:
                 note_str = pitch
             if note_str != "":
+                print("et7atet")
                 olobna.append(note_str)
     # Todo write in file
     meter = ""
@@ -494,9 +496,18 @@ for image in imagesNotes:
         output_line = None
     for h in range(len(olobna)):
         if h == 0 and output_line is None:
-            output_line = olobna[h] + " "
+            if h+1 <= len(olobna) - 1:
+                if olobna[h+1] ==".":
+                    output_line = olobna[h]
+                else:
+                    output_line = olobna[h] + " "
+            else:
+                output_line = olobna[h] + " "
         elif h != len(olobna) - 1:
-            output_line += olobna[h] + " "
+            if olobna[h+1] ==".":
+                output_line += olobna[h]
+            else:
+                output_line += olobna[h] + " "
         else:
             output_line += olobna[h]
     print("output:", output_line)
