@@ -184,7 +184,7 @@ def deskew(gray):
         rotation_number = 90 - abs(rotation_angle)
     '''
     # show_images([gray,normalize,edges], ["gray", "bin", "edges"])
-    rotated = rotate(binary_closing(np.logical_not(normalize), np.ones((3, 3))), rotation_angle, resize=True,
+    rotated = rotate((np.logical_not(normalize)), rotation_angle, resize=True,
                      mode='constant', cval=0).astype(np.uint8)
     # show_images([gray])
     gray = rotate(gray, rotation_angle, resize=True, mode='constant', cval=255)
@@ -341,6 +341,7 @@ def countStaffLines(staff_indices):
         if i == 0 or temp_staff > staff_indices[i - 1] + 1:
             staffs.append(temp_staff)
     return staffs, len(staffs)
+
 
 def draw_contours(img):
     # se = np.ones((3, 3))
@@ -503,7 +504,7 @@ def findContourArea(img):
 
 def extract_features_for_head_tail(img):
     area, contours = findContourArea(img)
-    if area > 10 and len(contours) != 0:
+    if area > 50 and len(contours) != 0:
         area1, _ = findBoundingCircleArea(img, contours)
         ratioCirc = area / area1
     else:
@@ -575,8 +576,21 @@ def split_images(img, s):
 
 
 def classifyNotePositionInSegment(img):
+
     top_image = img[0:img.shape[0] // 2, :]
     bot_image = img[img.shape[0] // 2: img.shape[0] - 1, :]
+    '''
+    height = img.shape[0]
+    middleRow = height//2
+    middleLeftPixles = img[middleRow, 0:4]
+
+    if not any(middleLeftPixles):
+        print("Classification :d")
+        tb = 1                     # this means its to the right(d)
+    else:
+        print("Classification: P")
+        tb = 0                       # this means its to the left(P)
+    '''
     # show_images([top_image, bot_image],["Top image", "Bot Image"])
     top_image_cv = bin_image_to_opencvimage(top_image)
     bot_image_cv = bin_image_to_opencvimage(bot_image)
@@ -591,6 +605,7 @@ def classifyNotePositionInSegment(img):
     else:
         print("Note head is down")
         tb = 1
+
     return tb, top_image, bot_image
 
 
@@ -801,6 +816,8 @@ def KNN(test_point, training_features, y_train, k):
     features_bar_line = training_features[y_train == 16]
     features_four_four = training_features[y_train == 17]
     features_four_two = training_features[y_train == 18]
+    features_natural = training_features[y_train == 19]
+    features_dot = training_features[y_train == 20]
 
     for i in features_triple_eighth_down:
         c = calculateDistance(i, test_point)
@@ -883,7 +900,7 @@ def KNN(test_point, training_features, y_train, k):
             minDist[minDist.index(max(minDist))] = c
             minClass[minDist.index(max(minDist))] = 15
     for i in features_bar_line:
-        c = calculateDistance(i,test_point)
+        c = calculateDistance(i, test_point)
         if c < max(minDist):
             minDist[minDist.index(max(minDist))] = c
             minClass[minDist.index(max(minDist))] = 16
@@ -897,6 +914,17 @@ def KNN(test_point, training_features, y_train, k):
         if c < max(minDist):
             minDist[minDist.index(max(minDist))] = c
             minClass[minDist.index(max(minDist))] = 18
+    for i in features_natural:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 19
+    for i in features_dot:
+        c = calculateDistance(i, test_point)
+        if c < max(minDist):
+            minDist[minDist.index(max(minDist))] = c
+            minClass[minDist.index(max(minDist))] = 20
+
 
     '''
     for i in features_triple_sixteenth:
@@ -934,9 +962,11 @@ def KNN(test_point, training_features, y_train, k):
     sixteen = minClass.count(16)
     seventeen = minClass.count(17)
     eighteen = minClass.count(18)
+    nineteen = minClass.count(19)
+    twenty = minClass.count(20)
 
     temp = [zero, one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen,
-            fifteen, sixteen, seventeen, eighteen]
+            fifteen, sixteen, seventeen, eighteen, nineteen, twenty]
     classification = temp.index(max(temp))
     return classification
 
@@ -984,53 +1014,145 @@ def predict(test_images, shapes, true_values, training_features, y_train):
 def single_note_pitch(bbox, first_staff, h, s, topbot):
     if topbot == 1:
         if bbox[2] - (s / 2) >= first_staff + (5 * h) + (5 * s) - 0.2 * s:
-            print("c")
-            return "c"
+            print("c1")
+            return "c", "1"
         elif bbox[2] >= first_staff + (5 * h) + (5 * s):
-            print("d")
-            return "d"
+            print("d1")
+            return "d", "1"
         elif bbox[2] - (s / 2) >= first_staff + (4 * h) + (4 * s) - 0.2 * s:
-            print("e")
-            return "e"
+            print("e1")
+            return "e", "1"
         elif bbox[2] >= first_staff + (4 * h) + (4 * s):
-            print("f")
-            return "f"
+            print("f1")
+            return "f", "1"
         elif bbox[2] - (s / 2) >= first_staff + (3 * h) + (3 * s) - 0.2 * s:
-            print("g")
-            return "g"
+            print("g1")
+            return "g", "1"
         elif bbox[2] >= first_staff + (3 * h) + (3 * s):
-            print("a")
-            return "a"
+            print("a1")
+            return "a", "1"
         elif bbox[2] - (s / 2) >= first_staff + (2 * h) + (2 * s) - 0.2 * s:
-            print("b")
-            return "b"
+            print("b1")
+            return "b", "1"
     else:
         if bbox[0] <= first_staff - h - (2 * s):
             print("b2")
-            return "b2"
+            return "b", "2"
         elif bbox[0] + (s / 2) <= first_staff - s + 0.2 * s:
             print("a2")
-            return "a2"
+            return "a", "2"
         elif bbox[0] <= first_staff - s:
             print("g2")
-            return "g2"
+            return "g", "2"
         elif bbox[0] + (s / 2) <= first_staff + h + 0.2 * s:
             print("f2")
-            return "f2"
+            return "f", "2"
         elif bbox[0] <= first_staff + h:
             print("e2")
-            return "e2"
+            return "e", "2"
         elif bbox[0] + (s / 2) <= first_staff + (2 * h) + s + 0.2 * s:
             print("d2")
-            return "d2"
+            return "d", "2"
         elif bbox[0] <= first_staff + (2 * h) + s:
             print("c2")
-            return "c2"
+            return "c", "2"
         elif bbox[0] + (s / 2) <= first_staff + (2 * h) + (2 * s) + 0.2 * s:
-            print("b")
-            return "b"
+            print("b1")
+            return "b", "1"
+
+    return
 
 
+def beamed_note_pitch_octave(center, first_staff, h, s):
+    print("center: ", center, "first : ", first_staff, "h: ", h, "s:", s)
+    if center >= first_staff + (5 * h) + (5 * s) - 0.2 * s:
+        print("c1")
+        return "c", "1"
+    elif center + (s / 2) >= first_staff + (5 * h) + (5 * s) - 0.2 * s:
+        print("d1")
+        return "d", "1"
+    elif center >= first_staff + (4 * h) + (4 * s) - 0.2 * s:
+        print("e1")
+        return "e", "1"
+    elif center + (s / 2) >= first_staff + (4 * h) + (4 * s) - 0.2 * s:
+        print("f1")
+        return "f", "1"
+    elif center >= first_staff + (3 * h) + (3 * s) - 0.2 * s:
+        print("g1")
+        return "g", "1"
+    elif center + (s / 2) >= first_staff + (3 * h) + (3 * s) - 0.2 * s:
+        print("a1")
+        return "a", "1"
+    elif center >= first_staff + (2 * h) + (2 * s) - 0.2 * s:
+        print("b1")
+        return "b", "1"
+    elif center + (s / 2) >= first_staff + (2 * h) + (2 * s) - 0.2 * s:
+        print("c2")
+        return "c", "1"
+    elif center >= first_staff + (1 * h) + (1 * s) - 0.2 * s:
+        print("d2")
+        return "d", "2"
+    elif center + (s / 2) >= first_staff + (1 * h) + (1 * s) - 0.2 * s:
+        print("e2")
+        return "e", "2"
+    elif first_staff - (0 * h) - (0 * s) + 0.2 * s >= center >= first_staff + (0 * h) + (0 * s) - 0.2 * s:
+        print("f2")
+        return "f", "2"
+    elif first_staff - (1 * h) - (1 * s) + 0.2 * s >= center - (s / 2):
+        print("g2")
+        return "g", "2"
+    elif first_staff - (1 * h) - (1 * s) + 0.2 * s >= center:
+        print("a2")
+        return "a", "2"
+    elif first_staff - (2 * h) - (2 * s) + 0.2 * s >= center - (s / 2):
+        print("b2")
+        return "b", "2"
+
+
+def beamed_note_pitch(center, first_staff, h, s):
+    print("center: ", center, "first : ", first_staff, "h: ", h, "s:", s)
+    if center >= first_staff + (5 * h) + (5 * s) - 0.2 * s:
+        print("c1")
+        return "c1"
+    elif center + (s / 2) >= first_staff + (5 * h) + (5 * s) - 0.2 * s:
+        print("d1")
+        return "d1"
+    elif center >= first_staff + (4 * h) + (4 * s) - 0.2 * s:
+        print("e1")
+        return "e1"
+    elif center + (s / 2) >= first_staff + (4 * h) + (4 * s) - 0.2 * s:
+        print("f1")
+        return "f1"
+    elif center >= first_staff + (3 * h) + (3 * s) - 0.2 * s:
+        print("g1")
+        return "g1"
+    elif center + (s / 2) >= first_staff + (3 * h) + (3 * s) - 0.2 * s:
+        print("a1")
+        return "a1"
+    elif center >= first_staff + (2 * h) + (2 * s) - 0.2 * s:
+        print("b1")
+        return "b1"
+    elif center + (s / 2) >= first_staff + (2 * h) + (2 * s) - 0.2 * s:
+        print("c2")
+        return "c2"
+    elif center >= first_staff + (1 * h) + (1 * s) - 0.2 * s:
+        print("d2")
+        return "d2"
+    elif center + (s / 2) >= first_staff + (1 * h) + (1 * s) - 0.2 * s:
+        print("e2")
+        return "e2"
+    elif first_staff - (0 * h) - (0 * s) + 0.2 * s >= center >= first_staff + (0 * h) + (0 * s) - 0.2 * s:
+        print("f2")
+        return "f2"
+    elif first_staff - (1 * h) - (1 * s) + 0.2 * s >= center - (s / 2):
+        print("g2")
+        return "g2"
+    elif first_staff - (1 * h) - (1 * s) + 0.2 * s >= center:
+        print("a2")
+        return "a2"
+    elif first_staff - (2 * h) - (2 * s) + 0.2 * s >= center - (s / 2):
+        print("b2")
+        return "b2"
 
 def getfirst_staff_line(img):
     rows = img.shape[0]
@@ -1038,7 +1160,6 @@ def getfirst_staff_line(img):
     h = np.sum(img == 0, 1)
     staff = h > 0.59 * cols
     return np.argwhere(staff)
-
 
 
 '''
